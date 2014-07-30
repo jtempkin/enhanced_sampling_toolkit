@@ -1,0 +1,34 @@
+README FILE FOR THE UMBRELLA SAMPLING CODEBASE
+---------------------------------------------------
+Primary Author: Jeremy Tempkin
+Created: 5/8/2014
+
+Contributing Authors:
+Seyit Kale
+Erik Thiede
+
+Description:
+
+This codebase is developed in order to provide a flexible and extensible code for performing generalized umbrella sampling calculations in molecular systems. 
+
+The codebase is written entirely in Python and acts as a wrapper to the LAMMPS molecular dynamics engine. Since LAMMPS can be built and imported as a shared Python library, only Python is required to interact with a molecular simulation running in LAMMPS (which is itself compiled in C++, but you only have to work with it's Python wrapping for this umbrella sampling code). Installing the LAMMPS distribution as a shared Python library must be done prior to running this code. 
+
+
+System Prerequisits:
+
+1) Python (commonly v. 2.7.x)
+2) LAMMPS distribution built as a shared python library. To install LAMMPS see: 
+3) mpi4py distribution for MPI parallelization.
+
+http://lammps.sandia.gov/doc/Section_python.html
+
+
+Folders:
+
+src - The main source code repository for this project.
+
+data - This folder contains data files that specify the construction of the molecular system you wish to simulate. These files are written using the LAMMPS format. See the LAMMPS documentation for more details. 
+
+input - This folder contains input files that configure input settings. 
+
+profiling - A folder for storing profiling information generated from cProfile information.  

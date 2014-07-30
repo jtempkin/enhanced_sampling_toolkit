@@ -1,0 +1,43 @@
+# this file sets up an alanine dipeptide simulation using LAMMPS command syntax
+
+# general molecular system parameters
+# NOTE: This section uses a modified syntax to set up the simulation
+
+dynamics            langevin
+temperature         310.0
+outputTrajFreq      100
+shake               off
+
+# forceField parameters
+units      real
+atom_style     full
+
+# define specific interation styles
+pair_style     lj/charmm/coul/long 8.0 10.0 10.0
+bond_style      harmonic
+angle_style     charmm 
+dihedral_style  charmm 
+improper_style  harmonic
+kspace_style    pppm 0.0001
+
+# read in the molecular data for the specified file
+read_data  /project/weare-dinner/jtempkin/umbrella_sampling/umbrella_sampling_code/data/data.diala
+
+# simulationParameters 
+neighbor 2.0 bin
+neigh_modify  delay 5
+timestep  1.0
+thermo_style  multi
+thermo 50
+
+# colvars definitions in lammps syntax
+colvars { 
+dihedral 5 7 9 15 0.0 250.0
+dihedral 7 9 15 17 0.0 250.0
+}
+
+# commands to equilibrate the system
+equilibrate {
+#minimize 1.0e-4 1.0e-6 250 1000 
+run 5000 post no
+} 

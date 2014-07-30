@@ -1,0 +1,11 @@
+wkdir 			/scratch/midway/jtempkin/wkdir/debug_walker
+datadir  		/project/weare-dinner/jtempkin/umbrella_sampling/umbrella_sampling_code/data
+dataFile		data.diala
+setupFile       setup.diala
+# parameters for the cells 
+ncells  		3
+cellWidth 		60.0
+nwalkers		1
+walkerSteps		1000
+stepLength		10
+Ftype 			transition
