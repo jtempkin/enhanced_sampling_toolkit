@@ -19,18 +19,23 @@ class lammpsWalker(walker.velocityWalker):
         """
         Initializes the walker based on an input file for lammps.
         """
+        # start walker object
+        self.lmp = self.initLAMMPS(filename, sysParams)
         
         # a list of the relevant collective variables
         self.colvars = []
+        
         # a list of commands used to equilibrate the system 
         self.equilCmds = []
+        
         # a general filename for storing the data
         self.filename = filename
+        
         # by default, execute shake code. This flag lets the walker know
         # that shakeH will be used in the dynamics
         self.shakeH = True
-        # start walker object
-        self.lmp = self.initLAMMPS(filename, sysParams)
+    
+        # walker index         
         self.index = index
         
     
@@ -237,7 +242,6 @@ class lammpsWalker(walker.velocityWalker):
     def drawVel(self, distType = 'gaussian'):
         """
         This function redraws the velocities from a maxwell-boltzmann dist.
-        DOES THIS WORK FOR SIMULATIONS THAT DO NOT HAVE A VELOCITY?
         """
         if distType == 'gaussian':
             self.lmp.command("velocity all create " + str(self.temperature) + " " + str(random.randint(100000,999999)) + " dist gaussian")
@@ -250,10 +254,12 @@ class lammpsWalker(walker.velocityWalker):
         """ 
         This function reverses the velocities of a given LAMMPS simulation
         """
+        
         # set varibales for reversing velocities
         self.lmp.command("variable vx atom -vx")
         self.lmp.command("variable vy atom -vy")
         self.lmp.command("variable vz atom -vz")
+        
         # set new velocities
         self.lmp.command("velocity all set v_vx v_vy v_vz")
         
@@ -264,6 +270,7 @@ class lammpsWalker(walker.velocityWalker):
         This function issues a run command to the underlying dynamics to propagate
         the dynamics a given number of steps. 
         """
+        
         self.lmp.command("run " + str(numSteps) + " pre " + str(pre) + " post " + str(post))
         
         return 0 
