@@ -199,21 +199,21 @@ def createUmbrellas(Params):
 
     return um
     
-def makeWkdir(sysParams):
+def makeWkdir(dirname):
     """
-    This function creates the wkdir for the intermediate MD files.
+    This function creates the scratch directory for the intermediate MD files.
     """
-    if os.path.exists(sysParams['wkdir']):
+    if os.path.exists(dirname):
         print "Working Directory already exists."        
         print "Making backup of old working directory."
-        if os.path.exists(sysParams['wkdir'] + ".backup"):
-            shutil.rmtree(sysParams['wkdir'] + ".backup")
-        shutil.move(sysParams['wkdir'], sysParams['wkdir'] + ".backup")
+        if os.path.exists(dirname + ".backup"):
+            shutil.rmtree(dirname + ".backup")
+        shutil.move(dirname, dirname + ".backup")
         #subprocess.call(['cp', '-r', sysParams['wkdir'], sysParams['wkdir'] + ".backup"])    
         #subprocess.call(['rm', '-r', sysParams['wkdir']])
-        subprocess.call(['mkdir', sysParams['wkdir']])
+        subprocess.call(['mkdir', dirname])
     else:
-        subprocess.call(['mkdir', sysParams['wkdir']])
+        subprocess.call(['mkdir', dirname])
         
     return 0
 

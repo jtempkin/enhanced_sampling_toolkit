@@ -14,6 +14,7 @@ import copy
 from mpi4py import MPI
 import errors
 import basisFunctions
+import lammpsWalker
 
 
 def main():
@@ -30,46 +31,76 @@ def main():
     rank = comm.Get_rank()
     nprocs = comm.Get_size()
     
-    #---------------SET READ PARAMETERS -----------
+    #---------------SET PARAMETERS -----------
     if rank == 0: print "Setting up umbrella sampling parameters."
     
-    sysParams = {}
+    params = {}
     
-    # here we will set the umbrella sampling parameters in the sysParams dict
-    sysParams['ncells'] = 3
-    sysParams['cellWidth'] = 60.0
-    sysParams['nwalkers'] = 1
-    sysParams['walkerSteps'] = 1000
-    sysParams['stepLength'] = 10
-    sysParams['Ftype'] = 'transition'
+    # set the scratch directory for the calculation files
+    params['scratchdir'] = "/Users/jeremytempkin/Documents/enhanced_sampling_toolkit/umbrella_sampling/debug_US"
+    
+    # here we will set the umbrella sampling parameters in the params dict
+    params['ncells'] = 3
+    params['cellWidth'] = 60.0
+    params['nwalkers'] = 1
+    params['walkerSteps'] = 1000
+    params['stepLength'] = 10
+    params['Ftype'] = 'transition'
+    
+    # lets set the dynamics parameters that are needed to specify the walker 
+    
+    params['inputFilename'] = 'syn.in'
+    params['temperature'] = 310.0
 
     #--------------- INITIALIZATION--------
     # only allow root rank to build files
     if rank == 0: 
-        print "Building working directory."
+        print "Building scratch directory."
         # construct the wkdir. This is where the intermediate dynamcs files will 
         # be written. 
-        fileIO.makeWkdir(sysParams)
+        fileIO.makeWkdir(params['scratchdir'])
 
     # construct the umbrella data structure
     if rank == 0: print "Initializing the umbrella structure."
-    system = basisFunctions.partition(sysParams['ncells'])
+    
+    # create the partition object 
+    system = basisFunctions.partition(params['ncells'])
 
+
+    # now we construct the umbrella windows
     if rank == 0: print "Building the umbrellas."
-    system.umbrellas = fileIO.createUmbrellas(sysParams)
-
-
+    
+    # specify the list of boundaries, nboxes, 1/2 width of the windows
+    umbs = []
+    # these are for the two-dimensional landscape of pairwise distances in the 
+    # synuclein protein based off PRE data 
+    umbs.append([0, 350, 70, 5])
+    umbs.append([0, 70, 14, 5])
+    
+    system.umbrellas = system.createUmbrellas(umbs)
+    
     #------------ MAIN LOOP --------------
     # sample umbrellas and construct F
     if rank == 0: print "Entering main loop."
     
     for i in range(rank, len(system.umbrellas), nprocs):
         print "Rank", rank, "sampling umbrella", i, "."
+        
+        # lets instantiate a walker object to sample this window. 
+        wlkr = lammpsWalker.lammpsWalker(params['inputFilename'])
+        
+        # equilibrate the walker to the target point in CV space
+        
+        # set colvars for recording samples
+        
         try: 
-            system.sample(sysParams['walkerSteps'], i, 0, sysParams, rank)
+            system.sample(wlkr, params['walkerSteps'], i, 0, params, rank)
         except errors.DynamicsError:
             print "Rank", rank, "sampling error occured in umbrella", i, "."
             continue
+        
+        # now we are done populating the samples array, close the walker
+        wlkr.close()
     
     #-----------------MPI COMMUNICATION------------
     """
@@ -93,16 +124,16 @@ def main():
     # now allow rank 0 to process data. 
     if rank == 0:
         print system.F
-        fileIO.writeMat(system.F, sysParams['wkdir'] + "/F.out")
+        fileIO.writeMat(system.F, params['wkdir'] + "/F.out")
     
         print "Entering eigenvalue routine."
         # solve eigenvalue problem for F
         system.getZ()
-        fileIO.writeMat(system.z, sysParams['wkdir'] + "/z.out")
+        fileIO.writeMat(system.z, params['wkdir'] + "/z.out")
     
         print "Computing the sensitivities."
         bounds = system.getlogBound(system.F)
-        fileIO.writeMat(bounds, sysParams['wkdir'] + "/bounds.out")
+        fileIO.writeMat(bounds, params['wkdir'] + "/bounds.out")
 
     
     # now we will perform an analysis of the data and increase sampling of 

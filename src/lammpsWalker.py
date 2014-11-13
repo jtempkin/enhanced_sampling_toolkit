@@ -2,12 +2,16 @@
 """
 Created on Tue Jul 15 16:21:03 2014
 
-@author: jtempkin
+This file implements the LAMMPS walker abstraction layer.
+
+
+@author: Jeremy Tempkin
 """
 
 import random
 import sys
 import walker
+
 from lammps import lammps
 
 
@@ -15,12 +19,12 @@ class lammpsWalker(walker.velocityWalker):
     """
     This class implements the lammps bindings into the walker class.
     """
-    def __init__(self, filename, sysParams , index = 0):
+    def __init__(self, filename, index = 0):
         """
         Initializes the walker based on an input file for lammps.
         """
         # start walker object
-        self.lmp = self.initLAMMPS(filename, sysParams)
+        self.lmp = self.initLAMMPS(filename)
         
         # a list of the relevant collective variables
         self.colvars = []
@@ -34,6 +38,11 @@ class lammpsWalker(walker.velocityWalker):
         # by default, execute shake code. This flag lets the walker know
         # that shakeH will be used in the dynamics
         self.shakeH = True
+        
+        # here is the list of dynamics properties the walker should know:
+        
+        self.temperature = 310.0
+        
     
         # walker index         
         self.index = index
@@ -46,7 +55,7 @@ class lammpsWalker(walker.velocityWalker):
         self.lmp.close()
         return 0 
         
-    def initLAMMPS(self, filename, sysParams):
+    def initLAMMPS(self, filename):
         """
         This function initializes a lammps simulation given an input file
         and the system parameters. Calls the setupLAMMPS internal routine. 
@@ -56,19 +65,27 @@ class lammpsWalker(walker.velocityWalker):
         args = ["-sc", "none", "-echo", "log"]
         self.lmp = lammps("", args)
         # after the lammps object is created, initialize the lammps simulation. 
-        self.setupLAMMPS(filename, sysParams)
+        self.__setupLAMMPS(filename)
 
         return self.lmp    
-    
-    def setupLAMMPS(self, filename, sysParams):
+
+    def __setupLAMMPS(self, filename=None):
         """
         The input file sets up and initializes the LAMMPS system from a setup
-        file. 
+        file. The setup file should be a simple text file written in LAMMPS
+        input file syntax.
         """
         # specify general log file parameters
         self.lmp.command("echo none")
-        self.lmp.command("log " + filename + ".log")
+
+        # if there is a specified filename, use it to set up the simulation.         
+        if filename != None:
+            self.lmp.command("log " + filename + ".log")
+            self.lmp.file(filename)
+        else:
+            self.lmp.command("log lammps.log")
         
+        """
         # set default values for keywords:
         self.dynaType = 'langevin'
         self.temperature = 310.0
@@ -145,6 +162,9 @@ class lammpsWalker(walker.velocityWalker):
         self.initColVars()
         # write out the configurations to a file. 
         self.lmp.command("dump 3 all dcd " + str(self.outputTrajFreq) + " " + filename + ".dcd")
+        """
+        
+        
         
         return 0 
         
@@ -176,8 +196,8 @@ class lammpsWalker(walker.velocityWalker):
         for cv in self.colvars:
             self.lmp.command("uncompute " + str(self.colvars.index(cv)))
             
-        return 0
-        
+        return 0    
+                
     def equilibrate(self, center):
         """
         This function prepares a LAMMPS image to be at the specified target 
@@ -215,6 +235,8 @@ class lammpsWalker(walker.velocityWalker):
         """
         This function returns the current position of the LAMMPS simulation.
         """
+        
+        
         return self.lmp.gather_atoms("x",1,3)
 
     def getColvars(self):
@@ -224,6 +246,7 @@ class lammpsWalker(walker.velocityWalker):
         """
         # get an empty array with placeholders
         cvarray = [None]*len(self.colvars)
+        
         # now get cv's one by one from each compute defined
         for i in range(len(self.colvars)):
             cvarray[i] = self.lmp.extract_compute(str(i), 2, 1)[0]
@@ -274,5 +297,36 @@ class lammpsWalker(walker.velocityWalker):
         self.lmp.command("run " + str(numSteps) + " pre " + str(pre) + " post " + str(post))
         
         return 0 
+    
+    def command(self, command):
+        """
+        This function allows the user to issue a LAMMPS command directly to the
+        LAMMPS object.
+        """
+        
+        # issue the command directly. 
+        self.lmp.command(command)
+        
+        return 0 
+        
+    def minimize(self):
+        """
+        This function runs a minimization routine with the specified type.
+        """
+        
+        self.lmp.command("minimize 1.0e-4 1.0e-6 100 1000")
+        
+        return 0 
+        
+    def setTemperature(temp):
+        """
+        This function sets the temperature of the walker object.
+        
+        NOTE THAT THIS DOES NOT ALTER THE DYNAMICS THERMOSTAT. LAMMPS REQUIRES
+        RESETING THIS THERMOSTAT. WE WILL LOOK INTO HOW TO DO THIS. 
+        """
+        self.temperature = temp
+        
+        return 0
         
     

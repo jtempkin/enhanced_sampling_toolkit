@@ -24,7 +24,7 @@ import scipy as sp
 import fileIO
 import sys
 import walker
-import acor
+#import acor
 import errors
 import random
 """
@@ -109,7 +109,7 @@ class partition:
         
         return F   
     
-    def sample(self, numSteps, umbrellaIndex, walkerIndex, sysParams, rank=-1):
+    def sample(self, wlkr, numSteps, umbrellaIndex, walkerIndex, sysParams, rank=-1):
         """    
         This function takes a system lmp and propagates the dynamics to generate
         the required samples. 
@@ -130,8 +130,9 @@ class partition:
         # from post-processing only the cvs's trajectory so we create a data
         # structure here to store values of this transition
         self.umbrellas[umbrellaIndex].basisFnxTimeSeries = []
-                
         
+        
+        """
         #print "Initializing walker."
         # now construct the type of walker needed 
         if sysParams['walkerType'] == "lammps":     
@@ -151,7 +152,7 @@ class partition:
             walkermodule = importlib.import_module(sysParams['dataFile'])
             # create the walker from the custom directory
             wlkr = walkermodule.getWalker()
-            
+        """   
             
         # allocate an variable to compute the metropolis accenptance percentange
         self.umbrellas[umbrellaIndex].metropolis_acceptance = 0.0
@@ -382,6 +383,29 @@ class partition:
         
         # Note that this is returns in ln (log base e), not log base 10.
         return logpji
+        
+        
+    def createUmbrellas(self, umbs):
+        """
+        This function creates a gridding of umbrellas based on a collective 
+        variable specification passed as arguments. 
+        
+        OK, there are definitely better ways of doing this but I don't want to 
+        implement them now. For now, I support just two dimentions and boxes. 
+        """
+        umbrellas = []
+        
+        # the stride is a list of the spacing of the centers of each box in each axis
+        stride = [(umbs[0][1] - umbs[0][0]) / umbs[0][2], (umbs[1][1] - umbs[1][0]) / umbs[1][2]]
+        
+        for i in range(umbs[0][2]): 
+            for j in range(umbs[1][2]):
+                center = [umbs[0][0] + stride[0]*i + stride[0] / 2.0, umbs[1][0] + stride[1]*j + stride[1] / 2.0]
+                width = [umbs[0][3], umbs[1][3]]
+                umbrellas.append(Box(center, width))
+        
+        return umbrellas
+     
     
 
 
@@ -423,7 +447,7 @@ class basisFunction:
         self.configs = [lastConfig]
 
         return 0 
-     
+    
      
 class Box(basisFunction):
     """

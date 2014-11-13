@@ -24,7 +24,7 @@ import scipy as sp
 import fileIO
 import sys
 import walker
-import acor
+#import acor
 import errors
 import random
 """
