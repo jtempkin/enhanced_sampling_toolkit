@@ -23,17 +23,17 @@ class lammpsWalker(walker.velocityWalker):
         """
         Initializes the walker based on an input file for lammps.
         """
+        # a general filename for storing the data, note the appending of the index
+        self.filename = filename + "." + str(index)
+        
         # start walker object
-        self.lmp = self.initLAMMPS(filename)
+        self.lmp = self.initLAMMPS(self.filename)
         
         # a list of the relevant collective variables
         self.colvars = []
         
         # a list of commands used to equilibrate the system 
         self.equilCmds = []
-        
-        # a general filename for storing the data
-        self.filename = filename
         
         # by default, execute shake code. This flag lets the walker know
         # that shakeH will be used in the dynamics
@@ -168,7 +168,7 @@ class lammpsWalker(walker.velocityWalker):
         
         return 0 
         
-    def initColVars(self):
+    def setColvars(self):
         """
         This function initializes the collective variable and trajectory output 
         for a LAMMPS simulation that is handed to this object. 
@@ -198,36 +198,48 @@ class lammpsWalker(walker.velocityWalker):
             
         return 0    
                 
-    def equilibrate(self, center):
+    def equilibrate(self, center, restraint, numSteps):
         """
         This function prepares a LAMMPS image to be at the specified target 
-        position given by umb.
+        position given by the vector 'center' passed and an arguments. 
         """
         
         # first enter the restraints based on computes data structure
         restCommand = "fix REST all restrain "
-        for index, cv in enumerate(self.colvars):
-            if cv[0] == 'dihedral':
-                restCommand += " " + " ".join(cv) + " " + str(center[index] + 180.0)
+        
+        # here we apply the constraints based on the collective variable definition
+        # check to make sure we have collective variables defined. 
+        if len(self.colvars) == 0:
+            print "There are no collective variables defined in walker " + str(self.index)
+            print "Aborting equilibration of walker " + str(self.index)
+            return 0 
+            
+        # let's get a string representation of the colvars, it's friendly
+        cv = []
+        for entry in self.colvars:
+            cv.append(map(str, entry))
+            
+        # now loop through each 
+        for index, entry in enumerate(cv):
+            if entry[0] == 'dihedral':
+                restCommand += " " + " ".join(entry) + " " + " ".join(map(str, restraint[index])) + " " + str(center[index] + 180.0)
             else:
-                restCommand += " " + " ".join(cv) + " " + str(center[index])
+                restCommand += " " + " ".join(entry) + " " + " ".join(map(str, restraint[index])) + " " + str(center[index])
         
         # now issue restraint definition to the lammps object 
-        self.lmp.command(restCommand)
+        self.command(restCommand)
                     
-        # now run the equilibration lines from the equilibrate file.     
-        for line in self.equilCmds:
-            if line[0] == '#':
-                continue
-            else:
-                self.lmp.command(line)
-
+        # now run the equilibration dynamics     
+        self.command("run " + str(numSteps) + " post no")
+        
+        """
         # apply SHAKE if used
         if self.shakeH:    
             self.lmp.command("fix 10 all shake 0.0001 500 0 m 1.008")
-            
+        """ 
+        
         # now remove constraints for subsequent dynamics         
-        self.lmp.command("unfix REST")
+        self.command("unfix REST")
         
         return 0
         
@@ -309,12 +321,15 @@ class lammpsWalker(walker.velocityWalker):
         
         return 0 
         
-    def minimize(self):
+    def minimize(self, args=None):
         """
         This function runs a minimization routine with the specified type.
         """
-        
-        self.lmp.command("minimize 1.0e-4 1.0e-6 100 1000")
+        # use default settings
+        if args == None:
+            self.lmp.command("minimize 1.0e-4 1.0e-6 100 1000")
+        else:
+            self.lmp.command("minimize " + " ".join(args))
         
         return 0 
         

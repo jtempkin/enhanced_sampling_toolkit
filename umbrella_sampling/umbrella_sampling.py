@@ -38,6 +38,7 @@ def main():
     
     # set the scratch directory for the calculation files
     params['scratchdir'] = "/Users/jeremytempkin/Documents/enhanced_sampling_toolkit/umbrella_sampling/debug_US"
+    params['inputFilename'] = "/Users/jtempkin/enhanced_sampling_toolkit/data/input.diala"
     
     # here we will set the umbrella sampling parameters in the params dict
     params['ncells'] = 3
@@ -71,13 +72,13 @@ def main():
     if rank == 0: print "Building the umbrellas."
     
     # specify the list of boundaries, nboxes, 1/2 width of the windows
-    umbs = []
-    # these are for the two-dimensional landscape of pairwise distances in the 
-    # synuclein protein based off PRE data 
-    umbs.append([0, 350, 70, 5])
-    umbs.append([0, 70, 14, 5])
+    umbParams = {}
     
-    system.umbrellas = system.createUmbrellas(umbs)
+    # right now, we will hardcore a 12x12 array using Erik's routine for gridding a space
+    umbParams['cvrange'] = np.array([map(float,entry.split(",")) for entry in "-180,180,12,30;-180,180,12,30".split(";")])
+    umbParams['wrapping'] = np.array(map(float, "1,1".split(',')))
+    
+    system.umbrellas = fileIO.createUmbrellas(umbParams)
     
     #------------ MAIN LOOP --------------
     # sample umbrellas and construct F
@@ -89,15 +90,30 @@ def main():
         # lets instantiate a walker object to sample this window. 
         wlkr = lammpsWalker.lammpsWalker(params['inputFilename'])
         
+        # minimize structure prior to dynamics
+        wlkr.minimize()
+        
+        # set colvars for this walker (currently, alanine dipeptide dihedrals)
+        wlkr.colvars.append(['dihedral', 5, 7, 9, 15])
+        wlkr.colvars.append(['dihedral', 7, 9, 15, 17]) 
+        
+        # set an array of starting/stoping restraints for equilibration
+        restraint = [[0.0, 10.0], [0.0, 10.0]]
+        
+        # now specify colvars to dynamics routines
+        wlkr.setColvars()
+        
         # equilibrate the walker to the target point in CV space
+        wlkr.equilibrate(system.umbrellas[i].center, restraint, 100000)
         
-        # set colvars for recording samples
-        
+        """
+        # enter the sampling routine 
         try: 
             system.sample(wlkr, params['walkerSteps'], i, 0, params, rank)
         except errors.DynamicsError:
             print "Rank", rank, "sampling error occured in umbrella", i, "."
             continue
+        """
         
         # now we are done populating the samples array, close the walker
         wlkr.close()
@@ -108,6 +124,7 @@ def main():
     eigenvalue problem. 
     """
     
+    """
     # now reduce the F matrix at root, first making a send buffer, 
     system.Fbuff = copy.deepcopy(system.F)
     comm.Reduce([system.Fbuff, MPI.DOUBLE], [system.F, MPI.DOUBLE], op=MPI.SUM, root=0)
@@ -135,7 +152,7 @@ def main():
         bounds = system.getlogBound(system.F)
         fileIO.writeMat(bounds, params['wkdir'] + "/bounds.out")
 
-    
+    """
     # now we will perform an analysis of the data and increase sampling of 
     # windows with high variance
 
