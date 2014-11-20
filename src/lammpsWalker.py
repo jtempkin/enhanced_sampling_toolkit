@@ -19,15 +19,15 @@ class lammpsWalker(walker.velocityWalker):
     """
     This class implements the lammps bindings into the walker class.
     """
-    def __init__(self, filename, index = 0):
+    def __init__(self, inputFilename, index = 0):
         """
         Initializes the walker based on an input file for lammps.
         """
         # a general filename for storing the data, note the appending of the index
-        self.filename = filename + "." + str(index)
+        self.filename = inputFilename + "." + str(index)
         
-        # start walker object
-        self.lmp = self.initLAMMPS(self.filename)
+        # start walker object from the passed lammps input file name
+        self.lmp = self.initLAMMPS(inputFilename)
         
         # a list of the relevant collective variables
         self.colvars = []
@@ -55,7 +55,7 @@ class lammpsWalker(walker.velocityWalker):
         self.lmp.close()
         return 0 
         
-    def initLAMMPS(self, filename):
+    def initLAMMPS(self, inputFilename=None):
         """
         This function initializes a lammps simulation given an input file
         and the system parameters. Calls the setupLAMMPS internal routine. 
@@ -64,8 +64,21 @@ class lammpsWalker(walker.velocityWalker):
         # initialize the lammps object
         args = ["-sc", "none", "-echo", "log"]
         self.lmp = lammps("", args)
+        
+        #self.lmp = lammps()
+        
         # after the lammps object is created, initialize the lammps simulation. 
-        self.__setupLAMMPS(filename)
+        # specify general log file parameters
+        self.lmp.command("echo none")
+
+        # if there is a specified filename, use it to set up the simulation.         
+        if inputFilename != None:
+            self.lmp.command("log " + self.filename + ".log")
+            self.lmp.file(inputFilename)
+        else:
+            self.lmp.command("log " + self.filename + ".log")
+        
+        #self.__setupLAMMPS(filename)
 
         return self.lmp    
 
@@ -173,18 +186,21 @@ class lammpsWalker(walker.velocityWalker):
         This function initializes the collective variable and trajectory output 
         for a LAMMPS simulation that is handed to this object. 
         """        
+        cv = []
+        for entry in self.colvars:
+            cv.append(map(str, entry))
         
         # initialize the groups and the computes associated with them
-        for cv in self.colvars:       
-            if cv[0] == 'bond':
-                self.lmp.command("group " + "b" + str(self.colvars.index(cv)) + " id " + " ".join(cv[1:]))
-                self.lmp.command("compute " + str(self.colvars.index(cv)) + " b" + str(self.colvars.index(cv)) + " bond/local dist" )
-            elif cv[0] == 'angle':
-                self.lmp.command("group " + "a" + str(self.colvars.index(cv)) + " id " + " ".join(cv[1:]))
-                self.lmp.command("compute " + str(self.colvars.index(cv)) + " a" + str(self.colvars.index(cv)) + " angle/local theta")
-            elif cv[0] == 'dihedral':
-                self.lmp.command("group " + "d" + str(self.colvars.index(cv)) + " id " + " ".join(cv[1:]))
-                self.lmp.command("compute " + str(self.colvars.index(cv)) + " d" + str(self.colvars.index(cv)) + " dihedral/local phi")        
+        for index,entry in enumerate(cv):  
+            if entry[0] == 'bond':
+                self.lmp.command("group " + "b" + str(index) + " id " + " ".join(entry[1:]))
+                self.lmp.command("compute " + str(index) + " b" + str(index) + " bond/local dist" )
+            elif entry[0] == 'angle':
+                self.lmp.command("group " + "a" + str(index) + " id " + " ".join(entry[1:]))
+                self.lmp.command("compute " + str(index) + " a" + str(index) + " angle/local theta")
+            elif entry[0] == 'dihedral':
+                self.lmp.command("group " + "d" + str(index) + " id " + " ".join(entry[1:]))
+                self.lmp.command("compute " + str(index) + " d" + str(index) + " dihedral/local phi")        
         
         return 0
 
@@ -309,6 +325,13 @@ class lammpsWalker(walker.velocityWalker):
         self.lmp.command("run " + str(numSteps) + " pre " + str(pre) + " post " + str(post))
         
         return 0 
+    
+    def setDynamics():
+        """
+        This routine sets the dynamics for the walker. 
+        """
+        
+        return 0
     
     def command(self, command):
         """

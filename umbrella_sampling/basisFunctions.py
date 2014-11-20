@@ -124,7 +124,11 @@ class partition:
         
         # This block of code is for the implementation of the abstracted walker
         # assign an input filename for this walker. 
-        inputFilename = sysParams['wkdir'] + "/in_" + str(umbrellaIndex) + "_w" + str(walkerIndex) + ".diala"
+        inputFilename = sysParams['scratchdir'] + "/in_" + str(umbrellaIndex) + "_w" + str(walkerIndex) + ".diala"
+        
+        
+        # assign an output file for the LAMMPS trajectory:
+        wlkr.command("dump 1 all dcd 10 " + inputFilename + ".dcd")
         
         # if we are using a transition type, we cannot directly reconstruct F 
         # from post-processing only the cvs's trajectory so we create a data
@@ -433,7 +437,7 @@ class basisFunction:
         lastConfig = self.configs.pop() 
         
         # write out the remaining data structure
-        with h5py.File(filename, "a") as f_handle:
+        with h5py.File(filename + ".hdf5", "a") as f_handle:
             # check to see if we've created a group for the colvars writes
             if 'colvars' in f_handle:
                 # if so, add in a dataset for this flush
@@ -448,7 +452,7 @@ class basisFunction:
                 dset = self.samples
         
         # write out the basis function time series as well            
-        with h5py.File(filename, "a") as f_handle:
+        with h5py.File(filename + ".hdf5", "a") as f_handle:
             # check to see if we've created a group for the colvars writes
             if 'timeSeries' in f_handle:
                 # if so, add in a dataset for this flush
@@ -461,10 +465,13 @@ class basisFunction:
                 dset = f_handle['timeSeries'].create_dataset("ts_" + str(len(f_handle['timeSeries'].keys())), np.asarray(self.basisFnxTimeSeries).shape, dtype="f")
                 dset = self.basisFnxTimeSeries
             
-        """
+        # so now we will also cast text output files
         with open(filename + ".timeSeries", "a") as f_handle:
             np.savetxt(f_handle, self.basisFnxTimeSeries)
-        """
+            
+        with open(filename + ".colvars", "a") as f_handle:
+            np.savetxt(f_handle, self.samples)
+
         # delete current reference to the list
         del self.samples
         del self.basisFnxTimeSeries

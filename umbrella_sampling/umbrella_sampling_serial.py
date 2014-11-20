@@ -11,11 +11,10 @@ import sys
 from time import time
 import fileIO
 import copy
-from mpi4py import MPI
+import numpy as np
 import errors
 import basisFunctions
 import lammpsWalker
-import numpy as np
 
 
 def main():
@@ -25,12 +24,8 @@ def main():
     # time the execution
     starttime = time()
     
-    #--------------MPI INIT---------------------
-    # init communicator
-    comm = MPI.COMM_WORLD
-    # get proc rank 
-    rank = comm.Get_rank()
-    nprocs = comm.Get_size()
+    # in the serial version, lets just set rank=0 
+    rank = 0
     
     #---------------SET PARAMETERS -----------
     if rank == 0: print "Setting up umbrella sampling parameters."
@@ -38,20 +33,18 @@ def main():
     params = {}
     
     # set the scratch directory for the calculation files
-    params['scratchdir'] = "/Users/jeremytempkin/Documents/enhanced_sampling_toolkit/umbrella_sampling/debug_US"
-    params['inputFilename'] = "/Users/jtempkin/enhanced_sampling_toolkit/data/input.diala"
+    params['scratchdir'] = "/Users/jtempkin/enhanced_sampling_toolkit/umbrella_sampling/debug_US"
+    params['inputFilename'] = "/Users/jtempkin/enhanced_sampling_toolkit/umbrella_sampling/input.diala"
     
     # here we will set the umbrella sampling parameters in the params dict
-    params['ncells'] = 3
+    params['ncells'] = 144
     params['cellWidth'] = 60.0
     params['nwalkers'] = 1
-    params['walkerSteps'] = 1000
+    params['walkerSteps'] = 10000
     params['stepLength'] = 10
     params['Ftype'] = 'transition'
     
     # lets set the dynamics parameters that are needed to specify the walker 
-    
-    params['inputFilename'] = 'syn.in'
     params['temperature'] = 310.0
 
     #--------------- INITIALIZATION--------
@@ -85,59 +78,51 @@ def main():
     # sample umbrellas and construct F
     if rank == 0: print "Entering main loop."
     
-    for i in range(rank, len(system.umbrellas), nprocs):
+    for i in range(len(system.umbrellas)):
         print "Rank", rank, "sampling umbrella", i, "."
         
+        print "init walker"
         # lets instantiate a walker object to sample this window. 
         wlkr = lammpsWalker.lammpsWalker(params['inputFilename'])
         
+        print "minimize"
         # minimize structure prior to dynamics
         wlkr.minimize()
+        
+        # set the dynamics to sample by langevin
+        wlkr.command("fix 1 all nve")
+        wlkr.command("fix 2 all langevin 310.0 310.0 30.0 20874")
+    
         
         # set colvars for this walker (currently, alanine dipeptide dihedrals)
         wlkr.colvars.append(['dihedral', 5, 7, 9, 15])
         wlkr.colvars.append(['dihedral', 7, 9, 15, 17]) 
         
         # set an array of starting/stoping restraints for equilibration
-        restraint = [[0.0, 10.0], [0.0, 10.0]]
+        restraint = [[0.0, 100.0], [0.0, 100.0]]
         
+        
+        print "setting colvars"
         # now specify colvars to dynamics routines
         wlkr.setColvars()
         
+        print "equilibrating"
         # equilibrate the walker to the target point in CV space
         wlkr.equilibrate(system.umbrellas[i].center, restraint, 100000)
         
-        """
+
         # enter the sampling routine 
         try: 
             system.sample(wlkr, params['walkerSteps'], i, 0, params, rank)
         except errors.DynamicsError:
             print "Rank", rank, "sampling error occured in umbrella", i, "."
             continue
-        """
+
         
         # now we are done populating the samples array, close the walker
         wlkr.close()
     
-    #-----------------MPI COMMUNICATION------------
-    """
-    Here we communicate the rows of F to each processor to set up and solve the 
-    eigenvalue problem. 
-    """
-    
 
-    # now reduce the F matrix at root, first making a send buffer, 
-    system.Fbuff = copy.deepcopy(system.F)
-    comm.Reduce([system.Fbuff, MPI.DOUBLE], [system.F, MPI.DOUBLE], op=MPI.SUM, root=0)
-        
-    # also share the F_error matrix
-    system.F_error_buff = copy.deepcopy(system.F_error)
-    comm.Reduce([system.F_error_buff, MPI.DOUBLE], [system.F_error, MPI.DOUBLE], op=MPI.SUM, root=0)
-    
-    # issue a global MPI barrier to ensure data has been recieved. 
-    comm.Barrier()
-    
-    
     #----------------WRITE OUT DATA-------------
     # now allow rank 0 to process data. 
     if rank == 0:
