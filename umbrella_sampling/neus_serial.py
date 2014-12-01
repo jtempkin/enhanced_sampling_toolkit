@@ -1,8 +1,8 @@
-#!/software/python-2.7-el6-x86_64/bin/python
+# #!/software/python-2.7-el6-x86_64/bin/python
 """
 Created on Mon Mar 24 12:42:46 2014
 
-The main script file for the umbrella sampling code. 
+The main script file for a neus implementation. 
 
 author: Jeremy Tempkin
 """
@@ -15,7 +15,6 @@ import numpy as np
 import errors
 import basisFunctions
 import lammpsWalker
-import partition
 
 
 def main():
@@ -60,7 +59,7 @@ def main():
     if rank == 0: print "Initializing the umbrella structure."
     
     # create the partition object 
-    system = partition.partition(params['ncells'])
+    system = basisFunctions.partition(params['ncells'])
 
 
     # now we construct the umbrella windows
@@ -82,11 +81,9 @@ def main():
     for i in range(len(system.umbrellas)):
         print "Rank", rank, "sampling umbrella", i, "."
         
-        print "init walker"
         # lets instantiate a walker object to sample this window. 
         wlkr = lammpsWalker.lammpsWalker(params['inputFilename'])
         
-        print "minimize"
         # minimize structure prior to dynamics
         wlkr.minimize()
         
@@ -102,12 +99,9 @@ def main():
         # set an array of starting/stoping restraints for equilibration
         restraint = [[0.0, 100.0], [0.0, 100.0]]
         
-        
-        print "setting colvars"
         # now specify colvars to dynamics routines
         wlkr.setColvars()
         
-        print "equilibrating"
         # equilibrate the walker to the target point in CV space
         wlkr.equilibrate(system.umbrellas[i].center, restraint, 100000)
         

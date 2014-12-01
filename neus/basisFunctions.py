@@ -49,10 +49,14 @@ class basisFunction:
         this file format, it stores each flush as a new dataset indexed in each
         group. 
         """
+        if len(self.samples) == 0:
+            print "Tried to flush an empty samples buffer."
+            return 0 
+        
         # get the last sample in the list
         lastSample = self.samples.pop()
-        lastBasisFunction = self.basisFnxTimeSeries.pop()
-        lastConfig = self.configs.pop() 
+        #lastBasisFunction = self.basisFnxTimeSeries.pop()
+        #lastConfig = self.configs.pop() 
         
         # write out the remaining data structure
         with h5py.File(filename + ".hdf5", "a") as f_handle:
@@ -68,7 +72,11 @@ class basisFunction:
                 # now flush the dataset
                 dset = f_handle['colvars'].create_dataset("cv_" + str(len(f_handle['colvars'].keys())), np.asarray(self.samples).shape, dtype="f")
                 dset = self.samples
-        
+         
+       
+        with open(filename + ".colvars", "a") as f_handle:
+            np.savetxt(f_handle, self.samples)
+        """
         # write out the basis function time series as well            
         with h5py.File(filename + ".hdf5", "a") as f_handle:
             # check to see if we've created a group for the colvars writes
@@ -82,23 +90,21 @@ class basisFunction:
                 # now flush the dataset
                 dset = f_handle['timeSeries'].create_dataset("ts_" + str(len(f_handle['timeSeries'].keys())), np.asarray(self.basisFnxTimeSeries).shape, dtype="f")
                 dset = self.basisFnxTimeSeries
-            
         # so now we will also cast text output files
         with open(filename + ".timeSeries", "a") as f_handle:
             np.savetxt(f_handle, self.basisFnxTimeSeries)
-            
-        with open(filename + ".colvars", "a") as f_handle:
-            np.savetxt(f_handle, self.samples)
+
+        """
 
         # delete current reference to the list
         del self.samples
-        del self.basisFnxTimeSeries
-        del self.configs
+        #del self.basisFnxTimeSeries
+        #del self.configs
             
         #now replace the data structure with the endpoint
         self.samples = [lastSample]
-        self.basisFnxTimeSeries = [lastBasisFunction]
-        self.configs = [lastConfig]
+        #self.basisFnxTimeSeries = [lastBasisFunction]
+        #self.configs = [lastConfig]
 
         return 0 
     
@@ -129,6 +135,11 @@ class Box(basisFunction):
         self.center = np.asarray(center)
         self.width = np.asarray(width)
         self.dimension = len(center)
+      
+        # set the radius to use for computing neighbors.
+        self.radius = np.max(self.width) * 2.0 * np.sqrt(2)
+        self.neighborList = []
+        
         
         # for storing CV's and configs
         self.samples = []
@@ -153,9 +164,14 @@ class Box(basisFunction):
             return 0.0
         else:
             norm = 0.0
-            for i in range(0, len(umb), 1):
-                norm += umb[i].indicator(coord)
             
+            if len(self.neighborList) > 0:
+                for i in range(len(self.neighborList)):
+                    norm += umb[self.neighborList[i]].indicator(coord)
+            else:
+                for i in range(len(umb)):
+                    norm += umb[i].indicator(coord)
+                    
             return 1.0 / norm
             
     def indicator(self, coord):

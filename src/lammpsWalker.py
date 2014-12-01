@@ -19,7 +19,7 @@ class lammpsWalker(walker.velocityWalker):
     """
     This class implements the lammps bindings into the walker class.
     """
-    def __init__(self, inputFilename, index = 0):
+    def __init__(self, inputFilename, logFilename, index = 0):
         """
         Initializes the walker based on an input file for lammps.
         """
@@ -27,7 +27,7 @@ class lammpsWalker(walker.velocityWalker):
         self.filename = inputFilename + "." + str(index)
         
         # start walker object from the passed lammps input file name
-        self.lmp = self.initLAMMPS(inputFilename)
+        self.lmp = self.initLAMMPS(inputFilename=inputFilename, logFilename=".".join([logFilename, str(index)]))
         
         # a list of the relevant collective variables
         self.colvars = []
@@ -55,17 +55,17 @@ class lammpsWalker(walker.velocityWalker):
         self.lmp.close()
         return 0 
         
-    def initLAMMPS(self, inputFilename=None):
+    def initLAMMPS(self, inputFilename=None, logFilename="log"):
         """
         This function initializes a lammps simulation given an input file
         and the system parameters. Calls the setupLAMMPS internal routine. 
         
         """
         # initialize the lammps object
-        args = ["-sc", "none", "-echo", "log"]
-        self.lmp = lammps("", args)
+        #args = ["-sc", "none", "-echo", "log"]
+        #self.lmp = lammps("", args)
         
-        #self.lmp = lammps()
+        self.lmp = lammps()
         
         # after the lammps object is created, initialize the lammps simulation. 
         # specify general log file parameters
@@ -73,10 +73,10 @@ class lammpsWalker(walker.velocityWalker):
 
         # if there is a specified filename, use it to set up the simulation.         
         if inputFilename != None:
-            self.lmp.command("log " + self.filename + ".log")
+            self.lmp.command("log " + logFilename)
             self.lmp.file(inputFilename)
         else:
-            self.lmp.command("log " + self.filename + ".log")
+            self.lmp.command("log " + logFilename)
         
         #self.__setupLAMMPS(filename)
 
@@ -263,8 +263,7 @@ class lammpsWalker(walker.velocityWalker):
         """
         This function returns the current position of the LAMMPS simulation.
         """
-        
-        
+
         return self.lmp.gather_atoms("x",1,3)
 
     def getColvars(self):
@@ -285,17 +284,15 @@ class lammpsWalker(walker.velocityWalker):
         """
         This routine sets the internal configuration. 
         """        
-        
         self.lmp.scatter_atoms("x", 1, 3, config)
-        
         return 0 
     
-    def drawVel(self, distType = 'gaussian'):
+    def drawVel(self, distType = 'gaussian', temperature = 310.0):
         """
         This function redraws the velocities from a maxwell-boltzmann dist.
         """
         if distType == 'gaussian':
-            self.lmp.command("velocity all create " + str(self.temperature) + " " + str(random.randint(100000,999999)) + " dist gaussian")
+            self.lmp.command("velocity all create " + str(temperature) + " " + str(random.randint(100000,999999)) + " dist gaussian")
         else:
             print "The drawVel routine was passed distType that was not understood."
             
@@ -356,7 +353,7 @@ class lammpsWalker(walker.velocityWalker):
         
         return 0 
         
-    def setTemperature(temp):
+    def setTemperature(self, temp):
         """
         This function sets the temperature of the walker object.
         
@@ -366,5 +363,15 @@ class lammpsWalker(walker.velocityWalker):
         self.temperature = temp
         
         return 0
+        
+    def setTimestep(self, timestep):
+        """
+        This routine sets the dynamics time step.
+        """
+        self.lmp.command("timestep " + str(timestep))
+        
+        return 0
+        
+        
         
     
