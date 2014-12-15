@@ -12,6 +12,7 @@ import scipy as sp
 import fileIO
 import sys
 import walker
+import basisFunctions_neus as basisFunctions
 import acor
 import errors
 import random
@@ -474,4 +475,91 @@ class partition:
         return logpji
 
      
+    def createUmbrellas(self, Params, basisType="Box"):
+        """
+        We create a grid of Umbrellas on the collective variable space.  Each collective variable is divided by evenly spaced umbrellas.
+        It takes in as input:
+            Params          A dictionary, which includes parameters which specify how to manipulate the collective parameters.
+                                Currently, the following keywords are implemented:
+                                    cvrangeN        Here, N is some integer, e.g. cvrange1, or cvrange2.
+                                                        cvrange should have a value of a string of 4 scalars, separated by a comma, e.g. "-180,180,12,30"
+                                                        These represent (respectively) the min and max values of the collective variable, the number of breaks in that axs, and 1/2 the width of the umbrella.
+                                Theoretically, you can pass it the sysParams array in the main statement, and it should work.  However, this might be an unsafe practice.
+                                It might be better to collect the collective variable params somewhere else, and just pass those as an argument.
+        The function should return:
+            um               A list of umbrella objects which cover the space of all the collective variables.
     
+        """
+        #First, we pick up the parameters we care about from the systemParams.
+        colVarParams = Params["cvrange"]
+        # We check if the user provided any input to wrap the basis functions.
+        if 'wrapping' in Params:
+            wrapping=np.array(Params['wrapping'])
+        else:
+            wrapping=np.zeros(len(colVarParams))
+        
+        # We make the following three lists:
+        #       rangelist, a list where element i is a list of all the possible center values for 
+        #                   collective variable i
+        #       widthlist, a list where each element is the width of the Box in that dimension
+        #       divisions, a list where element i is the number of divisions in collective variable i.
+        centersList=[]
+        widthlist=[]
+        divisions=[]
+        # We also create the boxwrap array.  This array will give the domain of each wrapping collective variable.
+        # For example, it would contain 360 for an angle going from -180 to 180 degrees.
+        boxwrap=[]
+        for cvindex in xrange(len(colVarParams)):
+            doeswrap = (wrapping[cvindex] != 0.0)
+            v=colVarParams[cvindex]
+            # We make an evenly spaced array containing all the points along a collective coordinate 
+            # where we want to center a box.  We will have to do this differently idepending on whether
+            # the coordinate wraps around:  the reason for this is that if the coordinate wraps around,
+            # we will want overlap over the boundaries.
+            if doeswrap:
+                c1=(np.linspace(v[0],v[1],v[2]+1))
+                centersList.append([(c1[i]+c1[i+1])/2 for i in xrange(len(c1)-1)])
+                boxwrap.append(v[1]-v[0])
+            else:
+                isIncreasing=v[1]>v[0]
+                if isIncreasing:
+                    centersList.append(np.linspace(v[0]+v[3],v[1]-v[3],v[2]))
+                else:
+                    centersList.append(np.linspace(v[0]-v[3],v[1]+v[3],v[2]))
+                boxwrap.append(0.0)
+            widthlist.append(v[3])
+            divisions.append(v[2])
+        # We define some constants which will be useful:  the number of umbrellas numum, and the
+        # cumulative product of the number of divisions for each successive collective variable, numthingie
+        # (It's important for integer rounding)
+        numum=np.product(divisions)
+        numheirarchy=np.flipud(np.cumprod(np.flipud(divisions)))
+        
+        # We create the boxwrap array.  This array will give the domain of each wrapping collective variable.
+        # For example, it would contain 360 for an angle going from -180 to 180 degrees.
+        
+        # We make um, the list of all our partition function objects.
+        um=[]
+        for i in xrange(int(numum)):
+            umbrellaCoord=[]
+            # We loop through the collective coordinates.
+            for j in xrange(len(divisions)):
+                # We figure out which center to use for the box, using integer rounding tricks and 
+                # modular arithmetic.
+                centerindex=int(np.floor(numheirarchy[j]*i/(numum))%divisions[j])
+                umbrellaCoord.append(centersList[j][centerindex])
+            # We make da box.
+            wraparray=np.array(boxwrap)
+            # We check if any elements of wraparray are nonzero.
+            if wraparray.any():
+   	        if basisType == "Box":
+   	            um.append(basisFunctions.Box(umbrellaCoord,widthlist,boxwrap))
+   	        elif basisType == "Cone":
+   	            um.append(basisFunctions.Cone(umbrellaCoord,widthlist,boxwrap))
+            else:
+   	        if basisType =="Box":
+  		    um.append(basisFunctions.Box(umbrellaCoord,widthlist))
+   	        elif basisType == "Cone":
+                    um.append(basisFunctions.Cone(umbrellaCoord,widthlist))
+    
+        return um
