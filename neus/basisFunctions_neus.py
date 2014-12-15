@@ -239,4 +239,70 @@ class Gaussian(basisFunction):
         vals = np.exp(-(dist)**2/ (2.0*self.width**2))
         # return the product
         return np.prod(vals)
+
+
+class Pyramid(basisFunction):
+    """
+    This class implements a pyramidal basis function
+    - Erik 
+
+    """
+    def __init__(self, center, width, periodicLength = None):
+        """
+        Initializes the pyramid at a center, given a width in each dimension.
+        """
+        self.center = np.asarray(center)
+        self.width = np.asarray(width)
+        self.dimension = len(center)
+        self.radius = np.sqrt(np.sum(self.width**2))
+        
+        # We calculate the slope of the pyramid.
+        self.slopes = 1.0/self.width
+        
+        # We check if the box wraps around.
+        if periodicLength != None:
+            self.wrapping=np.asarray(periodicLength)
+        else:
+            self.wrapping = None
+        #print "Gaussian created at ", mu, " with stdev ", sig
+    
+            
+    def __call__(self, coord, umb):
+        """
+        Return the value of the basis function at this coordinate. 
+        """
+        # get sum of box indicators. 
+        if self.indicator(coord) == 0.0:
+            return 0.0
+        else:
+            norm = 0.0
+            for i in range(0, len(umb), 1):
+                norm += umb[i].indicator(coord)
+            
+            return 1.0 / norm
+            
+    def indicator(self, coord):
+        """
+        Return the value of the indicator of the box at this point.  This will be 1.0 if coord is contained inside the box, and 0.0 if it is not.
+        """
+        # create a distance vector
+        distancevec = np.asarray(coord) - np.asarray(self.center)
+        # if any collective variable is periodic, construct dr, the adjuct for minimum image convention for the periodic cv's
+        if self.wrapping != None:
+            # build dr 
+            dr = np.zeros(distancevec.shape)
+            # add values to dr if the CV wraps
+            for i in xrange(len(self.wrapping)):
+                if self.wrapping[i] != 0.0:
+                    # This is an old trick from MD codes to find the minimum distance between two points.
+                    dr[i] = self.wrapping[i] * np.rint(distancevec[i]/self.wrapping[i])
+            # add min image vector
+            distancevec -= dr
+
+        # We calculate the value of 
+        psiparts = 1.0-self.slopes*np.abs(distancevec)
+         
+        # We remove negative entries and return the minimum value.
+        return min(psiparts.clip(min=0))
+
         
