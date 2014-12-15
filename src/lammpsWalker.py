@@ -11,7 +11,8 @@ This file implements the LAMMPS walker abstraction layer.
 import random
 import sys
 import walker
-
+import numpy as np
+import ctypes
 from lammps import lammps
 
 
@@ -19,7 +20,7 @@ class lammpsWalker(walker.velocityWalker):
     """
     This class implements the lammps bindings into the walker class.
     """
-    def __init__(self, inputFilename, logFilename, index = 0):
+    def __init__(self, inputFilename, logFilename, index = 0, debug = False):
         """
         Initializes the walker based on an input file for lammps.
         """
@@ -27,7 +28,7 @@ class lammpsWalker(walker.velocityWalker):
         self.filename = inputFilename + "." + str(index)
         
         # start walker object from the passed lammps input file name
-        self.lmp = self.initLAMMPS(inputFilename=inputFilename, logFilename=".".join([logFilename, str(index)]))
+        self.lmp = self.initLAMMPS(inputFilename=inputFilename, logFilename=".".join([logFilename, str(index)]), verbose = debug)
         
         # a list of the relevant collective variables
         self.colvars = []
@@ -55,17 +56,18 @@ class lammpsWalker(walker.velocityWalker):
         self.lmp.close()
         return 0 
         
-    def initLAMMPS(self, inputFilename=None, logFilename="log"):
+    def initLAMMPS(self, inputFilename=None, logFilename="log", verbose = False):
         """
         This function initializes a lammps simulation given an input file
         and the system parameters. Calls the setupLAMMPS internal routine. 
         
         """
         # initialize the lammps object
-        #args = ["-sc", "none", "-echo", "log"]
-        #self.lmp = lammps("", args)
-        
-        self.lmp = lammps()
+        if verbose == True:
+            self.lmp = lammps()
+        else:
+            args = ["-sc", "none", "-echo", "log"]
+            self.lmp = lammps("", args)
         
         # after the lammps object is created, initialize the lammps simulation. 
         # specify general log file parameters
@@ -201,6 +203,25 @@ class lammpsWalker(walker.velocityWalker):
             elif entry[0] == 'dihedral':
                 self.lmp.command("group " + "d" + str(index) + " id " + " ".join(entry[1:]))
                 self.lmp.command("compute " + str(index) + " d" + str(index) + " dihedral/local phi")        
+            elif entry[0] == 'x':
+                self.lmp.command("group x" + str(index) + " id " + " ".join(entry[1:]))
+                self.lmp.command("compute " + str(index) + " x" + str(index) + " property/atom x")
+            elif entry[0] == 'y':
+                self.lmp.command("group y" + str(index) + " id " + " ".join(entry[1:]))
+                self.lmp.command("compute " + str(index) + " y" + str(index) + " property/atom y")
+            elif entry[0] == 'z':
+                self.lmp.command("group z" + str(index) + " id " + " ".join(entry[1:]))
+                self.lmp.command("compute " + str(index) + " z" + str(index) + " property/atom z")
+            elif entry[0] == "vx":
+                self.lmp.command("group vx" + str(index) + " id " + " ".join(entry[1:]))
+                self.lmp.command("compute " + str(index) + " vx" + str(index) + " property/atom vx")
+            elif entry[0] == "vy":
+                self.lmp.command("group vy" + str(index) + " id " + " ".join(entry[1:]))
+                self.lmp.command("compute " + str(index) + " vy" + str(index) + " property/atom vy")
+            elif entry[0] == "vz":
+                self.lmp.command("group vz" + str(index) + " id " + " ".join(entry[1:]))
+                self.lmp.command("compute " + str(index) + " vz" + str(index) + " property/atom vz")
+            
         
         return 0
 
@@ -264,7 +285,23 @@ class lammpsWalker(walker.velocityWalker):
         This function returns the current position of the LAMMPS simulation.
         """
 
-        return self.lmp.gather_atoms("x",1,3)
+        return np.asarray(self.lmp.gather_atoms("x",1,3))
+        
+    def getVel(self):
+        """
+        This function returns the current velocities from the LAMMPS simulation.
+        """
+        
+        return np.asarray(self.lmp.gather_atoms("v", 1, 3))
+        
+    def setVel(self, vel):
+        """
+        This function sets the velocity to the lammps simulation. 
+        """
+        
+        self.lmp.scatter_atoms("v", 1, 3, vel.ctypes.data_as(ctypes.POINTER(ctypes.c_double)))
+        
+        return 0
 
     def getColvars(self):
         """
@@ -276,15 +313,19 @@ class lammpsWalker(walker.velocityWalker):
         
         # now get cv's one by one from each compute defined
         for i in range(len(self.colvars)):
-            cvarray[i] = self.lmp.extract_compute(str(i), 2, 1)[0]
-
+            if self.colvars[i][0] == 'x' or self.colvars[i][0] == 'y' or self.colvars[i][0] == 'z': 
+                cvarray[i] = self.lmp.extract_compute(str(i), 1, 1)[0]
+            else:
+                cvarray[i] = self.lmp.extract_compute(str(i), 2, 1)[0]
+                
         return cvarray
     
     def setConfig(self, config):
         """
         This routine sets the internal configuration. 
-        """        
-        self.lmp.scatter_atoms("x", 1, 3, config)
+        """                
+        self.lmp.scatter_atoms("x", 1, 3, config.ctypes.data_as(ctypes.POINTER(ctypes.c_double)))
+        
         return 0 
     
     def drawVel(self, distType = 'gaussian', temperature = 310.0):

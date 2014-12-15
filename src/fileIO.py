@@ -116,7 +116,7 @@ def checkInput(inputDict, trustMe):
     raise NotImplementedError("Dude, the input checker has not been fully implemnted!")
     return 0
 
-def createUmbrellas(Params):
+def createUmbrellas(Params, basisType="Box"):
     """
     We create a grid of Umbrellas on the collective variable space.  Each collective variable is divided by evenly spaced umbrellas.
     It takes in as input:
@@ -193,9 +193,15 @@ def createUmbrellas(Params):
         wraparray=np.array(boxwrap)
         # We check if any elements of wraparray are nonzero.
         if wraparray.any():
-            um.append(basisFunctions.Box(umbrellaCoord,widthlist,boxwrap))
+	    if basisType == "Box":
+                um.append(basisFunctions.Box(umbrellaCoord,widthlist,boxwrap))
+	    elif basisType == "Cone":
+	        um.append(basisFunctions.Cone(umbrellacoord,widthlist,boxwrap))
         else:
-            um.append(basisFunctions.Box(umbrellaCoord,widthlist))
+	    if basisType =="Box":
+		um.append(basisFunctions.Box(umbrellaCoord,widthlist))
+	    elif basisType == "Cone":
+                um.append(basisFunctions.Cone(umbrellaCoord,widthlist))
 
     return um
     
