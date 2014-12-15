@@ -140,7 +140,7 @@ class partition:
         
         return 0
         
-    def reinject(self, wlkr, i):
+    def reinject(self, wlkr, i, uniform=False):
         """
         This function initializes a simulation from the entry point list in the 
         current umbrella.
@@ -157,9 +157,7 @@ class partition:
             
             # don't redraw vel. 
             self.simulationTime[i] = 0.0
-            
-            #self.umbrellas[i].samples.append(wlkr.getColvars())
-            self.umbrellas[i].samples.append(wlkr.getColvars())
+
             
         else:    
             # now we initialize the starting coordinates from the entry points library
@@ -172,11 +170,7 @@ class partition:
             wlkr.Y_s = (self.umbrellas[i].entryPoints[temp_indx][3], self.umbrellas[i].entryPoints[temp_indx][4])
               		
             self.simulationTime[i] = self.umbrellas[i].entryPoints[temp_indx][0]
-            
-            #s1, s2, s3, s4, s5 = self.umbrellas[i].entryPoints[temp_indx]
-            self.umbrellas[i].samples.append(wlkr.getConfig())
-            
-            #self.umbrellas[i].samples.append(wlkr.getColvars())
+
         
         return 0
 
@@ -234,6 +228,9 @@ class partition:
         
         # inject the walker 
         self.reinject(wlkr, umbrellaIndex)
+        
+        # get the sample from the reinjection point
+        self.umbrellas[umbrellaIndex].samples.append(wlkr.getColvars())
         
         # also record the initial simulation time in a separate variable
         t = self.simulationTime[umbrellaIndex]
@@ -314,6 +311,10 @@ class partition:
                         
                         # reinject into this window
             		self.reinject(wlkr, umbrellaIndex)
+            		
+            		# get the sample from the new starting point
+            		self.umbrellas[umbrellaIndex].samples.append(wlkr.getColvars())
+
             		t = self.simulationTime[umbrellaIndex]
 
                         # we're done so let's stop the loop
