@@ -240,6 +240,7 @@ class lammpsWalker(walker.velocityWalker):
         This function prepares a LAMMPS image to be at the specified target 
         position given by the vector 'center' passed and an arguments. 
         """
+        print "Equilibrating walker."
         
         # first enter the restraints based on computes data structure
         restCommand = "fix REST all restrain "
@@ -277,6 +278,9 @@ class lammpsWalker(walker.velocityWalker):
         
         # now remove constraints for subsequent dynamics         
         self.command("unfix REST")
+        
+        # this resets the dynamics environment after the equilibration run
+        self.command("run 0 post no")
         
         return 0
         
