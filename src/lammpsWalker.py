@@ -47,8 +47,7 @@ class lammpsWalker(walker.velocityWalker):
     
         # walker index         
         self.index = index
-        
-    
+
     def close(self):
         """
         This function closes the lammps object. 
@@ -320,8 +319,9 @@ class lammpsWalker(walker.velocityWalker):
             if self.colvars[i][0] == 'x' or self.colvars[i][0] == 'y' or self.colvars[i][0] == 'z': 
                 cvarray[i] = self.lmp.extract_compute(str(i), 1, 1)[0]
             else:
+                #*** We REALLY need assurance here that what we are getting here is in fact not a NULL POINTER.
                 cvarray[i] = self.lmp.extract_compute(str(i), 2, 1)[0]
-                
+
         return cvarray
     
     def setConfig(self, config):
@@ -368,7 +368,7 @@ class lammpsWalker(walker.velocityWalker):
         
         return 0 
     
-    def setDynamics():
+    def setDynamics(self):
         """
         This routine sets the dynamics for the walker. 
         """

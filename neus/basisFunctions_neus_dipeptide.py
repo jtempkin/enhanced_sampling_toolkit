@@ -95,6 +95,9 @@ class basisFunction:
             np.savetxt(f_handle, self.basisFnxTimeSeries)
 
         """
+        for obs in self.local_observables:
+            with open(filename + obs[0].__name__, "w") as f_handle:
+                np.save(f_handle, obs[1])
 
         # delete current reference to the list
         del self.samples
@@ -106,7 +109,9 @@ class basisFunction:
         #self.basisFnxTimeSeries = [lastBasisFunction]
         #self.configs = [lastConfig]
 
-        return 0 
+        return 0
+
+
     
      
 class Box(basisFunction):

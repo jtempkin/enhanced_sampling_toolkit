@@ -13,11 +13,11 @@ import fileIO
 import sys
 import walker
 import basisFunctions_neus as basisFunctions
-import acor
 import errors
 import random
 import h5py
 import numpy as np
+import copy
 
 class partition:
     """
@@ -26,7 +26,11 @@ class partition:
     """
     
     def __init__(self, N):
-        
+        """
+        Init routine. Initializes the following values:
+
+
+        """
         # create an umbrella list
         self.umbrellas = []
         
@@ -36,6 +40,16 @@ class partition:
         self.a = np.zeros(N)
         self.m = np.zeros(N)
         self.z = np.zeros(N)
+        """
+        The obervables list is a bookkeeping of the observables of the system one
+        wants to record during the simulaiton. This list needs to be set prior to sampling.
+
+        The list shoud contain elements that are tuples of a function and a data array.
+
+        Each element should take two arguments, one the walker object and one the umbrella index for which the sample is
+        associated.
+        """
+        self.observables = []
 
         self.stoppingTimes = np.zeros(N)
         self.simulationTime = np.zeros(N)
@@ -50,7 +64,9 @@ class partition:
 
         for a finite time problem. 
         """
-	if finiteTime:
+        assert np.any(self.stoppingTimes[:] != 0.0), "Stopping Times value was not properly initialized."
+
+        if finiteTime:
             temp_M = np.zeros(self.M.shape)
         
             for i in range(self.M.shape[0]):
@@ -58,14 +74,14 @@ class partition:
         
             self.G = (self.k * self.G + temp_M) / (self.k + 1)
 
-	else:
-	    temp_M = np.zeros(self.M.shape)
+        else:
+            temp_M = np.zeros(self.M.shape)
 
-	    for i in range(self.M.shape[0]):
-		temp_M[i,:] = self.M[i,:] / self.stoppingTimes[i]
+            for i in range(self.M.shape[0]):
+		        temp_M[i,:] = self.M[i,:] / self.stoppingTimes[i]
 
-		# update diagonal elements of G in infinite time process
-		temp_M[i,i] = 1 - temp_M[i,:].sum()
+		        # update diagonal elements of G in infinite time process
+		        temp_M[i,i] = 1 - temp_M[i,:].sum()
 
 	    self.G = (self.k * self.G + temp_M) / (self.k + 1)
 
@@ -82,7 +98,38 @@ class partition:
             self.a[row] = 1 - self.G[row,:].sum()
         
         return 0
-        
+
+    def addObservable(self, A):
+        """
+        This routine adds an observable and initializes local copies of the observables in the basis windows.
+        """
+        assert len(A) == 3, "The observable passed was not in the correct format."
+        assert hasattr(self, "observables"), "The partition observables lists were not properly initialized."
+
+        # add the observable to both the partition and each window
+        self.observables.append(A)
+        for window in self.umbrellas:
+            if not hasattr(window, "local_observables"): window.local_observables = []
+            window.local_observables.append(copy.deepcopy(A))
+
+        return 0
+
+    def removeObservable(self, i): pass
+
+    def computeObservables(self):
+        """
+        This routine populates the partition observables with data averaged from the windows.
+        """
+        for indx in range(len(self.observables)):
+            temp = np.zeros(self.observables[indx][1].shape)
+
+            for i in range(len(self.umbrellas)):
+                temp += self.z[i] * self.umbrellas[i].local_observables[indx][1]
+
+            self.observables[indx][1][:] = temp[:]
+
+        return 0
+
     def computeZ(self, finiteTime=False):
         """
         Solves for z vector given current G,a via solving the following linear 
@@ -90,19 +137,19 @@ class partition:
             
             (I - G)^T z = a 
 	
-	for a finite time process and 
+	    for a finite time process and
 	
             zG = z 
 
-	for infinite time process.             
+	    for infinite time process.
         """
-	if finiteTime:
-            A = (np.identity(self.G.shape[0]) - self.G).transpose() 
+        if finiteTime:
+            A = (np.identity(self.G.shape[0]) - self.G).transpose()
         
             self.z = np.linalg.solve(A, self.a)
 
-	else:
-	    # compute via numpy interface to LAPACK the eigenvectors v and eigenvalues w
+        else:
+            # compute via numpy interface to LAPACK the eigenvectors v and eigenvalues w
             # The linalg routine returns this as the first (i.e. largest) eigenvalue.
             evals, evec = LA.eig(self.G, left=True, right=False)
             sort = np.argsort(evals)
@@ -110,26 +157,37 @@ class partition:
             self.z = evec[:,sort[-1]] / np.sum(evec[:,sort[-1]])
 
         return 0
-        
-    def computeAcor(self):
+
+    def accumulateObservables(self, wlkr, indx):
         """
-        This function will compute the autocorrelation function from the weighted
-        local estimations generated in each window. 
+        This routine loops through the observables list and updates the samples in the corresponding windows.
         """
-        # first gather the local estimations of the acor function
-        temp = np.zeros(self.acorr.shape)
-        for indx, window in enumerate(self.umbrellas):
-            temp += self.z[indx] * window.localCorrFunc
-            
-        # now update the global estimation
-        self.acorr = (self.acorr_nsamples * self.acorr + temp) / (self.acorr_nsamples + 1)
-        
-        self.acorr_nsamples += 1.0
-        
+
+        for obs in self.umbrellas[indx].local_observables:
+            # make sure that the element in the onservable list is in fact a tuple of length 2
+            # assert
+
+            # use the function pointer in the tuple to accumulate an entry into the second tuple entry (the data)
+            err = obs[0](obs[1], obs[2], wlkr)
+
+            if err != 0:
+                print "WARNING: Unable to accumulate observable for entry ", self.umbrellas[indx].local_observables.index(obs)
+                raise
+
+        return 0
+
+    def resetObservable(self, obs):
+        """
+        Set each element in the data of the passed observable to zero.
+        """
+        obs[1][:] = 0.0
+        obs[2][:] = 0.0
+
         return 0
         
     def accumulateAcorr(self, wlkr, i, s, stepLength):
         """
+        ******DEPRECATED*****
         This function takes the current position of the walker and updates the 
         local autocorrelation function estimation. 
         """
@@ -140,51 +198,6 @@ class partition:
         self.umbrellas[i].localCorrFunc_nsamples[time_indx] += 1.0
         
         return 0
-    
-    def pmf(self, wlkr, umbIndx):
-        """
-        This function provides the capability of accumulating a sample to a PMF
-        in the local estimates from each window.
-        """
-        
-        return 0
-        
-    def computePMF(self):
-	"""
-	This routine computes the global PMF based on the values in the local PMF.
-	"""
-	temp = np.zeros(self.pmf.shape)
-
-	for indx, window in enumerate(self.umbrellas):
-	    temp += self.z[indx] * window.localPmf
-	
-	# now update the global pmf
-	self.pmf = (self.k * self.pmf + temp) / (self.k + 1) 
-	
-	return 0 
-
-    def accumulatePMF(self, wlkr, umbInx):
-        """
-	This routine accumulates the local PMF based on the samples passed.
-
-        Assumes an even gridding of the PMF.
-        """
-
-	sample = wlkr.getColvars()
-        # shift dihedral values up to ranges between [0.0, 360.0]
-        indx = np.zeros(len(sample), dtype = np.int8)
-        for i in range(len(wlkr.colvars)):
-            if wlkr.colvars[i][0] == 'dihedral':
-                sample[i] += 180.0
-
-                indx[i] = self.umbrellas[umbInx].localPmf.shape[i] - 1 - int(np.floor(sample[i] / (360.0 / self.umbrellas[umbInx].localPmf.shape[i] ) ) )
-
-            else:
-                print "WARNING: accumulatePMF() does not support given collective variable."
-
-        self.umbrellas[umbInx].localPmf[tuple(indx)] += 1.0
-
-        return 0
         
     def reinject(self, wlkr, i):
         """
@@ -194,18 +207,14 @@ class partition:
         if len(self.umbrellas[i].entryPoints) == 0:
             # if there are no entry points recorded, set time to zero and 
             # reinject uniformly inside the box
-            pos = np.array([0.0, 0.0, 0.0])
-            pos[0] = self.umbrellas[i].center[0] + self.umbrellas[i].width[0] * (2.0*random.random() - 1.0)
-            pos[1] = self.umbrellas[i].center[1] + self.umbrellas[i].width[1] * (2.0*random.random() - 1.0)
-            
-            wlkr.setConfig(pos)
-	    #vel = np.random.normal(0.0, 0.728, (3,0))
-	    #wlkr.setVel(vel)
-            # set the reference to the current location 
+            restraint = [[0.0, 1000.0],[0.0, 1000.0]]
+            wlkr.equilibrate(self.umbrellas[i].center, restraint, "10000")
+
+            # set the reference to the current location
             wlkr.Y_s = (wlkr.getConfig(), wlkr.getVel())
-            
-            # don't redraw vel. 
-            self.simulationTime[i] = 0.0
+
+            # choose a simulation time uniformly between 0 and s
+            wlkr.simulationTime = 0.0
 
             
         else:    
@@ -218,7 +227,7 @@ class partition:
             # set the other component of the walker state
             wlkr.Y_s = (self.umbrellas[i].entryPoints[temp_indx][3], self.umbrellas[i].entryPoints[temp_indx][4])
               		
-            self.simulationTime[i] = self.umbrellas[i].entryPoints[temp_indx][0]
+            wlkr.simulationTime = self.umbrellas[i].entryPoints[temp_indx][0]
 
         
         return 0
@@ -269,7 +278,7 @@ class partition:
         inputFilename = sysParams['scratchdir'] + "/" + str(umbrellaIndex) + "_w" + str(walkerIndex)
         
         # assign an output file for the LAMMPS trajectory:
-        if trajFormat not in ['dcd','xyz']: 
+        if trajFormat not in ['dcd','xyz', 'xtc']:
             if not trajFormat: print "Warning: Trajectory Format Specified was not Recognized." 
         else:
             wlkr.command("dump 1 all " + trajFormat + " " + str(sysParams['stepLength']) + " " + inputFilename + "." + trajFormat)
@@ -278,45 +287,35 @@ class partition:
         # much time evolution is left to be done in this box
         T_0 = self.stoppingTimes[umbrellaIndex]
     
-        # inject the walker uniformly if there are no entryPoints
-        if len(self.umbrellas[umbrellaIndex].entryPoints) == 0:
-        
-            restraint = [[100.0, 100.0],[100.0, 100.0]]
-            wlkr.equilibrate(self.umbrellas[umbrellaIndex].center, restraint, "5000")            
-            
-            # set the reference to the current location 
-            wlkr.Y_s = (wlkr.getConfig(), wlkr.getVel())
-            
-            # choose a simulation time uniformly between 0 and s 
-            self.simulationTime[umbrellaIndex] = 0.0
-            
-        else:
-            self.reinject(wlkr, umbrellaIndex)
+
+        self.reinject(wlkr, umbrellaIndex)
         
         # get the sample from the reinjection point
         self.umbrellas[umbrellaIndex].samples.append(wlkr.getColvars())
         
         # also record the initial simulation time in a separate variable
-        t = self.simulationTime[umbrellaIndex]
+        t = wlkr.simulationTime
         
         # reset the local observables
-	self.umbrellas[umbrellaIndex].localPmf = np.zeros(self.umbrellas[umbrellaIndex].localPmf.shape)
+        for obs in self.umbrellas[umbrellaIndex].local_observables:
+            self.resetObservable(obs)
 
-	# reset local correlation function variables
-	#self.umbrellas[umbrellaIndex].localCorrFunc[:] = 0.0
-	#self.umbrellas[umbrellaIndex].localCorrFunc_nsamples[:] = 0.0
+	    # reset local correlation function variables
+	    #self.umbrellas[umbrellaIndex].localCorrFunc[:] = 0.0
+	    #self.umbrellas[umbrellaIndex].localCorrFunc_nsamples[:] = 0.0
         
         #for i in range(0, numSteps, sysParams['stepLength']):
         while T_0 > 0.0:
             # propagate the dynamics
             wlkr.propagate(sysParams['stepLength'])
-            self.simulationTime[umbrellaIndex] += sysParams['stepLength']
-            # for infinite time processes let's simply count down 
-	    T_0 -= sysParams['stepLength']
+            wlkr.simulationTime += sysParams['stepLength']
+
+            # for infinite time processes let's simply count down
+            T_0 -= sysParams['stepLength']
 	    
             # now we check to see if we've passed the autocorrelation length
             # if we do, we reset the Y ( [t / s] * s) value to the current point
-            if (self.simulationTime[umbrellaIndex] % sysParams['corrLength']) == 0.0:
+            if (wlkr.simulationTime % sysParams['corrLength']) == 0.0:
                 wlkr.Y_s = (wlkr.getConfig(), wlkr.getVel())
             
             # get the new sample position
@@ -354,44 +353,31 @@ class partition:
                 indicators = self.getBasisFunctionValues(self.umbrellas[umbrellaIndex].samples[-1])
             
                 randVal = random.random()
+                # record a transition to the matrix
+                self.M[umbrellaIndex,:] += indicators
+                #self.M[umbrellaIndex][indx] += 1.0
 
                 # now we update the T_0 value for making this transition
-		#T_0 = T_0 - self.simulationTime[umbrellaIndex] + t 
+		        #T_0 = T_0 - self.simulationTime[umbrellaIndex] + t
 
                 for indx in range(len(indicators)):
                     if randVal < indicators[:indx+1].sum():
-                    #if self.umbrellas[indx].indicator(self.umbrellas[umbrellaIndex].samples[-1]) == 1.0:        
-                        
-                        # record a transition to the matrix
-                        self.M[umbrellaIndex,:] += indicators
-                        #self.M[umbrellaIndex][indx] += 1.0
+                    #if self.umbrellas[indx].indicator(self.umbrellas[umbrellaIndex].samples[-1]) == 1.0:
                         
                         # now we will need to reinject the walker
                         
                         # append the entry point to the new window
-                        self.umbrellas[indx].newEntryPoints.append([indx, (self.simulationTime[umbrellaIndex], wlkr.getConfig(), wlkr.getVel(), wlkr.Y_s[0], wlkr.Y_s[1])])
+                        self.umbrellas[indx].newEntryPoints.append([indx, (wlkr.simulationTime, wlkr.getConfig(), wlkr.getVel(), wlkr.Y_s[0], wlkr.Y_s[1])])
                         
                         # drop the last point from the samples 
                         self.umbrellas[umbrellaIndex].samples.pop()
-                        
-                        # inject the walker uniformly if there are no entryPoints
-                        if len(self.umbrellas[umbrellaIndex].entryPoints) == 0:
 
-                            restraint = [[0.0, 1000.0],[0.0, 1000.0]]
-                            wlkr.equilibrate(self.umbrellas[umbrellaIndex].center, restraint, "10000")
-
-                            # set the reference to the current location 
-                            wlkr.Y_s = (wlkr.getConfig(), wlkr.getVel())
-                            
-                            # don't redraw vel. 
-                            self.simulationTime[umbrellaIndex] = 0.0
-                        else:
-                            self.reinject(wlkr, umbrellaIndex)
+                        self.reinject(wlkr, umbrellaIndex)
             		
-            		# get the sample from the new starting point
-            		self.umbrellas[umbrellaIndex].samples.append(wlkr.getColvars())
+                        # get the sample from the new starting point
+                        self.umbrellas[umbrellaIndex].samples.append(wlkr.getColvars())
 
-            		t = self.simulationTime[umbrellaIndex]
+                        t = wlkr.simulationTime
 
                         # we're done so let's stop the loop
                         break
@@ -400,15 +386,13 @@ class partition:
             
             # let's accumulate a sample into the autocorrelation function
             #self.accumulateAcorr(wlkr, umbrellaIndex, sysParams['corrLength'], sysParams['stepLength'])
-            self.accumulatePMF(wlkr, umbrellaIndex)
+            self.accumulateObservables(wlkr, umbrellaIndex)
 
             # now check to see if the data buffer has become too large and flush buffer to file
             #if len(self.umbrellas[umbrellaIndex].samples) > 1000000:
-                #self.umbrellas[umbrellaIndex].flushDataToFile(inputFilename)
+            #self.umbrellas[umbrellaIndex].flushDataToFile(inputFilename)
         
         print "Transitions recorded: ", self.M[umbrellaIndex,:].sum() - self.M[umbrellaIndex,umbrellaIndex]
-        
-        print self.umbrellas[umbrellaIndex].localPmf
         
         # flush the last data to file
         self.umbrellas[umbrellaIndex].flushDataToFile(inputFilename)   
