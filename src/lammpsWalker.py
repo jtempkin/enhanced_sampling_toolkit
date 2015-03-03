@@ -239,7 +239,11 @@ class lammpsWalker(walker.velocityWalker):
         This function prepares a LAMMPS image to be at the specified target 
         position given by the vector 'center' passed and an arguments. 
         """
-        print "Equilibrating walker."
+        #print "Equilibrating walker."
+        
+        assert len(center) == len(restraint), "The dimension of the center array and the restraint array do not match."
+        assert len(center) == len(self.colvars), "The dimension of the center array and the number of collective variables do not match."
+        
         
         # first enter the restraints based on computes data structure
         restCommand = "fix REST all restrain "
@@ -259,12 +263,15 @@ class lammpsWalker(walker.velocityWalker):
         # now loop through each 
         for index, entry in enumerate(cv):
             if entry[0] == 'dihedral':
-                restCommand += " " + " ".join(entry) + " " + " ".join(map(str, restraint[index])) + " " + str(center[index] + 180.0)
+                restCommand += " " + " ".join(entry) + " " + " ".join(map(str, restraint[index])) + " " + str(center[index])
+                #restCommand += " " + " ".join(entry) + " " + " ".join(map(str, restraint[index])) + " " + str(center[index] + 180.0)
             else:
                 restCommand += " " + " ".join(entry) + " " + " ".join(map(str, restraint[index])) + " " + str(center[index])
         
         # now issue restraint definition to the lammps object 
         self.command(restCommand)
+        
+        self.command("fix_modify REST energy yes")
                     
         # now run the equilibration dynamics     
         self.command("run " + str(numSteps) + " post no")

@@ -367,7 +367,7 @@ class partition:
                         # now we will need to reinject the walker
                         
                         # append the entry point to the new window
-                        self.umbrellas[indx].newEntryPoints.append([indx, (wlkr.simulationTime, wlkr.getConfig(), wlkr.getVel(), wlkr.Y_s[0], wlkr.Y_s[1])])
+                        self.umbrellas[indx].newEntryPoints.append([umbrellaIndex, (wlkr.simulationTime, wlkr.getConfig(), wlkr.getVel(), wlkr.Y_s[0], wlkr.Y_s[1])])
                         
                         # drop the last point from the samples 
                         self.umbrellas[umbrellaIndex].samples.pop()

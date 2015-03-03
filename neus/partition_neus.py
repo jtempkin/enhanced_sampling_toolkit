@@ -127,6 +127,25 @@ class partition:
         self.acorr_nsamples += 1.0
         
         return 0
+    
+    def getAcor(self):
+        """
+        This function will accumulate the autocorrelation function from the weighted
+        local estimations generated in each window but critically will not average with the 
+        previous iterations. This simply sets local estimate as teh weighted sum of the current 
+        set.
+        """
+        # first gather the local estimations of the acor function
+        temp = np.zeros(self.acorr.shape)
+        for indx, window in enumerate(self.umbrellas):
+            temp += self.z[indx] * window.localCorrFunc
+            
+        # now update the global estimation
+        self.acorr = temp
+        
+        #self.acorr_nsamples += 1.0
+        
+        return 0
         
     def accumulateAcorr(self, wlkr, i, s, stepLength):
         """
@@ -405,7 +424,7 @@ class partition:
         
         print "Transitions recorded: ", self.M[umbrellaIndex,:].sum() - self.M[umbrellaIndex,umbrellaIndex]
         # flush the last data to file
-        #self.umbrellas[umbrellaIndex].flushDataToFile(inputFilename)   
+        self.umbrellas[umbrellaIndex].flushDataToFile(inputFilename)   
 
         return 0
 
