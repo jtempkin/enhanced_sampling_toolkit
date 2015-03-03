@@ -74,8 +74,14 @@ class basisFunction:
                 dset = self.samples
         """
        
+        """       
+        *** NOTE FOR FILESYSTEM REASONS, WE'RE NOT WRITING COLVARS TO FILE BY
+        DEFAULT*** 
+       
         with open(filename + ".colvars", "a") as f_handle:
             np.save(f_handle, self.samples)
+            
+        """
         """
         # write out the basis function time series as well            
         with h5py.File(filename + ".hdf5", "a") as f_handle:
