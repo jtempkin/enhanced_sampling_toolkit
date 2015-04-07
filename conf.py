@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # Enhanced Sampling Toolkit documentation build configuration file, created by
-# sphinx-quickstart on Mon Apr  6 14:14:36 2015.
+# sphinx-quickstart on Tue Apr  7 11:17:28 2015.
 #
 # This file is execfile()d with the current directory set to its
 # containing dir.
@@ -31,9 +31,9 @@ import os
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
-    'sphinx.ext.todo',
     'sphinx.ext.coverage',
     'sphinx.ext.mathjax',
+    'sphinx.ext.viewcode',
 ]
 
 # Add any paths that contain templates here, relative to this directory.

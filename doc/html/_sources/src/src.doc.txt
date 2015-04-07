@@ -1,0 +1,9 @@
+.. Documentation for src folder. Leverages the autodoc functionallity
+   for formatting the lammpsWalker docstrings. Uses sphinx to compile the
+   documentation. 
+
+LAMMPS Walker Module
+=========================
+
+.. automodule:: lammpsWalker
+	:members:

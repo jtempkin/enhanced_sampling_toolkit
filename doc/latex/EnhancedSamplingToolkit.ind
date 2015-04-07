@@ -1,0 +1,66 @@
+\begin{theindex}
+\def\bigletter#1{{\Large\sffamily#1}\nopagebreak\vspace{1mm}}
+
+  \bigletter C
+  \item close() (lammpsWalker.lammpsWalker method), \hyperpage{5}
+  \item close() (walker.walker method), \hyperpage{3}
+  \item command() (lammpsWalker.lammpsWalker method), \hyperpage{5}
+
+  \indexspace
+  \bigletter D
+  \item destroyColvars() (lammpsWalker.lammpsWalker method), \hyperpage{5}
+  \item drawVel() (lammpsWalker.lammpsWalker method), \hyperpage{5}
+  \item drawVel() (walker.velocityWalker method), \hyperpage{3}
+
+  \indexspace
+  \bigletter E
+  \item equilibrate() (lammpsWalker.lammpsWalker method), \hyperpage{5}
+  \item equilibrate() (walker.walker method), \hyperpage{3}
+
+  \indexspace
+  \bigletter G
+  \item getColvars() (lammpsWalker.lammpsWalker method), \hyperpage{5}
+  \item getColvars() (walker.walker method), \hyperpage{3}
+  \item getConfig() (lammpsWalker.lammpsWalker method), \hyperpage{5}
+  \item getConfig() (walker.walker method), \hyperpage{3}
+  \item getVel() (lammpsWalker.lammpsWalker method), \hyperpage{5}
+
+  \indexspace
+  \bigletter L
+  \item lammpsWalker (class in lammpsWalker), \hyperpage{5}
+  \item lammpsWalker (module), \hyperpage{5}
+
+  \indexspace
+  \bigletter M
+  \item minimize() (lammpsWalker.lammpsWalker method), \hyperpage{5}
+
+  \indexspace
+  \bigletter P
+  \item propagate() (lammpsWalker.lammpsWalker method), \hyperpage{5}
+  \item propagate() (walker.walker method), \hyperpage{3}
+
+  \indexspace
+  \bigletter R
+  \item reverseVel() (lammpsWalker.lammpsWalker method), \hyperpage{5}
+  \item reverseVel() (walker.velocityWalker method), \hyperpage{3}
+
+  \indexspace
+  \bigletter S
+  \item setColvars() (lammpsWalker.lammpsWalker method), \hyperpage{6}
+  \item setConfig() (lammpsWalker.lammpsWalker method), \hyperpage{6}
+  \item setConfig() (walker.walker method), \hyperpage{3}
+  \item setDynamics() (lammpsWalker.lammpsWalker method), \hyperpage{6}
+  \item setTemperature() (lammpsWalker.lammpsWalker method), \hyperpage{6}
+  \item setTimestep() (lammpsWalker.lammpsWalker method), \hyperpage{6}
+  \item setVel() (lammpsWalker.lammpsWalker method), \hyperpage{6}
+
+  \indexspace
+  \bigletter V
+  \item velocityWalker (class in walker), \hyperpage{3}
+
+  \indexspace
+  \bigletter W
+  \item walker (class in walker), \hyperpage{3}
+  \item walker (module), \hyperpage{3}
+
+\end{theindex}
