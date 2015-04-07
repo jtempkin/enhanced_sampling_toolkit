@@ -1,11 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Jul 15 16:21:03 2014
-
-This file implements the LAMMPS walker abstraction layer.
-
-
-@author: Jeremy Tempkin
+This file implements the LAMMPS walker abstraction layer. The core of this idea is that 
 """
 
 import random
@@ -13,22 +8,50 @@ import sys
 import walker
 import numpy as np
 import ctypes
-from lammps import lammps
+#from lammps import lammps
 
 
 class lammpsWalker(walker.velocityWalker):
     """
-    This class implements the lammps bindings into the walker class.
+    This class implements the enhanced sampling walker API for the bindings to the LAMMPS package. To check the math formatting, here is an example $e^{i\pi} = -1$. 
+    
+    Some usage issues to note:
+    
+    1) Collective variables (CVs) are defined to the walker by constructing a list of
+    CVs internally in the walker.colvars object. These CVs list takes the following
+    format:
+
+    
+    ["coordinateType", atomids....]
+    
+    The coordinate type specifies which type of coordinate the CV is 
+    (i.e. bond, angle, dihedral, etc.). The next items in the list are the atom 
+    indecies involved in this specific instance of the CV.
+    
+    The walker will use this list to initialize them to the underlying LAMMPS objects. 
     """
+    
     def __init__(self, inputFilename, logFilename, index = 0, debug = False):
         """
-        Initializes the walker based on an input file for lammps.
+        Initializes a walker object. Takes the following input:
+        
+        * a filename that builds the model from a LAMMPS script.
+        * a filename to pipe standard LAMMPS output into.
+        * an index for the walker. (default=0)
+        * debug flag to open writing verbose output. Importantly, this pipes LAMMPS output to standard output. (default=False)
+        
+        The __init__() routine will check for LAMMPS being an importable library from Python and raise an execption if it cannot be loaded. 
+        
         """
-        # a general filename for storing the data, note the appending of the index
+        try:
+            from lammps import lammps
+        except:
+            print "ERROR: The LAMMPS python interface could not be found. Check your PYTHONPATH and compiled LAMMPS directory to make sure it is compiled and importable." 
+        # a filename for storing the data, note the appending of the index
         self.filename = inputFilename + "." + str(index)
         
         # start walker object from the passed lammps input file name
-        self.lmp = self.initLAMMPS(inputFilename=inputFilename, logFilename=".".join([logFilename, str(index)]), verbose = debug)
+        self.lmp = self.__initLAMMPS__(inputFilename=inputFilename, logFilename=".".join([logFilename, str(index)]), verbose = debug)
         
         # a list of the relevant collective variables
         self.colvars = []
@@ -50,15 +73,20 @@ class lammpsWalker(walker.velocityWalker):
 
     def close(self):
         """
-        This function closes the lammps object. 
+        This function closes the LAMMPS object. 
         """
         self.lmp.close()
         return 0 
         
-    def initLAMMPS(self, inputFilename=None, logFilename="log", verbose = False):
+    def __initLAMMPS__(self, inputFilename=None, logFilename="log", verbose = False):
         """
-        This function initializes a lammps simulation given an input file
-        and the system parameters. Calls the setupLAMMPS internal routine. 
+        This function initializes a LAMMPS simulation given an input file. 
+        
+        Takes the following arguments:
+        
+        * input file name
+        * 
+        
         
         """
         # initialize the lammps object
@@ -79,15 +107,17 @@ class lammpsWalker(walker.velocityWalker):
         else:
             self.lmp.command("log " + logFilename)
         
-        #self.__setupLAMMPS(filename)
+        #self.__setupLAMMPS__(filename)
 
         return self.lmp    
 
-    def __setupLAMMPS(self, filename=None):
+    def __setupLAMMPS__(self, filename=None):
         """
         The input file sets up and initializes the LAMMPS system from a setup
         file. The setup file should be a simple text file written in LAMMPS
         input file syntax.
+        
+        **DEPRECATED TO DATE 4/6/15**.
         """
         # specify general log file parameters
         self.lmp.command("echo none")
@@ -184,8 +214,19 @@ class lammpsWalker(walker.velocityWalker):
         
     def setColvars(self):
         """
-        This function initializes the collective variable and trajectory output 
-        for a LAMMPS simulation that is handed to this object. 
+        This function initializes the collective variable for a LAMMPS simulation that is handed to this object. 
+        
+        Currently supports the following cv's:
+        
+        * bond
+        * angle
+        * dihedral
+        * x, y or z position coordinates
+        * x, y or z velocity components 
+        
+        These are parsed and sent to the underlying LAMMPS object directly using the LAMMPS syntax for these variable. 
+        
+        The implementation first creates a labeled group in LAMMPS containing the atoms used in the CV. Then a compute is initialized using that group. 
         """        
         cv = []
         for entry in self.colvars:
@@ -388,7 +429,7 @@ class lammpsWalker(walker.velocityWalker):
         LAMMPS object.
         """
         
-        # issue the command directly. 
+        # issue the given command directly. 
         self.lmp.command(command)
         
         return 0 
@@ -400,6 +441,7 @@ class lammpsWalker(walker.velocityWalker):
         # use default settings
         if args == None:
             self.lmp.command("minimize 1.0e-4 1.0e-6 100 1000")
+        # else use the arguments provided. 
         else:
             self.lmp.command("minimize " + " ".join(args))
         
