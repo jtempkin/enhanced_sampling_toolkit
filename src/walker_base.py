@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-NOTE: we may want to use abstract properties in the future. 
+This section describes the base API used to define the walker objects. The base class is declared internally using Python's abstract base class module. The implementations of the bindings specific to the dynamics packages are registered to this base class definition through direct subclassing of the modules. A key feature of this decision is that it enforces the implementation of the dynamics bindings to implement each of the following methods in their class declarations. However, many of the methods can be overridden with empty methods if an implementation is incomplete or does not require all of the base class methods. 
+
+DEVELOPER NOTE: we may want to use abstract properties in the future. 
 """
 import abc
 
@@ -11,6 +13,28 @@ class walker(object):
     """
     __metaclass__=abc.ABCMeta
     
+    @abc.abstractmethod
+    def setColvars(self):
+        """
+        Sends the colvars to the underlying dyanmics engine.
+        """
+        return 
+        
+    @abc.abstractmethod
+    def destroyColvars(self):
+        """
+        Removes colvars from the walker. 
+        """
+        return 
+      
+ 
+    @abc.abstractmethod
+    def addColvars(self, cv):
+        """
+        Updates internal walker data structure containing a collective variable.
+        """
+        return
+
     @abc.abstractmethod
     def getConfig(self):
         """
@@ -55,17 +79,6 @@ class walker(object):
         Destroys the walker.
         """
         return
-        
-class velocityWalker(walker):
-    """
-    This is an abstract class for dynamics which have a velocity component, such as 
-    a protein under Langevin dynamics.  It extends the walker abstract class by
-    adding additional abstract methods that are necessary for a walker that has
-    a velocity.
-    
-    """
-    
-    __metaclass__=abc.ABCMeta
 
     @abc.abstractmethod
     def drawVel(self):

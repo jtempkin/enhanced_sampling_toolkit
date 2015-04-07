@@ -4,16 +4,17 @@ This file implements the LAMMPS walker abstraction layer. The core of this idea 
 """
 
 import random
-import sys
-import walker
+#import sys
+from walker_base import walker
+import collectiveVariables
 import numpy as np
 import ctypes
 #from lammps import lammps
 
 
-class lammpsWalker(walker.velocityWalker):
+class lammpsWalker(walker):
     """
-    This class implements the enhanced sampling walker API for the bindings to the LAMMPS package. To check the math formatting, here is an example $e^{i\pi} = -1$. 
+    This class implements the enhanced sampling walker API for the bindings to the LAMMPS package. 
     
     Some usage issues to note:
     
@@ -43,10 +44,6 @@ class lammpsWalker(walker.velocityWalker):
         The __init__() routine will check for LAMMPS being an importable library from Python and raise an execption if it cannot be loaded. 
         
         """
-        try:
-            from lammps import lammps
-        except:
-            print "ERROR: The LAMMPS python interface could not be found. Check your PYTHONPATH and compiled LAMMPS directory to make sure it is compiled and importable." 
         # a filename for storing the data, note the appending of the index
         self.filename = inputFilename + "." + str(index)
         
@@ -89,6 +86,10 @@ class lammpsWalker(walker.velocityWalker):
         
         
         """
+        try:
+            from lammps import lammps
+        except:
+            print "ERROR: The LAMMPS python interface could not be found. Check your PYTHONPATH and compiled LAMMPS directory to make sure it is compiled and importable." 
         # initialize the lammps object
         if verbose == True:
             self.lmp = lammps()
@@ -98,19 +99,287 @@ class lammpsWalker(walker.velocityWalker):
         
         # after the lammps object is created, initialize the lammps simulation. 
         # specify general log file parameters
-        self.lmp.command("echo none")
+        self.__command__("echo none")
 
         # if there is a specified filename, use it to set up the simulation.         
         if inputFilename != None:
-            self.lmp.command("log " + logFilename)
+            self.__command__("log " + logFilename)
             self.lmp.file(inputFilename)
         else:
-            self.lmp.command("log " + logFilename)
+            self.__command__("log " + logFilename)
         
         #self.__setupLAMMPS__(filename)
 
         return self.lmp    
 
+       
+    def setColvars(self):
+        """
+        This function initializes the collective variable for a LAMMPS simulation that is handed to this object. 
+        
+        Currently supports the following cv's:
+        
+        * bond
+        * angle
+        * dihedral
+        * x, y or z position coordinates
+        * x, y or z velocity components 
+        
+        These are parsed and sent to the underlying LAMMPS object directly using the LAMMPS syntax for these variable. 
+        
+        The implementation first creates a labeled group in LAMMPS containing the atoms used in the CV. Then a compute is initialized using that group. 
+        """
+        
+        """
+        cv = []
+        for entry in self.colvars:
+            cv.append(map(str, entry))
+        """
+        # initialize the groups and the computes associated with them
+        for index,entry in enumerate(self.colvars):  
+            if entry.type == 'bond':
+                self.__command__("group " + "b" + str(index) + " id " + " ".join(map(str,entry.atomIDs)))
+                self.__command__("compute " + str(index) + " b" + str(index) + " bond/local dist" )
+            elif entry.type == 'angle':
+                self.__command__("group " + "a" + str(index) + " id " + " ".join(map(str,entry.atomIDs)))
+                self.__command__("compute " + str(index) + " a" + str(index) + " angle/local theta")
+            elif entry.type == 'dihedral':
+                self.__command__("group " + "d" + str(index) + " id " + " ".join(map(str,entry.atomIDs)))
+                self.__command__("compute " + str(index) + " d" + str(index) + " dihedral/local phi")        
+            elif entry.type == 'x':
+                self.__command__("group x" + str(index) + " id " + " ".join(map(str,entry.atomIDs)))
+                self.__command__("compute " + str(index) + " x" + str(index) + " property/atom x")
+            elif entry.type == 'y':
+                self.__command__("group y" + str(index) + " id " + " ".join(map(str,entry.atomIDs)))
+                self.__command__("compute " + str(index) + " y" + str(index) + " property/atom y")
+            elif entry.type == 'z':
+                self.__command__("group z" + str(index) + " id " + " ".join(map(str,entry.atomIDs)))
+                self.__command__("compute " + str(index) + " z" + str(index) + " property/atom z")
+            elif entry.type == "vx":
+                self.__command__("group vx" + str(index) + " id " + " ".join(map(str,entry.atomIDs)))
+                self.__command__("compute " + str(index) + " vx" + str(index) + " property/atom vx")
+            elif entry.type == "vy":
+                self.__command__("group vy" + str(index) + " id " + " ".join(map(str,entry.atomIDs)))
+                self.__command__("compute " + str(index) + " vy" + str(index) + " property/atom vy")
+            elif entry.type == "vz":
+                self.__command__("group vz" + str(index) + " id " + " ".join(map(str,entry.atomIDs)))
+                self.__command__("compute " + str(index) + " vz" + str(index) + " property/atom vz")
+            
+        
+        return 0
+
+    def addColvars(self, name, cvType, atomIDs):
+        """
+        Implements the addition of a collective variable to the list of collective variables held by this walker.
+        """
+        __knownCVs__ = ['bond', 'angle', 'dihedral', 'x', 'y', 'z', 'vx', 'vy', 'vz']
+        assert cvType in __knownCVs__, "cvType that was provided was not understood." 
+            
+        self.colvars.append(collectiveVariables(name, cvType, atomIDs))
+        return 0
+        
+    def destroyColvars(self):
+        """
+        This function removes the colvars set by setColvars(). By default, it removes all of the collective variables in the list. It does not remove them from the collective variables list. 
+        """        
+        for cv in self.colvars:
+            self.__command__("uncompute " + str(self.colvars.index(cv)))
+            
+        return 0    
+                
+    def equilibrate(self, center, restraint, numSteps):
+        """
+        This function prepares a LAMMPS image to be at the specified target position given by the vector 'center' passed and an arguments. 
+        """
+        #print "Equilibrating walker."
+        
+        assert len(center) == len(restraint), "The dimension of the center array and the restraint array do not match."
+        assert len(center) == len(self.colvars), "The dimension of the center array and the number of collective variables do not match."
+        
+        
+        # first enter the restraints based on computes data structure
+        restCommand = "fix REST all restrain "
+        
+        # here we apply the constraints based on the collective variable definition
+        # check to make sure we have collective variables defined. 
+        if len(self.colvars) == 0:
+            print "There are no collective variables defined in walker " + str(self.index)
+            print "Aborting equilibration of walker " + str(self.index)
+            return 0 
+            
+        # let's get a string representation of the colvars, it's friendly
+        cv = []
+        for entry in self.colvars:
+            cv.append(map(str, entry))
+            
+        # now loop through each 
+        for index, entry in enumerate(cv):
+            if entry[0] == 'dihedral':
+                restCommand += " " + " ".join(entry) + " " + " ".join(map(str, restraint[index])) + " " + str(center[index])
+                #restCommand += " " + " ".join(entry) + " " + " ".join(map(str, restraint[index])) + " " + str(center[index] + 180.0)
+            else:
+                restCommand += " " + " ".join(entry) + " " + " ".join(map(str, restraint[index])) + " " + str(center[index])
+        
+        # now issue restraint definition to the lammps object 
+        self.__command__(restCommand)
+        
+        self.__command__("fix_modify REST energy yes")
+                    
+        # now run the equilibration dynamics     
+        self.__command__("run " + str(numSteps) + " post no")
+        
+        """
+        # apply SHAKE if used
+        if self.shakeH:    
+            self.lmp.command("fix 10 all shake 0.0001 500 0 m 1.008")
+        """ 
+        
+        # now remove constraints for subsequent dynamics         
+        self.__command__("unfix REST")
+        
+        # this resets the dynamics environment after the equilibration run
+        self.__command__("run 0 post no")
+        
+        return 0
+        
+    def getConfig(self):
+        """
+        This function returns the current position of the LAMMPS simulation.
+        """
+        config = np.asarray(self.lmp.gather_atoms("x",1,3))
+        
+        return config
+        
+    def getVel(self):
+        """
+        This function returns the current velocities from the LAMMPS simulation.
+        """
+        vel = np.asarray(self.lmp.gather_atoms("v", 1, 3))
+        
+        return vel
+        
+    def setVel(self, vel):
+        """
+        This function sets the velocity to the lammps simulation. 
+        """
+        
+        self.lmp.scatter_atoms("v", 1, 3, vel.ctypes.data_as(ctypes.POINTER(ctypes.c_double)))
+        
+        return 0
+
+    def getColvars(self):
+        """
+        This function returns the current position of the LAMMPS simulation in 
+        colvars space.
+        """
+        # get an empty array with placeholders
+        cvarray = [None]*len(self.colvars)
+        
+        # now get cv's one by one from each compute defined
+        for i in range(len(self.colvars)):
+            if self.colvars[i].type == 'x' or self.colvars[i].type == 'y' or self.colvars[i].type == 'z': 
+                cvarray[i] = self.lmp.extract_compute(str(i), 1, 1)[0]
+            else:
+                #*** We REALLY need assurance here that what we are getting here is in fact not a NULL POINTER.
+                cvarray[i] = self.lmp.extract_compute(str(i), 2, 1)[0]
+
+        return cvarray
+    
+    def setConfig(self, config):
+        """
+        This routine sets the internal configuration. 
+        """                
+        self.lmp.scatter_atoms("x", 1, 3, config.ctypes.data_as(ctypes.POINTER(ctypes.c_double)))
+        
+        return 0 
+    
+    def drawVel(self, distType = 'gaussian', temperature = 310.0):
+        """
+        This function redraws the velocities from a maxwell-boltzmann dist.
+        """
+        if distType == 'gaussian':
+            self.__command__("velocity all create " + str(temperature) + " " + str(random.randint(100000,999999)) + " dist gaussian")
+        else:
+            print "The drawVel() routine was passed a distribution Type that was not understood."
+            
+        return 0
+    
+    def reverseVel(self):
+        """ 
+        This function reverses the velocities of a given LAMMPS simulation
+        """
+        
+        # set varibales for reversing velocities
+        self.__command__("variable vx atom -vx")
+        self.__command__("variable vy atom -vy")
+        self.__command__("variable vz atom -vz")
+        
+        # set new velocities
+        self.__command__("velocity all set v_vx v_vy v_vz")
+        
+        return 0     
+        
+    def propagate(self, numSteps, pre='no', post='no'):
+        """
+        This function issues a run command to the underlying dynamics to propagate
+        the dynamics a given number of steps. 
+        """
+        
+        self.__command__("run " + str(numSteps) + " pre " + str(pre) + " post " + str(post))
+        
+        return 0 
+    
+    def setDynamics(self):
+        """
+        This routine sets the dynamics for the walker. 
+        """
+        
+        return 0
+    
+    def __command__(self, command):
+        """
+        This function allows the user to issue a LAMMPS command directly to the
+        LAMMPS object.
+        """
+        
+        # issue the given command directly. 
+        self.lmp.command(command)
+        
+        return 0 
+        
+    def minimize(self, args=None):
+        """
+        This function runs a minimization routine with the specified type.
+        """
+        # use default settings
+        if args == None:
+            self.__command__("minimize 1.0e-4 1.0e-6 100 1000")
+        # else use the arguments provided. 
+        else:
+            self.__command__("minimize " + " ".join(args))
+        
+        return 0 
+        
+    def setTemperature(self, temp):
+        """
+        This function sets the temperature of the walker object.
+        
+        NOTE THAT THIS DOES NOT ALTER THE DYNAMICS THERMOSTAT. LAMMPS REQUIRES
+        RESETING THIS THERMOSTAT. WE WILL LOOK INTO HOW TO DO THIS. 
+        """
+        self.temperature = temp
+        
+        return 0
+        
+    def setTimestep(self, timestep):
+        """
+        This routine sets the dynamics time step.
+        """
+        self.__command__("timestep " + str(timestep))
+        
+        return 0
+        
+        
     def __setupLAMMPS__(self, filename=None):
         """
         The input file sets up and initializes the LAMMPS system from a setup
@@ -211,261 +480,11 @@ class lammpsWalker(walker.velocityWalker):
         
         
         return 0 
+     
         
-    def setColvars(self):
-        """
-        This function initializes the collective variable for a LAMMPS simulation that is handed to this object. 
         
-        Currently supports the following cv's:
-        
-        * bond
-        * angle
-        * dihedral
-        * x, y or z position coordinates
-        * x, y or z velocity components 
-        
-        These are parsed and sent to the underlying LAMMPS object directly using the LAMMPS syntax for these variable. 
-        
-        The implementation first creates a labeled group in LAMMPS containing the atoms used in the CV. Then a compute is initialized using that group. 
-        """        
-        cv = []
-        for entry in self.colvars:
-            cv.append(map(str, entry))
-        
-        # initialize the groups and the computes associated with them
-        for index,entry in enumerate(cv):  
-            if entry[0] == 'bond':
-                self.lmp.command("group " + "b" + str(index) + " id " + " ".join(entry[1:]))
-                self.lmp.command("compute " + str(index) + " b" + str(index) + " bond/local dist" )
-            elif entry[0] == 'angle':
-                self.lmp.command("group " + "a" + str(index) + " id " + " ".join(entry[1:]))
-                self.lmp.command("compute " + str(index) + " a" + str(index) + " angle/local theta")
-            elif entry[0] == 'dihedral':
-                self.lmp.command("group " + "d" + str(index) + " id " + " ".join(entry[1:]))
-                self.lmp.command("compute " + str(index) + " d" + str(index) + " dihedral/local phi")        
-            elif entry[0] == 'x':
-                self.lmp.command("group x" + str(index) + " id " + " ".join(entry[1:]))
-                self.lmp.command("compute " + str(index) + " x" + str(index) + " property/atom x")
-            elif entry[0] == 'y':
-                self.lmp.command("group y" + str(index) + " id " + " ".join(entry[1:]))
-                self.lmp.command("compute " + str(index) + " y" + str(index) + " property/atom y")
-            elif entry[0] == 'z':
-                self.lmp.command("group z" + str(index) + " id " + " ".join(entry[1:]))
-                self.lmp.command("compute " + str(index) + " z" + str(index) + " property/atom z")
-            elif entry[0] == "vx":
-                self.lmp.command("group vx" + str(index) + " id " + " ".join(entry[1:]))
-                self.lmp.command("compute " + str(index) + " vx" + str(index) + " property/atom vx")
-            elif entry[0] == "vy":
-                self.lmp.command("group vy" + str(index) + " id " + " ".join(entry[1:]))
-                self.lmp.command("compute " + str(index) + " vy" + str(index) + " property/atom vy")
-            elif entry[0] == "vz":
-                self.lmp.command("group vz" + str(index) + " id " + " ".join(entry[1:]))
-                self.lmp.command("compute " + str(index) + " vz" + str(index) + " property/atom vz")
-            
-        
-        return 0
+walker.register(lammpsWalker)        
 
-        
-    def destroyColvars(self):
-        """
-        This function removes the colvars set by initColVars().
-        """        
-        for cv in self.colvars:
-            self.lmp.command("uncompute " + str(self.colvars.index(cv)))
-            
-        return 0    
-                
-    def equilibrate(self, center, restraint, numSteps):
-        """
-        This function prepares a LAMMPS image to be at the specified target 
-        position given by the vector 'center' passed and an arguments. 
-        """
-        #print "Equilibrating walker."
-        
-        assert len(center) == len(restraint), "The dimension of the center array and the restraint array do not match."
-        assert len(center) == len(self.colvars), "The dimension of the center array and the number of collective variables do not match."
-        
-        
-        # first enter the restraints based on computes data structure
-        restCommand = "fix REST all restrain "
-        
-        # here we apply the constraints based on the collective variable definition
-        # check to make sure we have collective variables defined. 
-        if len(self.colvars) == 0:
-            print "There are no collective variables defined in walker " + str(self.index)
-            print "Aborting equilibration of walker " + str(self.index)
-            return 0 
-            
-        # let's get a string representation of the colvars, it's friendly
-        cv = []
-        for entry in self.colvars:
-            cv.append(map(str, entry))
-            
-        # now loop through each 
-        for index, entry in enumerate(cv):
-            if entry[0] == 'dihedral':
-                restCommand += " " + " ".join(entry) + " " + " ".join(map(str, restraint[index])) + " " + str(center[index])
-                #restCommand += " " + " ".join(entry) + " " + " ".join(map(str, restraint[index])) + " " + str(center[index] + 180.0)
-            else:
-                restCommand += " " + " ".join(entry) + " " + " ".join(map(str, restraint[index])) + " " + str(center[index])
-        
-        # now issue restraint definition to the lammps object 
-        self.command(restCommand)
-        
-        self.command("fix_modify REST energy yes")
-                    
-        # now run the equilibration dynamics     
-        self.command("run " + str(numSteps) + " post no")
-        
-        """
-        # apply SHAKE if used
-        if self.shakeH:    
-            self.lmp.command("fix 10 all shake 0.0001 500 0 m 1.008")
-        """ 
-        
-        # now remove constraints for subsequent dynamics         
-        self.command("unfix REST")
-        
-        # this resets the dynamics environment after the equilibration run
-        self.command("run 0 post no")
-        
-        return 0
-        
-    def getConfig(self):
-        """
-        This function returns the current position of the LAMMPS simulation.
-        """
-
-        return np.asarray(self.lmp.gather_atoms("x",1,3))
-        
-    def getVel(self):
-        """
-        This function returns the current velocities from the LAMMPS simulation.
-        """
-        
-        return np.asarray(self.lmp.gather_atoms("v", 1, 3))
-        
-    def setVel(self, vel):
-        """
-        This function sets the velocity to the lammps simulation. 
-        """
-        
-        self.lmp.scatter_atoms("v", 1, 3, vel.ctypes.data_as(ctypes.POINTER(ctypes.c_double)))
-        
-        return 0
-
-    def getColvars(self):
-        """
-        This function returns the current position of the LAMMPS simulation in 
-        colvars space.
-        """
-        # get an empty array with placeholders
-        cvarray = [None]*len(self.colvars)
-        
-        # now get cv's one by one from each compute defined
-        for i in range(len(self.colvars)):
-            if self.colvars[i][0] == 'x' or self.colvars[i][0] == 'y' or self.colvars[i][0] == 'z': 
-                cvarray[i] = self.lmp.extract_compute(str(i), 1, 1)[0]
-            else:
-                #*** We REALLY need assurance here that what we are getting here is in fact not a NULL POINTER.
-                cvarray[i] = self.lmp.extract_compute(str(i), 2, 1)[0]
-
-        return cvarray
-    
-    def setConfig(self, config):
-        """
-        This routine sets the internal configuration. 
-        """                
-        self.lmp.scatter_atoms("x", 1, 3, config.ctypes.data_as(ctypes.POINTER(ctypes.c_double)))
-        
-        return 0 
-    
-    def drawVel(self, distType = 'gaussian', temperature = 310.0):
-        """
-        This function redraws the velocities from a maxwell-boltzmann dist.
-        """
-        if distType == 'gaussian':
-            self.lmp.command("velocity all create " + str(temperature) + " " + str(random.randint(100000,999999)) + " dist gaussian")
-        else:
-            print "The drawVel routine was passed distType that was not understood."
-            
-        return 0
-    
-    def reverseVel(self):
-        """ 
-        This function reverses the velocities of a given LAMMPS simulation
-        """
-        
-        # set varibales for reversing velocities
-        self.lmp.command("variable vx atom -vx")
-        self.lmp.command("variable vy atom -vy")
-        self.lmp.command("variable vz atom -vz")
-        
-        # set new velocities
-        self.lmp.command("velocity all set v_vx v_vy v_vz")
-        
-        return 0     
-        
-    def propagate(self, numSteps, pre='no', post='no'):
-        """
-        This function issues a run command to the underlying dynamics to propagate
-        the dynamics a given number of steps. 
-        """
-        
-        self.lmp.command("run " + str(numSteps) + " pre " + str(pre) + " post " + str(post))
-        
-        return 0 
-    
-    def setDynamics(self):
-        """
-        This routine sets the dynamics for the walker. 
-        """
-        
-        return 0
-    
-    def command(self, command):
-        """
-        This function allows the user to issue a LAMMPS command directly to the
-        LAMMPS object.
-        """
-        
-        # issue the given command directly. 
-        self.lmp.command(command)
-        
-        return 0 
-        
-    def minimize(self, args=None):
-        """
-        This function runs a minimization routine with the specified type.
-        """
-        # use default settings
-        if args == None:
-            self.lmp.command("minimize 1.0e-4 1.0e-6 100 1000")
-        # else use the arguments provided. 
-        else:
-            self.lmp.command("minimize " + " ".join(args))
-        
-        return 0 
-        
-    def setTemperature(self, temp):
-        """
-        This function sets the temperature of the walker object.
-        
-        NOTE THAT THIS DOES NOT ALTER THE DYNAMICS THERMOSTAT. LAMMPS REQUIRES
-        RESETING THIS THERMOSTAT. WE WILL LOOK INTO HOW TO DO THIS. 
-        """
-        self.temperature = temp
-        
-        return 0
-        
-    def setTimestep(self, timestep):
-        """
-        This routine sets the dynamics time step.
-        """
-        self.lmp.command("timestep " + str(timestep))
-        
-        return 0
-        
-        
-        
+if __name__ == "__main__":
+    print 'The lammpsWalker module is a subclass of walker:', issubclass(lammpsWalker, walker)
     
