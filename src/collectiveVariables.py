@@ -12,5 +12,5 @@ class collectiveVariables(object):
         self.type = cvType
         self.atomIDs = atomIDs
         
-        return 0
+    
         

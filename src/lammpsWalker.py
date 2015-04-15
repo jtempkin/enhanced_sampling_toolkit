@@ -9,6 +9,7 @@ from walker_base import walker
 import collectiveVariables
 import numpy as np
 import ctypes
+import os.path
 #from lammps import lammps
 
 
@@ -41,9 +42,12 @@ class lammpsWalker(walker):
         * an index for the walker. (default=0)
         * debug flag to open writing verbose output. Importantly, this pipes LAMMPS output to standard output. (default=False)
         
-        The __init__() routine will check for LAMMPS being an importable library from Python and raise an execption if it cannot be loaded. 
+        The __initLAMMPS__() routine will check for LAMMPS being an importable library from Python and raise an execption if it cannot be loaded. 
         
         """
+        if inputFilename is not None:
+            # check to see if there is actually a filename at that location.
+            assert os.path.isfile(inputFilename), "The input file for the LAMMPS walker could not be found."
         # a filename for storing the data, note the appending of the index
         self.filename = inputFilename + "." + str(index)
         
@@ -90,6 +94,7 @@ class lammpsWalker(walker):
             from lammps import lammps
         except:
             print "ERROR: The LAMMPS python interface could not be found. Check your PYTHONPATH and compiled LAMMPS directory to make sure it is compiled and importable." 
+        
         # initialize the lammps object
         if verbose == True:
             self.lmp = lammps()
@@ -99,14 +104,14 @@ class lammpsWalker(walker):
         
         # after the lammps object is created, initialize the lammps simulation. 
         # specify general log file parameters
-        self.__command__("echo none")
+        self.command("echo none")
 
         # if there is a specified filename, use it to set up the simulation.         
         if inputFilename != None:
-            self.__command__("log " + logFilename)
+            self.command("log " + logFilename)
             self.lmp.file(inputFilename)
         else:
-            self.__command__("log " + logFilename)
+            self.command("log " + logFilename)
         
         #self.__setupLAMMPS__(filename)
 
@@ -138,33 +143,33 @@ class lammpsWalker(walker):
         # initialize the groups and the computes associated with them
         for index,entry in enumerate(self.colvars):  
             if entry.type == 'bond':
-                self.__command__("group " + "b" + str(index) + " id " + " ".join(map(str,entry.atomIDs)))
-                self.__command__("compute " + str(index) + " b" + str(index) + " bond/local dist" )
+                self.command("group " + "b" + str(index) + " id " + " ".join(map(str,entry.atomIDs)))
+                self.command("compute " + str(index) + " b" + str(index) + " bond/local dist" )
             elif entry.type == 'angle':
-                self.__command__("group " + "a" + str(index) + " id " + " ".join(map(str,entry.atomIDs)))
-                self.__command__("compute " + str(index) + " a" + str(index) + " angle/local theta")
+                self.command("group " + "a" + str(index) + " id " + " ".join(map(str,entry.atomIDs)))
+                self.command("compute " + str(index) + " a" + str(index) + " angle/local theta")
             elif entry.type == 'dihedral':
-                self.__command__("group " + "d" + str(index) + " id " + " ".join(map(str,entry.atomIDs)))
-                self.__command__("compute " + str(index) + " d" + str(index) + " dihedral/local phi")        
+                self.command("group " + "d" + str(index) + " id " + " ".join(map(str,entry.atomIDs)))
+                self.command("compute " + str(index) + " d" + str(index) + " dihedral/local phi")        
             elif entry.type == 'x':
-                self.__command__("group x" + str(index) + " id " + " ".join(map(str,entry.atomIDs)))
-                self.__command__("compute " + str(index) + " x" + str(index) + " property/atom x")
+                self.command("group x" + str(index) + " id " + " ".join(map(str,entry.atomIDs)))
+                self.command("compute " + str(index) + " x" + str(index) + " property/atom x")
             elif entry.type == 'y':
-                self.__command__("group y" + str(index) + " id " + " ".join(map(str,entry.atomIDs)))
-                self.__command__("compute " + str(index) + " y" + str(index) + " property/atom y")
+                self.command("group y" + str(index) + " id " + " ".join(map(str,entry.atomIDs)))
+                self.command("compute " + str(index) + " y" + str(index) + " property/atom y")
             elif entry.type == 'z':
-                self.__command__("group z" + str(index) + " id " + " ".join(map(str,entry.atomIDs)))
-                self.__command__("compute " + str(index) + " z" + str(index) + " property/atom z")
+                self.command("group z" + str(index) + " id " + " ".join(map(str,entry.atomIDs)))
+                self.command("compute " + str(index) + " z" + str(index) + " property/atom z")
             elif entry.type == "vx":
-                self.__command__("group vx" + str(index) + " id " + " ".join(map(str,entry.atomIDs)))
-                self.__command__("compute " + str(index) + " vx" + str(index) + " property/atom vx")
+                self.command("group vx" + str(index) + " id " + " ".join(map(str,entry.atomIDs)))
+                self.command("compute " + str(index) + " vx" + str(index) + " property/atom vx")
             elif entry.type == "vy":
-                self.__command__("group vy" + str(index) + " id " + " ".join(map(str,entry.atomIDs)))
-                self.__command__("compute " + str(index) + " vy" + str(index) + " property/atom vy")
+                self.command("group vy" + str(index) + " id " + " ".join(map(str,entry.atomIDs)))
+                self.command("compute " + str(index) + " vy" + str(index) + " property/atom vy")
             elif entry.type == "vz":
-                self.__command__("group vz" + str(index) + " id " + " ".join(map(str,entry.atomIDs)))
-                self.__command__("compute " + str(index) + " vz" + str(index) + " property/atom vz")
-            
+                self.command("group vz" + str(index) + " id " + " ".join(map(str,entry.atomIDs)))
+                self.command("compute " + str(index) + " vz" + str(index) + " property/atom vz")
+        
         
         return 0
 
@@ -175,7 +180,7 @@ class lammpsWalker(walker):
         __knownCVs__ = ['bond', 'angle', 'dihedral', 'x', 'y', 'z', 'vx', 'vy', 'vz']
         assert cvType in __knownCVs__, "cvType that was provided was not understood." 
             
-        self.colvars.append(collectiveVariables(name, cvType, atomIDs))
+        self.colvars.append(collectiveVariables.collectiveVariables(name, cvType, atomIDs))
         return 0
         
     def destroyColvars(self):
@@ -183,7 +188,7 @@ class lammpsWalker(walker):
         This function removes the colvars set by setColvars(). By default, it removes all of the collective variables in the list. It does not remove them from the collective variables list. 
         """        
         for cv in self.colvars:
-            self.__command__("uncompute " + str(self.colvars.index(cv)))
+            self.command("uncompute " + str(self.colvars.index(cv)))
             
         return 0    
                 
@@ -208,25 +213,26 @@ class lammpsWalker(walker):
             return 0 
             
         # let's get a string representation of the colvars, it's friendly
+        """
         cv = []
         for entry in self.colvars:
             cv.append(map(str, entry))
-            
+        """ 
         # now loop through each 
-        for index, entry in enumerate(cv):
-            if entry[0] == 'dihedral':
-                restCommand += " " + " ".join(entry) + " " + " ".join(map(str, restraint[index])) + " " + str(center[index])
-                #restCommand += " " + " ".join(entry) + " " + " ".join(map(str, restraint[index])) + " " + str(center[index] + 180.0)
+        for index, entry in enumerate(self.colvars):
+            if entry.type == 'dihedral':
+                #restCommand += " " + entry.type + " " + " ".join(map(str, entry.atomIDs)) + " " + " ".join(map(str, restraint[index])) + " " + str(center[index])
+                restCommand += " " + entry.type + " " + " ".join(map(str,entry.atomIDs)) + " " + " ".join(map(str, restraint[index])) + " " + str(center[index] + 180.0)
             else:
-                restCommand += " " + " ".join(entry) + " " + " ".join(map(str, restraint[index])) + " " + str(center[index])
+                restCommand += " " + entry.type + " " + " ".join(map(str, entry.atomIDs)) + " " + " ".join(map(str, restraint[index])) + " " + str(center[index])
         
         # now issue restraint definition to the lammps object 
-        self.__command__(restCommand)
+        self.command(restCommand)
         
-        self.__command__("fix_modify REST energy yes")
+        self.command("fix_modify REST energy yes")
                     
         # now run the equilibration dynamics     
-        self.__command__("run " + str(numSteps) + " post no")
+        self.command("run " + str(numSteps) + " post no")
         
         """
         # apply SHAKE if used
@@ -235,10 +241,10 @@ class lammpsWalker(walker):
         """ 
         
         # now remove constraints for subsequent dynamics         
-        self.__command__("unfix REST")
+        self.command("unfix REST")
         
         # this resets the dynamics environment after the equilibration run
-        self.__command__("run 0 post no")
+        self.command("run 0 post no")
         
         return 0
         
@@ -293,12 +299,15 @@ class lammpsWalker(walker):
         
         return 0 
     
-    def drawVel(self, distType = 'gaussian', temperature = 310.0):
+    def drawVel(self, distType = 'gaussian', temperature = 310.0, seed = None):
         """
         This function redraws the velocities from a maxwell-boltzmann dist.
         """
+        if seed is None:
+            seed = random.randint(100000,999999)
+        
         if distType == 'gaussian':
-            self.__command__("velocity all create " + str(temperature) + " " + str(random.randint(100000,999999)) + " dist gaussian")
+            self.command("velocity all create " + str(temperature) + " " + str(seed) + " dist gaussian")
         else:
             print "The drawVel() routine was passed a distribution Type that was not understood."
             
@@ -310,12 +319,12 @@ class lammpsWalker(walker):
         """
         
         # set varibales for reversing velocities
-        self.__command__("variable vx atom -vx")
-        self.__command__("variable vy atom -vy")
-        self.__command__("variable vz atom -vz")
+        self.command("variable vx atom -vx")
+        self.command("variable vy atom -vy")
+        self.command("variable vz atom -vz")
         
         # set new velocities
-        self.__command__("velocity all set v_vx v_vy v_vz")
+        self.command("velocity all set v_vx v_vy v_vz")
         
         return 0     
         
@@ -325,7 +334,7 @@ class lammpsWalker(walker):
         the dynamics a given number of steps. 
         """
         
-        self.__command__("run " + str(numSteps) + " pre " + str(pre) + " post " + str(post))
+        self.command("run " + str(numSteps) + " pre " + str(pre) + " post " + str(post))
         
         return 0 
     
@@ -336,7 +345,7 @@ class lammpsWalker(walker):
         
         return 0
     
-    def __command__(self, command):
+    def command(self, command):
         """
         This function allows the user to issue a LAMMPS command directly to the
         LAMMPS object.
@@ -353,10 +362,10 @@ class lammpsWalker(walker):
         """
         # use default settings
         if args == None:
-            self.__command__("minimize 1.0e-4 1.0e-6 100 1000")
+            self.command("minimize 1.0e-4 1.0e-6 100 1000")
         # else use the arguments provided. 
         else:
-            self.__command__("minimize " + " ".join(args))
+            self.command("minimize " + " ".join(args))
         
         return 0 
         
@@ -375,7 +384,7 @@ class lammpsWalker(walker):
         """
         This routine sets the dynamics time step.
         """
-        self.__command__("timestep " + str(timestep))
+        self.command("timestep " + str(timestep))
         
         return 0
         

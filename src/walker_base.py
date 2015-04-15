@@ -51,7 +51,7 @@ class walker(object):
         return
     
     @abc.abstractmethod
-    def equilibrate(self, colvar):
+    def equilibrate(self, center, restraint, numSteps):
         """
         This function sets the walker at a specific configuration in the collective variable space.
         At minimum, any implementation will need to give it the configuration.
@@ -91,5 +91,19 @@ class walker(object):
     def reverseVel(self): 
         """
         This function reverses the velocity of the walker.
+        """
+        return
+        
+    @abc.abstractmethod
+    def getVel(self): 
+        """
+        This function returns the velocities of the system.
+        """
+        return
+        
+    @abc.abstractmethod
+    def setVel(self):
+        """
+        This routine sets the velocities of the system.
         """
         return
