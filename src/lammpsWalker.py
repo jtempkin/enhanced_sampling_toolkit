@@ -117,62 +117,6 @@ class lammpsWalker(walker):
 
         return self.lmp    
 
-       
-    def setColvars(self):
-        """
-        This function initializes the collective variable for a LAMMPS simulation that is handed to this object. 
-        
-        Currently supports the following cv's:
-        
-        * bond
-        * angle
-        * dihedral
-        * x, y or z position coordinates
-        * x, y or z velocity components 
-        
-        These are parsed and sent to the underlying LAMMPS object directly using the LAMMPS syntax for these variable. 
-        
-        The implementation first creates a labeled group in LAMMPS containing the atoms used in the CV. Then a compute is initialized using that group. 
-        """
-        
-        """
-        cv = []
-        for entry in self.colvars:
-            cv.append(map(str, entry))
-        """
-        # initialize the groups and the computes associated with them
-        for index,entry in enumerate(self.colvars):  
-            if entry.type == 'bond':
-                self.command("group " + "b" + str(index) + " id " + " ".join(map(str,entry.atomIDs)))
-                self.command("compute " + str(index) + " b" + str(index) + " bond/local dist" )
-            elif entry.type == 'angle':
-                self.command("group " + "a" + str(index) + " id " + " ".join(map(str,entry.atomIDs)))
-                self.command("compute " + str(index) + " a" + str(index) + " angle/local theta")
-            elif entry.type == 'dihedral':
-                self.command("group " + "d" + str(index) + " id " + " ".join(map(str,entry.atomIDs)))
-                self.command("compute " + str(index) + " d" + str(index) + " dihedral/local phi")        
-            elif entry.type == 'x':
-                self.command("group x" + str(index) + " id " + " ".join(map(str,entry.atomIDs)))
-                self.command("compute " + str(index) + " x" + str(index) + " property/atom x")
-            elif entry.type == 'y':
-                self.command("group y" + str(index) + " id " + " ".join(map(str,entry.atomIDs)))
-                self.command("compute " + str(index) + " y" + str(index) + " property/atom y")
-            elif entry.type == 'z':
-                self.command("group z" + str(index) + " id " + " ".join(map(str,entry.atomIDs)))
-                self.command("compute " + str(index) + " z" + str(index) + " property/atom z")
-            elif entry.type == "vx":
-                self.command("group vx" + str(index) + " id " + " ".join(map(str,entry.atomIDs)))
-                self.command("compute " + str(index) + " vx" + str(index) + " property/atom vx")
-            elif entry.type == "vy":
-                self.command("group vy" + str(index) + " id " + " ".join(map(str,entry.atomIDs)))
-                self.command("compute " + str(index) + " vy" + str(index) + " property/atom vy")
-            elif entry.type == "vz":
-                self.command("group vz" + str(index) + " id " + " ".join(map(str,entry.atomIDs)))
-                self.command("compute " + str(index) + " vz" + str(index) + " property/atom vz")
-        
-        
-        return 0
-
     def addColvars(self, name, cvType, atomIDs):
         """
         Implements the addition of a collective variable to the list of collective variables held by this walker.
@@ -185,11 +129,42 @@ class lammpsWalker(walker):
         * x, y, z velocity components
         
         The collective variables are added as an instance of a collective variable object which contains the necessary fields defining that collective variable. 
+
         """
         __knownCVs__ = ['bond', 'angle', 'dihedral', 'x', 'y', 'z', 'vx', 'vy', 'vz']
         assert cvType in __knownCVs__, "cvType that was provided was not understood." 
-            
+        
+        for cv in self.colvars:
+            assert cv.name != name, "Collective variable names must be unique."
+                
+        # now append the collective variable to the walker list.      
         self.colvars.append(collectiveVariables.collectiveVariables(name, cvType, atomIDs))
+        
+        cv = self.colvars[-1]
+        # first set the group for the colvar
+        self.command("group " + cv.name + " id " + " ".join(map(str,cv.atomIDs)))
+            
+        # now set the appropriate colvar
+        if cv.type == 'bond':
+            self.command("compute " + cv.name + " " + cv.name + " bond/local dist" )
+        elif cv.type == 'angle':
+            self.command("compute " + cv.name + " " + cv.name + " angle/local theta")
+        elif cv.type == 'dihedral':
+            self.command("compute " + cv.name + " " + cv.name + " dihedral/local phi")        
+        elif cv.type == 'x':
+            self.command("compute " + cv.name + " " + cv.name + " property/atom x")
+        elif cv.type == 'y':
+            self.command("compute " + cv.name + " " + cv.name + " property/atom y")
+        elif cv.type == 'z':
+            self.command("compute " + cv.name + " " + cv.name + " property/atom z")
+        elif cv.type == "vx":
+            self.command("compute " + cv.name + " " + cv.name + " property/atom vx")
+        elif cv.type == "vy":
+            self.command("compute " + cv.name + " " + cv.name + " property/atom vy")
+        elif cv.type == "vz":
+            self.command("compute " + cv.name + " " + cv.name + " property/atom vz")  
+
+        
         return 0
         
     def destroyColvars(self):
@@ -197,7 +172,7 @@ class lammpsWalker(walker):
         This function removes the colvars set by setColvars(). By default, it removes all of the collective variables in the list. It does not remove them from the collective variables list. 
         """        
         for cv in self.colvars:
-            self.command("uncompute " + str(self.colvars.index(cv)))
+            self.command("uncompute " + cv.name)
             
         return 0    
                 
@@ -288,15 +263,17 @@ class lammpsWalker(walker):
         colvars space.
         """
         # get an empty array with placeholders
-        cvarray = [None]*len(self.colvars)
+        cvarray = []
         
         # now get cv's one by one from each compute defined
-        for i in range(len(self.colvars)):
-            if self.colvars[i].type in ['x', 'y', 'z', 'vx', 'vy', 'vz']: 
-                cvarray[i] = self.lmp.extract_compute(str(i), 1, 1)[0]
+        for cv in self.colvars:
+            if cv.type in ['x', 'y', 'z', 'vx', 'vy', 'vz']: 
+                cvarray.append(self.lmp.extract_compute(cv.name, 1, 1)[0])
             else:
                 #*** We REALLY need assurance here that what we are getting here is in fact not a NULL POINTER.
-                cvarray[i] = self.lmp.extract_compute(str(i), 2, 1)[0]
+                cvarray.append(self.lmp.extract_compute(cv.name, 2, 1)[0])
+                
+        assert len(cvarray) == len(self.colvars), "Not all collective variables were added."
 
         return cvarray
     
@@ -499,7 +476,55 @@ class lammpsWalker(walker):
         
         return 0 
      
+    def setColvars(self):
+        """
+        This function initializes the collective variable for a LAMMPS simulation that is handed to this object. 
         
+        Currently supports the following cv's:
+        
+        * bond
+        * angle
+        * dihedral
+        * x, y or z position coordinates
+        * x, y or z velocity components 
+        
+        These are parsed and sent to the underlying LAMMPS object directly using the LAMMPS syntax for these variable. 
+        
+        The implementation first creates a labeled group in LAMMPS containing the atoms used in the CV. Then a compute is initialized using that group. 
+        
+        
+                **** DEPRECATED as of 4.15.15 ******
+        """
+        # the first thing we need to do is eliminate the current list of colvars in the lammps object. The reason for this is that LAMMPS throws an ERROR and bails if you try to reuse a compute name. This usually ends up bailing on the whole program execution so we make sure to erase the whole list first. 
+        self.destroyColvars()
+        
+        # initialize the groups and the computes associated with them
+        for index,entry in enumerate(self.colvars):  
+            # first set the group for the colvar
+            self.command("group " + entry.name + " id " + " ".join(map(str,entry.atomIDs)))
+            
+            # now set the appropriate colvar
+            if entry.type == 'bond':
+                self.command("compute " + entry.name + " b" + str(index) + " bond/local dist" )
+            elif entry.type == 'angle':
+                self.command("compute " + entry.name + " a" + str(index) + " angle/local theta")
+            elif entry.type == 'dihedral':
+                self.command("compute " + entry.name + " d" + str(index) + " dihedral/local phi")        
+            elif entry.type == 'x':
+                self.command("compute " + entry.name + " x" + str(index) + " property/atom x")
+            elif entry.type == 'y':
+                self.command("compute " + entry.name + " y" + str(index) + " property/atom y")
+            elif entry.type == 'z':
+                self.command("compute " + str(index) + " z" + str(index) + " property/atom z")
+            elif entry.type == "vx":
+                self.command("compute " + str(index) + " vx" + str(index) + " property/atom vx")
+            elif entry.type == "vy":
+                self.command("compute " + str(index) + " vy" + str(index) + " property/atom vy")
+            elif entry.type == "vz":
+                self.command("compute " + str(index) + " vz" + str(index) + " property/atom vz")
+        
+        
+        return 0        
         
 walker.register(lammpsWalker)        
 
