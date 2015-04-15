@@ -176,6 +176,15 @@ class lammpsWalker(walker):
     def addColvars(self, name, cvType, atomIDs):
         """
         Implements the addition of a collective variable to the list of collective variables held by this walker.
+        
+        The currently support collective variables are:
+        * bonds
+        * angles
+        * dihedrals
+        * x, y, z positions
+        * x, y, z velocity components
+        
+        The collective variables are added as an instance of a collective variable object which contains the necessary fields defining that collective variable. 
         """
         __knownCVs__ = ['bond', 'angle', 'dihedral', 'x', 'y', 'z', 'vx', 'vy', 'vz']
         assert cvType in __knownCVs__, "cvType that was provided was not understood." 
@@ -283,7 +292,7 @@ class lammpsWalker(walker):
         
         # now get cv's one by one from each compute defined
         for i in range(len(self.colvars)):
-            if self.colvars[i].type == 'x' or self.colvars[i].type == 'y' or self.colvars[i].type == 'z': 
+            if self.colvars[i].type in ['x', 'y', 'z', 'vx', 'vy', 'vz']: 
                 cvarray[i] = self.lmp.extract_compute(str(i), 1, 1)[0]
             else:
                 #*** We REALLY need assurance here that what we are getting here is in fact not a NULL POINTER.
