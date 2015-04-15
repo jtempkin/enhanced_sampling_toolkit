@@ -129,11 +129,7 @@ Contents:
 
 \chapter{Walker API}
 \label{src/src.doc:welcome-to-enhanced-sampling-toolkit-s-documentation}\label{src/src.doc:module-walker}\label{src/src.doc::doc}\label{src/src.doc:walker-api}\index{walker (module)}
-Created on Fri Jun  6 15:16:18 2014
-
 NOTE: we may want to use abstract properties in the future.
-
-@author: jeremytempkin
 \index{velocityWalker (class in walker)}
 
 \begin{fulllineitems}
@@ -171,7 +167,7 @@ walkers should implement.
 
 \begin{fulllineitems}
 \phantomsection\label{src/src.doc:walker.walker.close}\pysiglinewithargsret{\bfcode{close}}{}{}
-Destroys the walker, and does some housecleaning.
+Destroys the walker.
 
 \end{fulllineitems}
 
@@ -224,197 +220,7 @@ At minimum, it should take some sort of specification of the configuration.
 
 
 \chapter{LAMMPS Walker Module}
-\label{src/src.doc:module-lammpsWalker}\label{src/src.doc:lammps-walker-module}\index{lammpsWalker (module)}
-This file implements the LAMMPS walker abstraction layer. The core of this idea is that
-\index{lammpsWalker (class in lammpsWalker)}
-
-\begin{fulllineitems}
-\phantomsection\label{src/src.doc:lammpsWalker.lammpsWalker}\pysiglinewithargsret{\strong{class }\code{lammpsWalker.}\bfcode{lammpsWalker}}{\emph{inputFilename}, \emph{logFilename}, \emph{index=0}, \emph{debug=False}}{}
-This class implements the enhanced sampling walker API for the bindings to the LAMMPS package. To check the math formatting, here is an example \$e\textasciicircum{}\{ipi\} = -1\$.
-
-Some usage issues to note:
-
-1) Collective variables (CVs) are defined to the walker by constructing a list of
-CVs internally in the walker.colvars object. These CVs list takes the following
-format:
-
-{[}''coordinateType'', atomids....{]}
-
-The coordinate type specifies which type of coordinate the CV is 
-(i.e. bond, angle, dihedral, etc.). The next items in the list are the atom 
-indecies involved in this specific instance of the CV.
-
-The walker will use this list to initialize them to the underlying LAMMPS objects.
-\index{close() (lammpsWalker.lammpsWalker method)}
-
-\begin{fulllineitems}
-\phantomsection\label{src/src.doc:lammpsWalker.lammpsWalker.close}\pysiglinewithargsret{\bfcode{close}}{}{}
-This function closes the LAMMPS object.
-
-\end{fulllineitems}
-
-\index{command() (lammpsWalker.lammpsWalker method)}
-
-\begin{fulllineitems}
-\phantomsection\label{src/src.doc:lammpsWalker.lammpsWalker.command}\pysiglinewithargsret{\bfcode{command}}{\emph{command}}{}
-This function allows the user to issue a LAMMPS command directly to the
-LAMMPS object.
-
-\end{fulllineitems}
-
-\index{destroyColvars() (lammpsWalker.lammpsWalker method)}
-
-\begin{fulllineitems}
-\phantomsection\label{src/src.doc:lammpsWalker.lammpsWalker.destroyColvars}\pysiglinewithargsret{\bfcode{destroyColvars}}{}{}
-This function removes the colvars set by initColVars().
-
-\end{fulllineitems}
-
-\index{drawVel() (lammpsWalker.lammpsWalker method)}
-
-\begin{fulllineitems}
-\phantomsection\label{src/src.doc:lammpsWalker.lammpsWalker.drawVel}\pysiglinewithargsret{\bfcode{drawVel}}{\emph{distType='gaussian'}, \emph{temperature=310.0}}{}
-This function redraws the velocities from a maxwell-boltzmann dist.
-
-\end{fulllineitems}
-
-\index{equilibrate() (lammpsWalker.lammpsWalker method)}
-
-\begin{fulllineitems}
-\phantomsection\label{src/src.doc:lammpsWalker.lammpsWalker.equilibrate}\pysiglinewithargsret{\bfcode{equilibrate}}{\emph{center}, \emph{restraint}, \emph{numSteps}}{}
-This function prepares a LAMMPS image to be at the specified target 
-position given by the vector `center' passed and an arguments.
-
-\end{fulllineitems}
-
-\index{getColvars() (lammpsWalker.lammpsWalker method)}
-
-\begin{fulllineitems}
-\phantomsection\label{src/src.doc:lammpsWalker.lammpsWalker.getColvars}\pysiglinewithargsret{\bfcode{getColvars}}{}{}
-This function returns the current position of the LAMMPS simulation in 
-colvars space.
-
-\end{fulllineitems}
-
-\index{getConfig() (lammpsWalker.lammpsWalker method)}
-
-\begin{fulllineitems}
-\phantomsection\label{src/src.doc:lammpsWalker.lammpsWalker.getConfig}\pysiglinewithargsret{\bfcode{getConfig}}{}{}
-This function returns the current position of the LAMMPS simulation.
-
-\end{fulllineitems}
-
-\index{getVel() (lammpsWalker.lammpsWalker method)}
-
-\begin{fulllineitems}
-\phantomsection\label{src/src.doc:lammpsWalker.lammpsWalker.getVel}\pysiglinewithargsret{\bfcode{getVel}}{}{}
-This function returns the current velocities from the LAMMPS simulation.
-
-\end{fulllineitems}
-
-\index{minimize() (lammpsWalker.lammpsWalker method)}
-
-\begin{fulllineitems}
-\phantomsection\label{src/src.doc:lammpsWalker.lammpsWalker.minimize}\pysiglinewithargsret{\bfcode{minimize}}{\emph{args=None}}{}
-This function runs a minimization routine with the specified type.
-
-\end{fulllineitems}
-
-\index{propagate() (lammpsWalker.lammpsWalker method)}
-
-\begin{fulllineitems}
-\phantomsection\label{src/src.doc:lammpsWalker.lammpsWalker.propagate}\pysiglinewithargsret{\bfcode{propagate}}{\emph{numSteps}, \emph{pre='no'}, \emph{post='no'}}{}
-This function issues a run command to the underlying dynamics to propagate
-the dynamics a given number of steps.
-
-\end{fulllineitems}
-
-\index{reverseVel() (lammpsWalker.lammpsWalker method)}
-
-\begin{fulllineitems}
-\phantomsection\label{src/src.doc:lammpsWalker.lammpsWalker.reverseVel}\pysiglinewithargsret{\bfcode{reverseVel}}{}{}
-This function reverses the velocities of a given LAMMPS simulation
-
-\end{fulllineitems}
-
-\index{setColvars() (lammpsWalker.lammpsWalker method)}
-
-\begin{fulllineitems}
-\phantomsection\label{src/src.doc:lammpsWalker.lammpsWalker.setColvars}\pysiglinewithargsret{\bfcode{setColvars}}{}{}
-This function initializes the collective variable for a LAMMPS simulation that is handed to this object.
-
-Currently supports the following cv's:
-\begin{itemize}
-\item {} 
-bond
-
-\item {} 
-angle
-
-\item {} 
-dihedral
-
-\item {} 
-x, y or z position coordinates
-
-\item {} 
-x, y or z velocity components
-
-\end{itemize}
-
-These are parsed and sent to the underlying LAMMPS object directly using the LAMMPS syntax for these variable.
-
-The implementation first creates a labeled group in LAMMPS containing the atoms used in the CV. Then a compute is initialized using that group.
-
-\end{fulllineitems}
-
-\index{setConfig() (lammpsWalker.lammpsWalker method)}
-
-\begin{fulllineitems}
-\phantomsection\label{src/src.doc:lammpsWalker.lammpsWalker.setConfig}\pysiglinewithargsret{\bfcode{setConfig}}{\emph{config}}{}
-This routine sets the internal configuration.
-
-\end{fulllineitems}
-
-\index{setDynamics() (lammpsWalker.lammpsWalker method)}
-
-\begin{fulllineitems}
-\phantomsection\label{src/src.doc:lammpsWalker.lammpsWalker.setDynamics}\pysiglinewithargsret{\bfcode{setDynamics}}{}{}
-This routine sets the dynamics for the walker.
-
-\end{fulllineitems}
-
-\index{setTemperature() (lammpsWalker.lammpsWalker method)}
-
-\begin{fulllineitems}
-\phantomsection\label{src/src.doc:lammpsWalker.lammpsWalker.setTemperature}\pysiglinewithargsret{\bfcode{setTemperature}}{\emph{temp}}{}
-This function sets the temperature of the walker object.
-
-NOTE THAT THIS DOES NOT ALTER THE DYNAMICS THERMOSTAT. LAMMPS REQUIRES
-RESETING THIS THERMOSTAT. WE WILL LOOK INTO HOW TO DO THIS.
-
-\end{fulllineitems}
-
-\index{setTimestep() (lammpsWalker.lammpsWalker method)}
-
-\begin{fulllineitems}
-\phantomsection\label{src/src.doc:lammpsWalker.lammpsWalker.setTimestep}\pysiglinewithargsret{\bfcode{setTimestep}}{\emph{timestep}}{}
-This routine sets the dynamics time step.
-
-\end{fulllineitems}
-
-\index{setVel() (lammpsWalker.lammpsWalker method)}
-
-\begin{fulllineitems}
-\phantomsection\label{src/src.doc:lammpsWalker.lammpsWalker.setVel}\pysiglinewithargsret{\bfcode{setVel}}{\emph{vel}}{}
-This function sets the velocity to the lammps simulation.
-
-\end{fulllineitems}
-
-
-\end{fulllineitems}
-
-
+\label{src/src.doc:lammps-walker-module}
 
 \chapter{Indices and tables}
 \label{index:indices-and-tables}\begin{itemize}
@@ -433,9 +239,6 @@ This function sets the velocity to the lammps simulation.
 \renewcommand{\indexname}{Python Module Index}
 \begin{theindex}
 \def\bigletter#1{{\Large\sffamily#1}\nopagebreak\vspace{1mm}}
-\bigletter{l}
-\item {\texttt{lammpsWalker}}, \pageref{src/src.doc:module-lammpsWalker}
-\indexspace
 \bigletter{w}
 \item {\texttt{walker}}, \pageref{src/src.doc:module-walker}
 \end{theindex}
