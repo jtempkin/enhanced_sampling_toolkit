@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Apr  4 15:34:23 2014
-
 This file contains a number of file input/output routines. 
 
-@author: jtempkin
+The following routines provide a number of standalone tools for processing common input/output tasks one may need in scripting enhanced sampling algorithms. 
 """
 
 import os.path
@@ -118,16 +116,15 @@ def checkInput(inputDict, trustMe):
     
 def makeWkdir(dirname):
     """
-    This function creates the scratch directory for the intermediate MD files.
+    This function creates the scratch directory for the intermediate MD files. The default behavior is to check to see if the specified directory exists and if so, move it to a backupfile using the name plus ".backup" extension. *** THIS BEHAVIOR SHOULD CHANGE SINCE THERE IS STILL THE POSSIBILITY OF DATA LOSS HERE***
     """
     if os.path.exists(dirname):
+        # print some warnings that the target dictory exists
         print "Working Directory already exists."        
         print "Making backup of old working directory."
         if os.path.exists(dirname + ".backup"):
             shutil.rmtree(dirname + ".backup")
         shutil.move(dirname, dirname + ".backup")
-        #subprocess.call(['cp', '-r', sysParams['wkdir'], sysParams['wkdir'] + ".backup"])    
-        #subprocess.call(['rm', '-r', sysParams['wkdir']])
         subprocess.call(['mkdir', dirname])
     else:
         subprocess.call(['mkdir', dirname])
@@ -140,10 +137,9 @@ def writeMat(mat, filename, binary=False, log=False):
     
     If binary arg is set to True, writes it as a numpy binary array at the chosen filename. 
     
-    >>> import numpy as np
-    >>> z = np.zeros((1,4))
-    >>> writeMat(z,"./debug/z.test.out")
+    Acts effectively as a thin wrapper to numpy.save / numpy.savetxt routines. 
     
+    We'll add some HDF5 support in future releases. 
     """
     if binary:
         if log:
