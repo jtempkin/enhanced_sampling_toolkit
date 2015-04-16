@@ -7,6 +7,7 @@ import random
 #import sys
 from walker_base import walker
 import collectiveVariables
+import outputClass
 import numpy as np
 import ctypes
 import os.path
@@ -56,6 +57,9 @@ class lammpsWalker(walker):
         
         # a list of the relevant collective variables
         self.colvars = []
+        
+        # we're constructing a list for collective output classes. 
+        self.output = []
         
         # a list of commands used to equilibrate the system 
         self.equilCmds = []
@@ -373,6 +377,32 @@ class lammpsWalker(walker):
         self.command("timestep " + str(timestep))
         
         return 0
+        
+    def setOutput(self, name, outputType, filename, nSteps):
+        """
+        This routine sets up a mechanism for writing system information to file directly from the dynamics engine. This is equivalent to output constructed 
+        """
+        # assert outputType in __knownOutput__, "The output type specified was not recognized."        
+        __knownOutputTypes__ = ['dcd', 'xyz']
+        assert outputType in __knownOutputTypes__, "outputType that was provided was not understood." 
+        
+        for out in self.output:
+            assert out.name != name, "Output class names must be unique."
+                
+        # now append the collective variable to the walker list.      
+        self.output.append(outputClass.outputClass(name, outputType, filename, nSteps))
+        
+        dump = self.output[-1]
+        
+        self.command("dump " + dump.name + " all " + " ".join([dump.type, str(dump.nSteps), dump.destination]))
+        
+        
+    def removeOutput(self):
+        """
+        This routine removes the ouput pipes for information to be written to disk from the underlying dynamics engine. Right now this simply clears all existing output. 
+        """
+        for out in self.output:
+            self.command("undump " + out.name)
         
         
     def __setupLAMMPS__(self, filename=None):
