@@ -29,7 +29,13 @@ class partition:
         """
         Init routine. Initializes the following values:
 
+        The obervables list is a bookkeeping of the observables of the system one
+        wants to record during the simulaiton. This list needs to be set prior to sampling.
 
+        The list shoud contain elements that are tuples of a function and a data array.
+
+        Each element should take two arguments, one the walker object and one the umbrella index for which the sample is
+        associated.
         """
         # create an umbrella list
         self.umbrellas = []
@@ -40,15 +46,8 @@ class partition:
         self.a = np.zeros(N)
         self.m = np.zeros(N)
         self.z = np.zeros(N)
-        """
-        The obervables list is a bookkeeping of the observables of the system one
-        wants to record during the simulaiton. This list needs to be set prior to sampling.
 
-        The list shoud contain elements that are tuples of a function and a data array.
-
-        Each element should take two arguments, one the walker object and one the umbrella index for which the sample is
-        associated.
-        """
+        # keep a list of any observable objects that should be estimated during sampling. 
         self.observables = []
 
         self.stoppingTimes = np.zeros(N)
@@ -235,7 +234,7 @@ class partition:
     def getBasisFunctionValues(self, coord):
         """
         This function takes a point in collective variable space and returns 
-        an array of the value of the basis functions.
+        an array of the value of the basis functions at that point. 
         """
         # build an array 
         indicators = np.zeros(len(self.umbrellas))
@@ -254,7 +253,7 @@ class partition:
     
     def initializeMat(self, ncells):
         """
-        This function constructs the matrix F.
+        This function constructs and returns an ncells by ncells matrix as a numpy array of zeros.
         """
         F = np.zeros((ncells, ncells))
         
@@ -263,7 +262,9 @@ class partition:
     def sampleNeus(self, wlkr, numSteps, umbrellaIndex, walkerIndex, sysParams, rank=-1, trajFormat=None):
         """    
         This function takes a system lmp and propagates the dynamics to generate
-        the required samples but storing and generating samples via NEUS. 
+        the required samples but storing and generating samples via NEUS algorithm.
+        
+        We should remove the need for the output to be specified internally here. 
         
         """
         # if we are passing in a value of the rank, we know it is MPI and report the rank
@@ -308,6 +309,8 @@ class partition:
         while T_0 > 0.0:
             # propagate the dynamics
             wlkr.propagate(sysParams['stepLength'])
+            
+            # update the record of the simulation time. 
             wlkr.simulationTime += sysParams['stepLength']
 
             # for infinite time processes let's simply count down
@@ -403,9 +406,9 @@ class partition:
         """
         This function returns True if the proposed move is accepted and false if 
         rejected based on a metropolization rule for the current Index.
-        
-        Here we add 
         """
+        
+        
         if current_umb.indicator(current_umb.samples[-2]) == 0.0:
             print "An error occured. umb(umb.samples[-2]) == 0.0."
             sys.exit(0)
@@ -444,7 +447,7 @@ class partition:
     def buildNeighborList(self):
         """
         This routine constructs a neighborlist based on the radius of the basis 
-        function. 
+        function. Computes the neighborlist as follows: 
         """
         
         for i in range(len(self.umbrellas)):
