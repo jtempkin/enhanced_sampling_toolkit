@@ -178,6 +178,8 @@ class lammpsWalker(walker):
         for cv in self.colvars:
             self.command("uncompute " + cv.name)
             
+        self.colvars = []
+            
         return 0    
                 
     def equilibrate(self, center, restraint, numSteps):
@@ -403,6 +405,10 @@ class lammpsWalker(walker):
         """
         for out in self.output:
             self.command("undump " + out.name)
+            
+        self.output = []
+        
+        return 0
         
         
     def __setupLAMMPS__(self, filename=None):
