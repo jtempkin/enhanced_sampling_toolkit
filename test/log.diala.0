@@ -1,0 +1,68 @@
+  orthogonal box = (-20 -20 -20) to (20 20 20)
+  1 by 1 by 1 MPI processor grid
+  reading atoms ...
+  22 atoms
+  reading velocities ...
+  22 velocities
+  scanning bonds ...
+  4 = max bonds/atom
+  scanning angles ...
+  6 = max angles/atom
+  scanning dihedrals ...
+  12 = max dihedrals/atom
+  scanning impropers ...
+  1 = max impropers/atom
+  reading bonds ...
+  21 bonds
+  reading angles ...
+  36 angles
+  reading dihedrals ...
+  43 dihedrals
+  reading impropers ...
+  4 impropers
+  4 = max # of 1-2 neighbors
+  7 = max # of 1-3 neighbors
+  13 = max # of 1-4 neighbors
+  16 = max # of special neighbors
+1 atoms in group cv4
+WARNING: No fixes defined, atoms won't move (verlet.cpp:55)
+PPPM initialization ...
+  G vector (1/distance) = 0.186875
+  grid = 9 9 9
+  stencil order = 5
+  estimated absolute RMS force accuracy = 0.0146118
+  estimated relative force accuracy = 4.40031e-05
+  using double precision FFTs
+  3d grid and FFT values/proc = 2744 729
+Memory usage per processor = 12.3622 Mbytes
+---------------- Step        0 ----- CPU =      0.0000 (sec) ----------------
+TotEng   =        22.6676 KinEng   =        19.4051 Temp     =       310.0000 
+PotEng   =         3.2625 E_bond   =         0.9766 E_angle  =         2.4122 
+E_dihed  =        12.2802 E_impro  =         0.8927 E_vdwl   =         0.7549 
+E_coul   =        51.3159 E_long   =       -65.3699 Press    =        26.4035 
+---------------- Step        1 ----- CPU =      0.0001 (sec) ----------------
+TotEng   =        22.6676 KinEng   =        19.4051 Temp     =       310.0000 
+PotEng   =         3.2625 E_bond   =         0.9766 E_angle  =         2.4122 
+E_dihed  =        12.2802 E_impro  =         0.8927 E_vdwl   =         0.7549 
+E_coul   =        51.3159 E_long   =       -65.3699 Press    =        26.4035 
+Loop time of 0.000142097 on 1 procs for 1 steps with 22 atoms
+PPPM initialization ...
+  G vector (1/distance) = 0.186875
+  grid = 9 9 9
+  stencil order = 5
+  estimated absolute RMS force accuracy = 0.0146118
+  estimated relative force accuracy = 4.40031e-05
+  using double precision FFTs
+  3d grid and FFT values/proc = 2744 729
+Memory usage per processor = 12.3622 Mbytes
+---------------- Step        1 ----- CPU =      0.0000 (sec) ----------------
+TotEng   =        22.6676 KinEng   =        19.4051 Temp     =       310.0000 
+PotEng   =         3.2625 E_bond   =         0.9766 E_angle  =         2.4122 
+E_dihed  =        12.2802 E_impro  =         0.8927 E_vdwl   =         0.7549 
+E_coul   =        51.3159 E_long   =       -65.3699 Press    =        26.4035 
+---------------- Step        2 ----- CPU =      0.0002 (sec) ----------------
+TotEng   =        22.7836 KinEng   =        17.8744 Temp     =       285.5473 
+PotEng   =         4.9091 E_bond   =         2.4608 E_angle  =         2.8901 
+E_dihed  =        12.2364 E_impro  =         0.9456 E_vdwl   =         0.6611 
+E_coul   =        51.0765 E_long   =       -65.3614 Press    =        32.1400 
+Loop time of 0.000169039 on 1 procs for 1 steps with 22 atoms

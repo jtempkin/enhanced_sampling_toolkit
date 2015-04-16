@@ -14,7 +14,7 @@ class outputClass(object):
         Here we construct the base necessary fields. Note that nSteps has a default value. 
         """        
         self.name = name 
-        self.outputType = outputType
+        self.type = outputType
         self.destination = filename
         self.nSteps = nSteps 
         

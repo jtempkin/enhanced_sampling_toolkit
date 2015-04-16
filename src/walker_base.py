@@ -107,3 +107,17 @@ class walker(object):
         This routine sets the velocities of the system.
         """
         return
+        
+    @abc.abstractmethod
+    def setOutput(self):
+        """
+        This routine adds a source of output for the walker to write information to disk.
+        """
+        return 
+        
+    @abc.abstractmethod
+    def removeOutput(self):
+        """
+        This routine adds a source of output for the walker to write information to disk.
+        """
+        return 
