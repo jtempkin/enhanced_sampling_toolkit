@@ -12,6 +12,8 @@ class langevin():
         """
         This constructs a langevin object. Requires that you specify a temperature and a damping coefficient. 
         """
+        self.type = "langevin"
         self.damping_coefficient = damping_coefficient
         self.temperature = temperature
         self.shake = shake
+        self.seed = seed

@@ -49,11 +49,15 @@ class lammpsWalker(walker):
         if inputFilename is not None:
             # check to see if there is actually a filename at that location.
             assert os.path.isfile(inputFilename), "The input file for the LAMMPS walker could not be found."
+            
         # a filename for storing the data, note the appending of the index
         self.filename = inputFilename + "." + str(index)
         
+        # walker index         
+        self.index = index
+        
         # start walker object from the passed lammps input file name
-        self.lmp = self.__initLAMMPS__(inputFilename=inputFilename, logFilename=".".join([logFilename, str(index)]), verbose = debug)
+        self.lmp = self.__initLAMMPS__(inputFilename = inputFilename, logFilename = ".".join([logFilename, str(index)]), verbose = debug)
         
         # a list of the relevant collective variables
         self.colvars = []
@@ -61,20 +65,11 @@ class lammpsWalker(walker):
         # we're constructing a list for collective output classes. 
         self.output = []
         
+        self.dynamics = None
+        
         # a list of commands used to equilibrate the system 
         self.equilCmds = []
         
-        # by default, execute shake code. This flag lets the walker know
-        # that shakeH will be used in the dynamics
-        self.shakeH = True
-        
-        # here is the list of dynamics properties the walker should know:
-        
-        self.temperature = 310.0
-        
-    
-        # walker index         
-        self.index = index
 
     def close(self):
         """
@@ -330,10 +325,44 @@ class lammpsWalker(walker):
         
         return 0 
     
-    def setDynamics(self):
+    def setDynamics(self, dynamics_instance):
         """
         This routine sets the dynamics for the walker. 
-        """
+        """        
+        __knownDynamics__ = ['langevin']
+        
+        assert dynamics_instance.type in __knownDynamics__, "Dynamics instance type was not recognized."        
+        
+        # first we should check to see if there is already a dynamics defined. 
+        if self.dynamics is not None:
+            # if there is a dynamics already present, remove it's fixes from LAMMPS
+            for item in self.dynamics.fixes:
+                self.command("unfix " + item)
+        
+        # now replace with new dynamics instance
+        self.dynamics = dynamics_instance        
+        
+        self.dynamics.fixes = []
+        
+        # and set the required fixes
+        if self.dynamics.type is 'langevin':                        
+            # send the fixes to the underlying lammps object 
+            self.command("fix 1 all nve")
+            if self.dynamics.seed is None:
+                self.command("fix 2 all langevin " + " ".join([str(self.dynamics.temperature), str(self.dynamics.temperature)]) + " " + str(self.dynamics.damping_coefficient) + " " + str(random.randint(100000, 999999)))
+            else: 
+                self.command("fix 2 all langevin " + " ".join([str(self.dynamics.temperature), str(self.dynamics.temperature)]) + " " + str(self.dynamics.damping_coefficient) + " " + str(self.dynamics.seed))
+            
+            # add the fixes to the internal list 
+            self.dynamics.fixes.append("1")
+            self.dynamics.fixes.append("2")
+            
+        # set shake
+        if self.dynamics.shake is True:
+            self.command("fix shk all shake 0.0001 20 0 m 1.0")
+            self.dynamics.fixes.append("shk")
+        
+        self.propagate(0, pre='yes')
         
         return 0
     
