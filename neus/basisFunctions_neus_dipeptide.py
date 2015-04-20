@@ -23,9 +23,7 @@ from scipy import linalg as LA
 import scipy as sp
 import fileIO
 import sys
-import walker
-#import acor
-import errors
+import walker_base
 import random
 import h5py
 

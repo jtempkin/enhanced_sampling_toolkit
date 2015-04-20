@@ -11,7 +11,7 @@ from scipy import linalg as LA
 import scipy as sp
 import fileIO
 import sys
-import walker
+import walker_base
 import basisFunctions_neus as basisFunctions
 import errors
 import random
