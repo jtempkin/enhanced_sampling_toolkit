@@ -12,13 +12,6 @@ class walker(object):
     walkers should implement.
     """
     __metaclass__=abc.ABCMeta
-    
-    @abc.abstractmethod
-    def setColvars(self):
-        """
-        Sends the colvars to the underlying dyanmics engine.
-        """
-        return 
         
     @abc.abstractmethod
     def destroyColvars(self):
