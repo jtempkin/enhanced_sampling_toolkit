@@ -12,8 +12,7 @@ import scipy as sp
 import fileIO
 import sys
 import walker_base
-import basisFunctions_neus as basisFunctions
-import errors
+import basisFunctions_neus_dipeptide as basisFunctions
 import random
 import h5py
 import numpy as np
