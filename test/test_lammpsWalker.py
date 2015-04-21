@@ -214,3 +214,30 @@ def test_minimize():
     This test checks the minimization routine for the walker class. This routine uses a simple point particle on a 2D surface problem so that we have a good handle on how the minimization will work. 
     """
     # 
+    
+def test_setOutput():
+    """
+    This test checks that the setOutput routine populates the output list in the walker object.
+    """
+    
+def test_removeOutput():
+    """
+    This test checks that the setOutput routine destroys the output list entries in the walker object.
+    """
+    
+def test_setDynamics():
+    """
+    This routine checks the setDynamics routine in the walker sets the correct dynamics object to the walker. 
+    """    
+    
+def test_setTimestep():
+    """
+    This routine checks whether the set timestep routine returns.
+    """
+    
+def test_setTemperature():
+    """
+    This routine checks the action of the setTemperature routine to change the temperature of the underlying dynamics engine. 
+    """    
+    
+    
