@@ -392,12 +392,11 @@ class lammpsWalker(walker):
         
     def setTemperature(self, temp):
         """
-        This function sets the temperature of the walker object.
-        
-        NOTE THAT THIS DOES NOT ALTER THE DYNAMICS THERMOSTAT. LAMMPS REQUIRES
-        RESETING THIS THERMOSTAT. WE WILL LOOK INTO HOW TO DO THIS. 
+        This function sets the temperature of the walker object. 
         """
-        self.temperature = temp
+        self.dynamics.temperature = temp
+        
+        self.setDynamics(self.dynamics)
         
         return 0
         
