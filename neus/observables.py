@@ -12,34 +12,38 @@ class pmf:
     """
     This class represents a PMF observable.
     """
-    def __init__(self, name):
+    def __init__(self, name, data):
         """
         Constructor for the time correlation function for the end to end distance.
         """
         self.name = name
+        self.data = data
+        self.nsamples = np.zeros(data.shape)
 
-    def __call__(self, data, nsamples, wlkr):
-        # recover the cv sample from the walker
-        sample = wlkr.getColvars()
+    def __call__(self, sample, colvars):
 
         # make an array of
         indx = np.zeros(len(sample), dtype = np.int8)
+        
+        assert len(sample) == self.data.ndim, "The sample received does not match the dimensionality of the data array for this observable."
+        
+        assert len(sample) == len(colvars), "The sample dimentionality does not match the colvars dimensions"
 
         # we should add a check here to make sure that we are going to appropriately match the data type handed to us
         #assert
 
-        for i in range(len(wlkr.colvars)):
-            if wlkr.colvars[i][0] == 'dihedral':
+        for i,cv in enumerate(colvars):
+            if cv.name == 'dihedral':
                 # shift dihedral values up to ranges between [0.0, 360.0]
                 sample[i] += 180.0
 
-                indx[i] = data.shape[i] - 1 - int(np.floor(sample[i] / (360.0 / data.shape[i] ) ) )
+                indx[i] = self.data.shape[i] - 1 - int(np.floor(sample[i] / (360.0 / self.data.shape[i] ) ) )
 
             else:
                 print "WARNING: accumulatePMF() does not support given collective variable."
 
-        data[tuple(indx)] += 1.0
-        nsamples[tuple(indx)] += 1.0
+        self.data[tuple(indx)] += 1.0
+        self.nsamples[tuple(indx)] += 1.0
 
         return 0
 
