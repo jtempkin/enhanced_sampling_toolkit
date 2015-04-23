@@ -413,7 +413,7 @@ class lammpsWalker(walker):
         This routine sets up a mechanism for writing system information to file directly from the dynamics engine. This is equivalent to output constructed 
         """
         # assert outputType in __knownOutput__, "The output type specified was not recognized."        
-        __knownOutputTypes__ = ['dcd', 'xyz']
+        __knownOutputTypes__ = ['dcd', 'xyz', 'custom', 'xyz/mpiio', "atom"]
         assert outputType in __knownOutputTypes__, "outputType that was provided was not understood." 
         
         for out in self.output:
@@ -424,7 +424,10 @@ class lammpsWalker(walker):
         
         dump = self.output[-1]
         
-        self.command("dump " + dump.name + " all " + " ".join([dump.type, str(dump.nSteps), dump.destination]))
+        if dump.type == "custom":
+            self.command("dump " + dump.name + " all " + " ".join([dump.type, str(dump.nSteps), dump.destination, "x y z"]))
+        else:
+            self.command("dump " + dump.name + " all " + " ".join([dump.type, str(dump.nSteps), dump.destination]))
         
         
     def removeOutput(self):

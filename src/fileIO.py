@@ -124,6 +124,9 @@ def makeWkdir(dirname):
         print "Making backup of old working directory."
         if os.path.exists(dirname + ".backup"):
             shutil.rmtree(dirname + ".backup")
+            
+        #subprocess.call(['mkdir', dirname + ".backup"])
+        #subprocess.call(['mv', dirname + '/*', dirname + ".backup"])
         shutil.move(dirname, dirname + ".backup")
         subprocess.call(['mkdir', dirname])
     else:
