@@ -280,6 +280,8 @@ class partition:
         This routine samples the given box via the equilibrium overlap method. 
         """
         assert sysParams.has_key('scratchdir'), "Scratch directory was not specified in the sampling routine."
+        
+        assert sysParams['transitionMatrixType'] in ['transition','overlap']
         # assign an input filename for this walker. 
         #inputFilename = sysParams['scratchdir'] + "/" + str(umbrellaIndex) + "_w" + str(walkerIndex)
         inputFilename = None
