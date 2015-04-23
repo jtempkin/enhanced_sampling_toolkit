@@ -7,10 +7,10 @@ import numpy as np
 import copy
 from scipy import linalg as LA
 import scipy as sp
-import sys
 import random
-import basisFunctions
+import basisFunctions_neus_dipeptide as basisFunctions
 import entryPoints
+import h5py
 
 class partition:
     """
@@ -35,6 +35,8 @@ class partition:
         # initialize the matricies needed for the NEUS
         self.M = np.zeros((N,N))
         self.F = np.zeros((N,N))     
+        # we should track how many samples are taken in the M matrix
+        self.nsamples_M = np.zeros(N)
         self.a = np.zeros(N)
         self.m = np.zeros(N)
         self.z = np.zeros(N)
@@ -74,15 +76,22 @@ class partition:
             temp_M = np.zeros(self.M.shape)
 
             for i in range(self.M.shape[0]):
-		        temp_M[i,:] = self.M[i,:] / self.stoppingTimes[i]
+                temp_M[i,:] = self.M[i,:] / self.stoppingTimes[i]
 
-		        # update diagonal elements of G in infinite time process
-		        temp_M[i,i] = 1 - temp_M[i,:].sum()
+                # update diagonal elements of G in infinite time process
+                temp_M[i,i] = 1 - temp_M[i,:].sum()
 
             self.F = (self.k * self.F + temp_M) / (self.k + 1)
      
         elif updateType == 'overlap':
-            pass
+            
+            temp_M = np.zeros(self.M.shape)
+            
+            for i in range(self.M.shape[0]):
+                temp_M[i,:] = self.M[i,:] / self.nsamples_M[i]
+                
+            self.F = (self.k * self.F + temp_M) / (self.k + 1)
+                
 
         return 0
     
@@ -154,14 +163,14 @@ class partition:
 	    for infinite time process.
         """
         if finiteTime:
-            A = (np.identity(self.G.shape[0]) - self.G).transpose()
+            A = (np.identity(self.F.shape[0]) - self.F).transpose()
         
             self.z = np.linalg.solve(A, self.a)
 
         else:
             # compute via numpy interface to LAPACK the eigenvectors v and eigenvalues w
             # The linalg routine returns this as the first (i.e. largest) eigenvalue.
-            evals, evec = LA.eig(self.G, left=True, right=False)
+            evals, evec = LA.eig(self.F, left=True, right=False)
             sort = np.argsort(evals)
             # normalize if needed.
             self.z = evec[:,sort[-1]] / np.sum(evec[:,sort[-1]])
@@ -183,10 +192,10 @@ class partition:
         """
         Set each element in the data of the passed observable to zero.
         """
-        for elem in np.nditer(obs.data):
+        for elem in np.nditer(obs.data, op_flags=['readwrite']):
             elem[...] = 0.0
             
-        for elem in np.nditer(obs.nsamples):
+        for elem in np.nditer(obs.nsamples, op_flags=['readwrite']):
             elem[...] = 0.0
 
         return 0
@@ -213,22 +222,47 @@ class partition:
         
         return 0
 
-    def getBasisFunctionValues(self, coord):
+    def getBasisFunctionValues(self, coord, umbrella_index = None):
         """
         This function takes a point in collective variable space and returns 
         an array of the value of the basis functions at that point. 
+        
+        If no umbrella index is passed, then search the whole space 
         """
         # build an array 
         indicators = np.zeros(len(self.umbrellas))
-	
-        # go through the basis functions and construct the indicators array
-        for i in range(len(self.umbrellas)):
-            if self.umbrellas[i].indicator == 0.0:
-                continue
-            else:
+        
+        if umbrella_index is None:
+    	
+            # go through the basis functions and construct the indicators array
+            for i in range(len(self.umbrellas)):
+                if self.umbrellas[i].indicator(coord) == 0.0:
+                    continue
+                else:
+                    indicators[i] = self.umbrellas[i].indicator(coord)
+                    
+        elif len(self.umbrellas[umbrella_index].neighborList) == 0: 
+            # go through the basis functions and construct the indicators array
+            for i in range(len(self.umbrellas)):
+                if self.umbrellas[i].indicator(coord) == 0.0:
+                    continue
+                else:
+                    indicators[i] = self.umbrellas[i].indicator(coord)
+        else:
+            
+            # make sure the partition has a neighborlist
+            assert hasattr(self.umbrellas[umbrella_index], 'neighborList'), "There is no neighborlist defined."
+            # now loop over neighbors and populate the indicator
+            for i in self.umbrellas[umbrella_index].neighborList:
+                
                 indicators[i] = self.umbrellas[i].indicator(coord)
                 
+            # if we don't find any support, let's try this again and search the whole space. 
+            if np.sum(indicators) == 0.0:
+                indicators = self.getBasisFunctionValues(coord, umbrella_index=None)
+                
         # normalize the values of the basis functions
+        assert np.sum(indicators) != 0.0
         indicators = indicators / np.sum(indicators)
         
         return indicators
@@ -247,15 +281,19 @@ class partition:
         """
         assert sysParams.has_key('scratchdir'), "Scratch directory was not specified in the sampling routine."
         # assign an input filename for this walker. 
-        inputFilename = sysParams['scratchdir'] + "/" + str(umbrellaIndex) + "_w" + str(walkerIndex)
+        #inputFilename = sysParams['scratchdir'] + "/" + str(umbrellaIndex) + "_w" + str(walkerIndex)
+        inputFilename = None
     
         oldConfig = wlkr.getConfig()
         oldSample = wlkr.getColvars()
         
-        assert self.umbrellas[umbrellaIndex].indicator(oldConfig) > 0.0, "The walker is not in the support of the current window."
+        f_handle = h5py.File(sysParams['scratchdir'] + "/ep." + str(umbrellaIndex) + ".h5py", "w")
+        
+        #print self.umbrellas[umbrellaIndex](oldSample, self.umbrellas), self.umbrellas[umbrellaIndex].indicator(oldSample)
+        assert self.umbrellas[umbrellaIndex].indicator(oldSample) > 0.0, "The walker is not in the support of the current window."
         
         # get the sample from the initial state of the walker in CV space
-        self.umbrellas[umbrellaIndex].samples.append(wlkr.getColvars())
+        self.umbrellas[umbrellaIndex].samples.append(oldSample)
         
         # reset the local observables arrays for this round of sampling
         for obs in self.umbrellas[umbrellaIndex].local_observables:
@@ -272,12 +310,14 @@ class partition:
             newConfig = wlkr.getConfig()
             newSample = wlkr.getColvars()
             
-            # update the record of the simulation time for the walker object. 
-            wlkr.simulationTime += sysParams['stepLength']
+            if sysParams['transitionMatrixType'] == 'transition':
+                # update the M matrix based on this sample 
+                self.M[umbrellaIndex,:] = self.getBasisFunctionValues(newSample, umbrellaIndex)
+                # increment the number of samples 
+                self.nsamples_M[umbrellaIndex] += 1
             
             # get the new configuration
-            if self.metropolisMove(self.umbrellas[umbrellaIndex], oldConfig, newConfig):
-                
+            if self.metropolisMove(self.umbrellas[umbrellaIndex], oldSample, newSample):
                 # get the new sample position and append it to the samples list
                 self.umbrellas[umbrellaIndex].samples.append(newSample) 
                 
@@ -303,9 +343,20 @@ class partition:
 
             # now check to see if the data buffer has become too large and flush buffer to file
             #if len(self.umbrellas[umbrellaIndex].samples) > 1000000: self.umbrellas[umbrellaIndex].flushDataToFile(inputFilename)
+            
+            if sysParams['transitionMatrixType'] == 'overlap':
+                self.M[umbrellaIndex,:] = self.getBasisFunctionValues(oldSample, umbrellaIndex)
+                # increment the number of samples 
+                self.nsamples_M[umbrellaIndex] += 1
+            
+            if i % 10000 == 0: f_handle.create_dataset(str(i) + ".config", data=wlkr.getConfig())
+        
         
         # flush the last data to file after sampling has finished
         self.umbrellas[umbrellaIndex].flushDataToFile(inputFilename)
+        
+        f_handle.flush()
+        f_handle.close()
         
         return 0
         
@@ -420,26 +471,53 @@ class partition:
         
         # evaluate probability
         if random.random() <= prob:
+        
             return True
             
         else:        
+            
             return False
         
         # if something went wrong, raise an error 
         raise Exception("Something went wrong in the Metropolis Move Section. We don't know what.")
     
-    def buildNeighborList(self):
+    def buildNeighborList(self, L, umbrellas):
         """
         This routine constructs a neighborlist based on the radius of the basis 
-        function. Computes the neighborlist as follows: 
-        """
+        function.
         
-        for i in range(len(self.umbrellas)):
-            for j in range(i+1, len(self.umbrellas), 1):
-                dist = np.linalg.norm(self.umbrellas[i].center - self.umbrellas[j].center)
-                if dist < (self.umbrellas[i].radius + self.umbrellas[j].radius):
-                    self.umbrellas[i].neighborList.append(j)
-                    self.umbrellas[j].neighborList.append(i)
+        L is the vector specifying the box lengths in each dimension. 
+        """      
+        # we should make sure that ever basisFunction has a radius defined. 
+        for win in umbrellas:
+            assert hasattr(win, 'radius')
+            
+        # now let's find all of the neighbors and populate a list of neighbors for each 
+        for i in range(len(umbrellas)):
+            for j in range(i+1, len(umbrellas)):
+                # get the distance between the centers                    
+                dr = umbrellas[i].center - umbrellas[j].center
+                
+                # apply minimum image convention if the dimension wraps 
+                for indx,dim in enumerate(L):
+                    if dim == -1.0: 
+                        continue
+                    else:
+                        # now apply the minimum image criteria
+                        if abs(dr[indx]) > dim / 2.0:
+                            if dr[indx] > 0.0: 
+                                dr[indx] -= dim
+                            elif dr[indx] < 0.0: 
+                                dr [indx] += dim
+                        else: 
+                            continue 
+                            
+                dist = np.linalg.norm(dr)
+                # append i,j to each other's list
+                
+                if dist <= (umbrellas[i].radius + umbrellas[j].radius):
+                    umbrellas[i].neighborList.append(j)
+                    umbrellas[j].neighborList.append(i)
     
             
         return 0
@@ -527,7 +605,7 @@ class partition:
         return logpji
 
      
-    def createUmbrellas(self, Params, basisType="Box"):
+    def createUmbrellas(self, colVarParams, wrapping, basisType="Box", neighborList=True):
         """
         We create a grid of Umbrellas on the collective variable space.  Each collective variable is divided by evenly spaced umbrellas.
         It takes in as input:
@@ -542,12 +620,12 @@ class partition:
             um               A list of umbrella objects which cover the space of all the collective variables.
     
         """
-        #First, we pick up the parameters we care about from the systemParams.
-        colVarParams = Params["cvrange"]
+        assert type(colVarParams) is np.ndarray, "The colvars array passed is not of the correct type."
+        
+        assert basisType in ['Box', 'Gaussian', 'Pyramid']
+        
         # We check if the user provided any input to wrap the basis functions.
-        if 'wrapping' in Params:
-            wrapping=np.array(Params['wrapping'])
-        else:
+        if 'wrapping' is None:
             wrapping=np.zeros(len(colVarParams))
         
         # We make the following three lists:
@@ -606,16 +684,27 @@ class partition:
             if wraparray.any():
    	        if basisType == "Box":
    	            um.append(basisFunctions.Box(umbrellaCoord,widthlist,boxwrap))
-   	        elif basisType == "Cone":
-   	            um.append(basisFunctions.Cone(umbrellaCoord,widthlist,boxwrap))
+   	        elif basisType == "Gaussian":
+   	            um.append(basisFunctions.Gaussian(umbrellaCoord,widthlist,boxwrap))
    	        elif basisType == "Pyramid":
    	            um.append(basisFunctions.Pyramid(umbrellaCoord,widthlist,boxwrap))
             else:
    	        if basisType =="Box":
   		    um.append(basisFunctions.Box(umbrellaCoord,widthlist))
-   	        elif basisType == "Cone":
-                    um.append(basisFunctions.Cone(umbrellaCoord,widthlist))
+   	        elif basisType == "Gaussian":
+                    um.append(basisFunctions.Gaussian(umbrellaCoord,widthlist))
                 elif basisType == "Pyramid":
                     um.append(basisFunctions.Pyramid(umbrellaCoord,widthlist))
+                    
+        # if we specify to build a neighborlist for the windows, let's build it here. 
+        L = np.zeros(len(colVarParams))
+        for i in range(len(L)):
+            if wrapping[i] == 1:
+                L[i] = colVarParams[i][1] - colVarParams[i][0]
+            else:
+                L[i] = -1.0
+        
+        if neighborList:
+            self.buildNeighborList(L, um)
     
         return um
