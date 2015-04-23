@@ -71,9 +71,9 @@ class basisFunction:
                 dset = f_handle['colvars'].create_dataset("cv_" + str(len(f_handle['colvars'].keys())), np.asarray(self.samples).shape, dtype="f")
                 dset = self.samples
         """
-       
-        with open(filename + ".colvars", "a") as f_handle:
-            np.save(f_handle, self.samples)
+        if filename is not None:
+            with open(filename + ".colvars", "a") as f_handle:
+                np.save(f_handle, self.samples)
         """
         # write out the basis function time series as well            
         with h5py.File(filename + ".hdf5", "a") as f_handle:
@@ -93,9 +93,11 @@ class basisFunction:
             np.savetxt(f_handle, self.basisFnxTimeSeries)
 
         """
+        """
         for obs in self.local_observables:
             with open(filename + obs[0].__name__, "w") as f_handle:
                 np.save(f_handle, obs[1])
+        """
 
         # delete current reference to the list
         del self.samples
@@ -140,7 +142,8 @@ class Box(basisFunction):
         self.dimension = len(center)
       
         # set the radius to use for computing neighbors.
-        self.radius = np.linalg.norm(self.width)**2
+        self.radius = np.sqrt(np.sum(self.width**2)) * 2.0
+        #self.radius = np.linalg.norm(self.width)**2
         self.neighborList = []
         
         
@@ -184,7 +187,7 @@ class Box(basisFunction):
         # create a distance vector
         distancevec = sp.asarray(coord) - sp.asarray(self.center)
         # if any collective variable is periodic, construct dr, the adjuct for minimum image convetion for the periodic cv's
-        if self.wrapping != None:
+        if self.wrapping is not None:
             # build dr 
             dr = np.zeros(distancevec.shape)
             # add values to dr if the CV wraps
@@ -284,12 +287,19 @@ class Pyramid(basisFunction):
         # get sum of box indicators. 
         if self.indicator(coord) == 0.0:
             return 0.0
-        else:
+        elif len(self.neighborList) > 0:
             norm = 0.0
-            for i in range(0, len(umb), 1):
+            for i in self.neighborList:
                 norm += umb[i].indicator(coord)
             
-            return self.indicator(coord) / norm
+            
+        else: 
+            norm = 0.0
+            for win in umb:
+                norm += win.indicator(coord)
+            
+        assert norm != 0.0
+        return self.indicator(coord) / norm
             
     def indicator(self, coord):
         """
@@ -298,7 +308,7 @@ class Pyramid(basisFunction):
         # create a distance vector
         distancevec = np.asarray(coord) - np.asarray(self.center)
         # if any collective variable is periodic, construct dr, the adjuct for minimum image convention for the periodic cv's
-        if self.wrapping != None:
+        if self.wrapping is not None:
             # build dr 
             dr = np.zeros(distancevec.shape)
             # add values to dr if the CV wraps
