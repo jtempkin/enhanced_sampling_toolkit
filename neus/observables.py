@@ -6,6 +6,7 @@ These routines are initialized as their own class and subsequently can be invoke
 """
 
 import numpy as np
+import copy
     
 # ------------- OBSERVABLES FUNCTIONS ---------------------
 class pmf:
@@ -22,22 +23,23 @@ class pmf:
 
     def __call__(self, sample, colvars):
 
+        temp_sample = copy.deepcopy(sample)
         # make an array of
-        indx = np.zeros(len(sample), dtype = np.int8)
+        indx = np.zeros(len(temp_sample), dtype = np.int8)
         
-        assert len(sample) == self.data.ndim, "The sample received does not match the dimensionality of the data array for this observable."
+        assert len(temp_sample) == self.data.ndim, "The sample received does not match the dimensionality of the data array for this observable."
         
-        assert len(sample) == len(colvars), "The sample dimentionality does not match the colvars dimensions"
+        assert len(temp_sample) == len(colvars), "The sample dimentionality does not match the colvars dimensions"
 
         # we should add a check here to make sure that we are going to appropriately match the data type handed to us
         #assert
 
         for i,cv in enumerate(colvars):
-            if cv.name == 'dihedral':
+            if cv.type == 'dihedral':
                 # shift dihedral values up to ranges between [0.0, 360.0]
-                sample[i] += 180.0
+                temp_sample[i] += 180.0
 
-                indx[i] = self.data.shape[i] - 1 - int(np.floor(sample[i] / (360.0 / self.data.shape[i] ) ) )
+                indx[i] = self.data.shape[i] - 1 - int(np.floor(temp_sample[i] / (360.0 / self.data.shape[i] ) ) )
 
             else:
                 print "WARNING: accumulatePMF() does not support given collective variable."
