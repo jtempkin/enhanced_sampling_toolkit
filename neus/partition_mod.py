@@ -376,13 +376,6 @@ class partition:
         # assign an input filename for this walker. 
         inputFilename = sysParams['scratchdir'] + "/" + str(umbrellaIndex) + "_w" + str(walkerIndex)
         
-        # set the T_0 value, the value essentially acts as a "countdown" for how
-        # much time evolution is left to be done in this box
-        T_0 = self.stoppingTimes[umbrellaIndex]
-    
-        # reinject the walker to start in this box. 
-        self.reinject(wlkr, umbrellaIndex)
-        
         # get the sample from the initial state of the walker in CV space
         self.umbrellas[umbrellaIndex].samples.append(wlkr.getColvars())
         
@@ -400,9 +393,6 @@ class partition:
             
             # update the record of the simulation time for the walker object. 
             wlkr.simulationTime += sysParams['stepLength']
-
-            # for infinite time processes let's simply count down
-            T_0 -= sysParams['stepLength']
 	    
             # now we check to see if we've passed the autocorrelation length
             # if we do, we reset the Y ( [t / s] * s) value to the current point
