@@ -53,17 +53,18 @@ class P1:
     """
     This routine returns the TCF of the end to end distance.
     """
-    def __init__(self, s, stepLength, atomids):
+    def __init__(self, name, s, stepLength, atomids, data):
         """
         Constructor for the time correlation function for the end to end distance.
         """
-        self.s = s * stepLength
+        self.s = s
         self.stepLength = stepLength
         self.atomids = atomids
-        self.name = "P1"
+        self.name = name
+        self.data = data
+        self.nsamples = np.zeros(data.shape)
 
-
-    def __call__(self, data, nsamples, wlkr):
+    def __call__(self, wlkr):
         """
         This function takes the current position of the walker and updates the
         local autocorrelation function estimation.
@@ -84,7 +85,7 @@ class P1:
 
         temp_val = np.dot(l1, l2)
 
-        data[time_indx] = (data[time_indx] * nsamples[time_indx] + temp_val) / (nsamples[time_indx] + 1.0)
-        nsamples[time_indx] += 1.0
+        self.data[time_indx] = (self.data[time_indx] * self.nsamples[time_indx] + temp_val) / (self.nsamples[time_indx] + 1.0)
+        self.nsamples[time_indx] += 1.0
 
         return 0
