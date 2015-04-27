@@ -289,7 +289,7 @@ class partition:
         oldConfig = wlkr.getConfig()
         oldSample = wlkr.getColvars()
         
-        f_handle = h5py.File(sysParams['scratchdir'] + "/ep." + str(umbrellaIndex) + ".h5py", "w")
+        f_handle = h5py.File(sysParams['scratchdir'] + "/ep." + str(umbrellaIndex) + ".h5py", "a")
         
         #print self.umbrellas[umbrellaIndex](oldSample, self.umbrellas), self.umbrellas[umbrellaIndex].indicator(oldSample)
         assert self.umbrellas[umbrellaIndex].indicator(oldSample) > 0.0, "The walker is not in the support of the current window."
@@ -351,7 +351,7 @@ class partition:
                 # increment the number of samples 
                 self.nsamples_M[umbrellaIndex] += 1
             
-            if i % 10000 == 0: f_handle.create_dataset(str(i) + ".config", data=wlkr.getConfig())
+            if i % 1000 == 0: f_handle.create_dataset(str(self.k) + "." + str(i) + ".config", data=wlkr.getConfig())
         
         
         # flush the last data to file after sampling has finished
