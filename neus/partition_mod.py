@@ -314,7 +314,7 @@ class partition:
             
             if sysParams['transitionMatrixType'] == 'transition':
                 # update the M matrix based on this sample 
-                self.M[umbrellaIndex,:] = self.getBasisFunctionValues(newSample, umbrellaIndex)
+                self.M[umbrellaIndex,:] += self.getBasisFunctionValues(newSample, umbrellaIndex)
                 # increment the number of samples 
                 self.nsamples_M[umbrellaIndex] += 1
             
@@ -347,7 +347,7 @@ class partition:
             #if len(self.umbrellas[umbrellaIndex].samples) > 1000000: self.umbrellas[umbrellaIndex].flushDataToFile(inputFilename)
             
             if sysParams['transitionMatrixType'] == 'overlap':
-                self.M[umbrellaIndex,:] = self.getBasisFunctionValues(oldSample, umbrellaIndex)
+                self.M[umbrellaIndex,:] += self.getBasisFunctionValues(oldSample, umbrellaIndex)
                 # increment the number of samples 
                 self.nsamples_M[umbrellaIndex] += 1
             
