@@ -293,7 +293,7 @@ class partition:
         
         return F
         
-    def sample_US(self, wlkr, numSteps, umbrellaIndex, walkerIndex, sysParams):
+    def sample_US(self, wlkr, numSteps, umbrellaIndex, walkerIndex, sysParams, debug=False):
         """
         This routine samples the given box via the equilibrium overlap method. 
         """
@@ -301,8 +301,10 @@ class partition:
         
         assert sysParams['transitionMatrixType'] in ['transition','overlap']
         # assign an input filename for this walker. 
-        inputFilename = sysParams['scratchdir'] + "/" + str(umbrellaIndex) + "_w" + str(walkerIndex)
-        #inputFilename = None
+        if debug: 
+            inputFilename = sysParams['scratchdir'] + "/" + str(umbrellaIndex) + "_w" + str(walkerIndex)
+        else:
+            inputFilename = None
     
         oldConfig = wlkr.getConfig()
         oldSample = wlkr.getColvars()
