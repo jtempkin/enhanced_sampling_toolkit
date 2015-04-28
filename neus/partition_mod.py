@@ -293,7 +293,7 @@ class partition:
         oldConfig = wlkr.getConfig()
         oldSample = wlkr.getColvars()
         
-        f_handle = h5py.File(sysParams['scratchdir'] + "/ep." + str(umbrellaIndex) + ".h5py", "w")
+        f_handle = h5py.File(sysParams['scratchdir'] + "/ep." + str(umbrellaIndex) + ".h5py", "a")
         
         #print self.umbrellas[umbrellaIndex](oldSample, self.umbrellas), self.umbrellas[umbrellaIndex].indicator(oldSample)
         assert self.umbrellas[umbrellaIndex].indicator(oldSample) > 0.0, "The walker is not in the support of the current window."
@@ -318,7 +318,7 @@ class partition:
             
             if sysParams['transitionMatrixType'] == 'transition':
                 # update the M matrix based on this sample 
-                self.M[umbrellaIndex,:] = self.getBasisFunctionValues(newSample, umbrellaIndex)
+                self.M[umbrellaIndex,:] += self.getBasisFunctionValues(newSample, umbrellaIndex)
                 # increment the number of samples 
                 self.nsamples_M[umbrellaIndex] += 1
             
@@ -351,11 +351,11 @@ class partition:
             #if len(self.umbrellas[umbrellaIndex].samples) > 1000000: self.umbrellas[umbrellaIndex].flushDataToFile(inputFilename)
             
             if sysParams['transitionMatrixType'] == 'overlap':
-                self.M[umbrellaIndex,:] = self.getBasisFunctionValues(oldSample, umbrellaIndex)
+                self.M[umbrellaIndex,:] += self.getBasisFunctionValues(oldSample, umbrellaIndex)
                 # increment the number of samples 
                 self.nsamples_M[umbrellaIndex] += 1
             
-            if i % 10000 == 0: f_handle.create_dataset(str(i) + ".config", data=wlkr.getConfig())
+            if i % 1000 == 0: f_handle.create_dataset(str(self.k) + "." + str(i) + ".config", data=wlkr.getConfig())
         
         
         # flush the last data to file after sampling has finished
