@@ -5,7 +5,8 @@ This is an update partition module that contains the flexibility to perform both
 
 import numpy as np
 import copy
-from scipy import linalg as LA
+from scipy.sparse import linalg as LA
+from scipy import sparse
 import scipy as sp
 import random
 import basisFunctions_neus_dipeptide as basisFunctions
@@ -169,8 +170,11 @@ class partition:
 
         else:
             # compute via numpy interface to LAPACK the eigenvectors v and eigenvalues w
+            # here will first convert F to sparse format before solving.
             # The linalg routine returns this as the first (i.e. largest) eigenvalue.
-            evals, evec = LA.eig(self.F, left=True, right=False)
+        
+            F_sparse = sparse.coo_matrix(self.F)
+            evals, evec = LA.eigs(F_sparse)
             sort = np.argsort(evals)
             # normalize if needed.
             self.z = evec[:,sort[-1]] / np.sum(evec[:,sort[-1]])
