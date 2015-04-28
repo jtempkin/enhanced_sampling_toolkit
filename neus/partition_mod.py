@@ -108,7 +108,7 @@ class partition:
         
         return 0
 
-    def addObservable(self, A):
+    def addObservable(self, A, rank_index=None):
         """
         This routine adds an observable and initializes local copies of the observables in the basis windows.
         """
@@ -116,9 +116,14 @@ class partition:
 
         # add the observable to both the partition and each window
         self.observables.append(A)
-        for window in self.umbrellas:
-            if not hasattr(window, "local_observables"): window.local_observables = []
-            window.local_observables.append(copy.deepcopy(A))
+        if rank_index is None:
+            for window in self.umbrellas:
+                if not hasattr(window, "local_observables"): window.local_observables = []
+                window.local_observables.append(copy.deepcopy(A))
+        else:
+            for window in rank_index:
+                if not hasattr(self.umbrellas[window], "local_observables"): self.umbrellas[window].local_observables = []
+                self.umbrellas[window].local_observables.append(copy.deepcopy(A))
 
         return 0
 
