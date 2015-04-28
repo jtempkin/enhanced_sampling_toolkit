@@ -151,9 +151,13 @@ class partition:
         """
         for o_indx,obs in enumerate(self.observables):
             temp = np.zeros(obs.data.shape)
-
-            for w_indx,win in enumerate(self.umbrellas):
-                temp += self.z[w_indx] * win.local_observables[o_indx].data
+            
+            if self.rank_window_index is None:
+                for w_indx,win in enumerate(self.umbrellas):
+                    temp += self.z[w_indx] * win.local_observables[o_indx].data
+            else:
+                for w_indx in self.rank_window_index:
+                    temp += self.z[w_indx] * self.umbrellas[w_indx].local_observables[o_indx].data
 
             obs.data[:] = temp[:]
 
