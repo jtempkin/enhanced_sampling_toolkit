@@ -44,6 +44,9 @@ class partition:
 
         # keep a list of any observable objects that should be estimated during sampling. 
         self.observables = []
+        
+        # start a list of the windows associated with this partition. 
+        self.rank_window_index = None
 
         self.stoppingTimes = np.zeros(N)
         self.simulationTime = np.zeros(N)
@@ -114,14 +117,15 @@ class partition:
         """
         assert hasattr(self, "observables"), "The partition observables lists were not properly initialized."
 
-        # add the observable to both the partition and each window
+        # add the observable to both the partition and each window own by the ranks
         self.observables.append(A)
-        if rank_index is None:
+        
+        if self.rank_window_index is None:
             for window in self.umbrellas:
                 if not hasattr(window, "local_observables"): window.local_observables = []
                 window.local_observables.append(copy.deepcopy(A))
         else:
-            for window in rank_index:
+            for window in self.rank_window_index:
                 if not hasattr(self.umbrellas[window], "local_observables"): self.umbrellas[window].local_observables = []
                 self.umbrellas[window].local_observables.append(copy.deepcopy(A))
 
