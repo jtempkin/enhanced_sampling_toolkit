@@ -187,10 +187,11 @@ class partition:
             # The linalg routine returns this as the first (i.e. largest) eigenvalue.
         
             F_sparse = sparse.coo_matrix(self.F)
-            evals, evec = LA.eigs(F_sparse)
+            evals, evec = LA.eigs(F_sparse.transpose())
+            #evals, evec = LA.eig(self.F, left=True, right=False)
             sort = np.argsort(evals)
             # normalize if needed.
-            self.z = evec[:,sort[-1]] / np.sum(evec[:,sort[-1]])
+            self.z[:] = evec[:,sort[-1]] / np.sum(evec[:,sort[-1]])
 
         return 0
 
@@ -300,8 +301,8 @@ class partition:
         
         assert sysParams['transitionMatrixType'] in ['transition','overlap']
         # assign an input filename for this walker. 
-        #inputFilename = sysParams['scratchdir'] + "/" + str(umbrellaIndex) + "_w" + str(walkerIndex)
-        inputFilename = None
+        inputFilename = sysParams['scratchdir'] + "/" + str(umbrellaIndex) + "_w" + str(walkerIndex)
+        #inputFilename = None
     
         oldConfig = wlkr.getConfig()
         oldSample = wlkr.getColvars()
@@ -503,6 +504,9 @@ class partition:
             
         # now let's find all of the neighbors and populate a list of neighbors for each 
         for i in range(len(umbrellas)):
+            # add the current window to it's own neighborList
+            umbrellas[i].neighborList.append(i)
+            # now search the other windows
             for j in range(i+1, len(umbrellas)):
                 # get the distance between the centers                    
                 dr = umbrellas[i].center - umbrellas[j].center

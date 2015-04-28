@@ -73,7 +73,7 @@ class basisFunction:
         """
         if filename is not None:
             with open(filename + ".colvars", "a") as f_handle:
-                np.save(f_handle, self.samples)
+                np.savetxt(f_handle, self.samples)
         """
         # write out the basis function time series as well            
         with h5py.File(filename + ".hdf5", "a") as f_handle:
