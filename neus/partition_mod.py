@@ -12,6 +12,7 @@ import random
 import basisFunctions_neus_dipeptide as basisFunctions
 import entryPoints
 import h5py
+import observables
 
 class partition:
     """
@@ -195,14 +196,17 @@ class partition:
 
         return 0
 
-    def accumulateObservables(self, sample, colvars, indx):
+    def accumulateObservables(self, wlkr, sample, colvars, indx):
         """
         This routine loops through the observables list and updates the samples in the corresponding windows.
         """
 
         for obs in self.umbrellas[indx].local_observables:
             # use the observable call routine to accumulate a sampling in the observables data structure
-            obs(sample, colvars)
+            if isinstance(obs, observables.pmf): 
+                obs(sample, colvars)
+            if isinstance(obs, observables.P1):
+                obs(wlkr)
 
         return 0
 
@@ -348,7 +352,7 @@ class partition:
                 oldSample = newSample
                 
                 # append the new sample to the observables
-                self.accumulateObservables(newSample, wlkr.colvars, umbrellaIndex)
+                self.accumulateObservables(wlkr, newSample, wlkr.colvars, umbrellaIndex)
             
             else:
                 # if we reject the proposed position, append the old config                
@@ -361,7 +365,7 @@ class partition:
                 wlkr.drawVel(distType = 'gaussian', temperature = 310.0)
                 
                 # append the new sample to the observables
-                self.accumulateObservables(oldSample, wlkr.colvars, umbrellaIndex)
+                self.accumulateObservables(wlkr, oldSample, wlkr.colvars, umbrellaIndex)
 
             # now check to see if the data buffer has become too large and flush buffer to file
             #if len(self.umbrellas[umbrellaIndex].samples) > 1000000: self.umbrellas[umbrellaIndex].flushDataToFile(inputFilename)
@@ -461,7 +465,7 @@ class partition:
 
             
             # let's accumulate a sample into the autocorrelation function
-            self.accumulateObservables(wlkr.getColvars(), wlkr.colvars, umbrellaIndex)
+            self.accumulateObservables(wlkr, wlkr.getColvars(), wlkr.colvars, umbrellaIndex)
 
             # now check to see if the data buffer has become too large and flush buffer to file
             #if len(self.umbrellas[umbrellaIndex].samples) > 1000000: self.umbrellas[umbrellaIndex].flushDataToFile(inputFilename)
