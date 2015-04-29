@@ -386,7 +386,7 @@ class partition:
         
         return 0
         
-    def sample_NEUS(self, wlkr, numSteps, umbrellaIndex, walkerIndex, sysParams):
+    def sample_NEUS(self, wlkr, numSteps, umbrellaIndex, walkerIndex, sysParams, debug=False):
         """    
         This function takes a system lmp and propagates the dynamics to generate
         the required samples but storing and generating samples via NEUS algorithm.
@@ -397,8 +397,11 @@ class partition:
         
         """      
         assert sysParams.has_key('scratchdir'), "Scratch directory was not specified in the sampling routine."
-        # assign an input filename for this walker. 
-        inputFilename = sysParams['scratchdir'] + "/" + str(umbrellaIndex) + "_w" + str(walkerIndex)
+        # assign an input filename for this walker.  
+        if debug: 
+            inputFilename = sysParams['scratchdir'] + "/" + str(umbrellaIndex) + "_w" + str(walkerIndex)
+        else:
+            inputFilename = None
         
         # get the sample from the initial state of the walker in CV space
         self.umbrellas[umbrellaIndex].samples.append(wlkr.getColvars())
