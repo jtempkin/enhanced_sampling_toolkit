@@ -83,7 +83,7 @@ class P1:
         y2 = config[self.atomids[1]:self.atomids[1]+3]
         l2 = y1 - y2
 
-        temp_val = np.sqrt(np.dot(l1, l2))
+        temp_val = np.dot(l1, l2)
 
         self.data[time_indx] = (self.data[time_indx] * self.nsamples[time_indx] + temp_val) / (self.nsamples[time_indx] + 1.0)
         self.nsamples[time_indx] += 1.0
