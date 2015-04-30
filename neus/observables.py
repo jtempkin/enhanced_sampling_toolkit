@@ -56,6 +56,8 @@ class P1:
     def __init__(self, name, s, stepLength, atomids, data):
         """
         Constructor for the time correlation function for the end to end distance.
+        
+        NOTE: Step Length is the time between samples taken, not necessarily the time the walker advances each timestep. 
         """
         self.s = s
         self.stepLength = stepLength
@@ -69,6 +71,9 @@ class P1:
         This function takes the current position of the walker and updates the
         local autocorrelation function estimation.
         """
+        # check to see that we are accumulating a value at a time when it is appropriate. return otherwise 
+        if not wlkr.simulationTime % self.stepLength: return 0 
+            
         time_indx = (wlkr.simulationTime - np.floor(wlkr.simulationTime / self.s) * self.s ) / self.stepLength
 
         # current configuration
