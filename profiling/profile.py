@@ -7,9 +7,9 @@ import sys
 import cProfile
 import pstats
 
-if sys.argv[1] == 'US':
-    cProfile.run("profile_US.py", "profile_US")
-    p = pstats.Stats("profile_US")
-
+with open(sys.argv[1], "r") as f_handle:
+    cProfile.run(f_handle, sys.argv[1] + ".pstats")
+    
+p = pstats.Stats(sys.argv[1] + ".pstats")
 p.strip_dirs().sort_stats("time").print_stats()
     
