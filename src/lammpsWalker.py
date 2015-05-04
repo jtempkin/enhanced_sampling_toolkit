@@ -10,7 +10,8 @@ import collectiveVariables
 import outputClass
 import numpy as np
 import ctypes
-import os.path
+import os
+import shutil
 #from lammps import lammps
 
 
@@ -94,7 +95,19 @@ class lammpsWalker(walker):
             from lammps import lammps
         except:
             print "ERROR: The LAMMPS python interface could not be found. Check your PYTHONPATH and compiled LAMMPS directory to make sure it is compiled and importable." 
-        
+
+
+        # check to see we are handing an absolute pathname. 
+        if not os.path.isabs(inputFilename):
+            inputFilename = os.path.abspath(inputFilename)
+            
+        if not os.path.isabs(logFilename):
+            logFilename = os.path.abspath(logFilename)
+
+        # we're going to assume here that the user is taking care of the fact that LAMMPS needs to know where to find things but we will issue a worning in case they aren't. 
+        if not os.path.dirname(inputFilename) != os.getcwd():
+            print "WARNING: Getting lammps input file from directory other than current working directory. Be sure pathnames are correct in input files." 
+            
         # initialize the lammps object
         if verbose == True:
             self.lmp = lammps()
@@ -109,11 +122,8 @@ class lammpsWalker(walker):
         # if there is a specified filename, use it to set up the simulation.         
         if inputFilename != None:
             self.command("log " + logFilename)
-            # check to see we are handing an absolute pathname. LAMMPS seems to bail on relative path names
-            if not os.path.isabs(inputFilename):
-                self.lmp.file(os.path.abspath(inputFilename))
-            else:
-                self.lmp.file(inputFilename)
+                
+            self.lmp.file(inputFilename)
         else:
             self.command("log " + logFilename)
         
