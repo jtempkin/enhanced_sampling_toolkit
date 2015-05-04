@@ -89,6 +89,7 @@ class lammpsWalker(walker):
         
         
         """
+        
         try:
             from lammps import lammps
         except:
@@ -100,7 +101,7 @@ class lammpsWalker(walker):
         else:
             args = ["-sc", "none", "-echo", "log"]
             self.lmp = lammps("", args)
-        
+            
         # after the lammps object is created, initialize the lammps simulation. 
         # specify general log file parameters
         self.command("echo none")
@@ -108,7 +109,11 @@ class lammpsWalker(walker):
         # if there is a specified filename, use it to set up the simulation.         
         if inputFilename != None:
             self.command("log " + logFilename)
-            self.lmp.file(inputFilename)
+            # check to see we are handing an absolute pathname. LAMMPS seems to bail on relative path names
+            if not os.path.isabs(inputFilename):
+                self.lmp.file(os.path.abspath(inputFilename))
+            else:
+                self.lmp.file(inputFilename)
         else:
             self.command("log " + logFilename)
         
