@@ -11,5 +11,5 @@ with open(sys.argv[1], "r") as f_handle:
     cProfile.run(f_handle, sys.argv[1] + ".pstats")
     
 p = pstats.Stats(sys.argv[1] + ".pstats")
-p.strip_dirs().sort_stats("time").print_stats()
+p.strip_dirs().sort_stats("tottime").print_stats(10)
     

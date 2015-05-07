@@ -114,7 +114,7 @@ def main(debug=False):
         if debug: print system
 
         # now we construct the umbrella windows
-        system.umbrellas = system.createUmbrellas(params['cvrange'], params['wrapping'], basisType=params['basisType'])
+        system.umbrellas = system.createUmbrellas(params['cvrange'], params['wrapping'], basisType=params['basisType'], neighborList=False)
         
         with open(params['systemFile'], "w") as f_handle:
             pickle.dump(system, f_handle, protocol=2)
@@ -160,7 +160,7 @@ def main(debug=False):
         st = time()
 
         # this loop does one iteration of the update
-        for i in system.rank_window_index:
+        for i in range(10):
             print "sampling window", i
             # lets instantiate a walker object to sample this window.
 
@@ -232,7 +232,7 @@ def main(debug=False):
 
         system.k += 1
         
-        system.computeZ()
+        #system.computeZ()
         
         if debug: print system.z
         
