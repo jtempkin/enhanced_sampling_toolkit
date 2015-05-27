@@ -1,6 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-This file implements the LAMMPS walker abstraction layer. The core of this idea is that 
+This module implements the Walker API for the LAMMPS MD engine. See walker_base.py for a specification of the API. For details concerning the usage of the LAMMPS MD package see the excellent documentation at the LAMMPS webpage:
+
+http://lammps.sandia.gov/
+
+
+In particular, you may want to see how the Python wrapper to LAMMPS on which this implementation is based:
+
+http://lammps.sandia.gov/doc/Section_python.html
+
+Here we will outline basic usage guides for the walker API usage in LAMMPS. 
 """
 
 import random
@@ -10,7 +19,8 @@ import collectiveVariables
 import outputClass
 import numpy as np
 import ctypes
-import os.path
+import os
+import shutil
 #from lammps import lammps
 
 
@@ -36,14 +46,26 @@ class lammpsWalker(walker):
     
     def __init__(self, inputFilename, logFilename, index = 0, debug = False):
         """
-        Initializes a walker object. Takes the following input:
+        Initializes a walker object. 
         
-        * a filename that builds the model from a LAMMPS script.
-        * a filename to pipe standard LAMMPS output into.
-        * an index for the walker. (default=0)
-        * debug flag to open writing verbose output. Importantly, this pipes LAMMPS output to standard output. (default=False)
+        Arguments:
+        -----------------------
+        inputFilename - 
+            A string with a system path to a LAMMPS input file. This file is 
+            read and interpreted by LAMMPS's own interpreter so the syntax 
+            should be readable by LAMMPS. If None is provided, the input file 
+            is ignored. 
         
-        The __initLAMMPS__() routine will check for LAMMPS being an importable library from Python and raise an execption if it cannot be loaded. 
+        LogFilename - 
+            A string to pipe standard LAMMPS output into. 
+            
+        index (default: 0) - 
+            A optional index which is appended to the log files and output 
+            files to protect overwriting multiple copies 
+            
+        debug (default: False) - 
+            A boolean flag for debugging purposes. If set to True, will direct 
+            LAMMPS output to stdout instead of to logFilename. 
         
         """
         if inputFilename is not None:
@@ -82,25 +104,36 @@ class lammpsWalker(walker):
         """
         This function initializes a LAMMPS simulation given an input file. 
         
-        Takes the following arguments:
-        
-        * input file name
-        * 
+        Arguments:
+        -----------------------
         
         
         """
+        
         try:
             from lammps import lammps
         except:
             print "ERROR: The LAMMPS python interface could not be found. Check your PYTHONPATH and compiled LAMMPS directory to make sure it is compiled and importable." 
-        
+
+
+        # check to see we are handing an absolute pathname. 
+        if not os.path.isabs(inputFilename):
+            inputFilename = os.path.abspath(inputFilename)
+            
+        if not os.path.isabs(logFilename):
+            logFilename = os.path.abspath(logFilename)
+
+        # we're going to assume here that the user is taking care of the fact that LAMMPS needs to know where to find things but we will issue a worning in case they aren't. 
+        if not os.path.dirname(inputFilename) != os.getcwd():
+            print "WARNING: Getting lammps input file from directory other than current working directory. Be sure pathnames are correct in input files." 
+            
         # initialize the lammps object
         if verbose == True:
             self.lmp = lammps()
         else:
             args = ["-sc", "none", "-echo", "log"]
             self.lmp = lammps("", args)
-        
+            
         # after the lammps object is created, initialize the lammps simulation. 
         # specify general log file parameters
         self.command("echo none")
@@ -108,6 +141,7 @@ class lammpsWalker(walker):
         # if there is a specified filename, use it to set up the simulation.         
         if inputFilename != None:
             self.command("log " + logFilename)
+                
             self.lmp.file(inputFilename)
         else:
             self.command("log " + logFilename)
@@ -120,30 +154,45 @@ class lammpsWalker(walker):
         """
         Implements the addition of a collective variable to the list of collective variables held by this walker.
         
-        The currently support collective variables are:
-        * bonds
-        * angles
-        * dihedrals
-        * x, y, z positions
-        * x, y, z velocity components
+        Arguments:
+        -----------------------
+        name - 
+            A internal string used to reference this collective variable. Collective variable names must be unique.
         
-        The collective variables are added as an instance of a collective variable object which contains the necessary fields defining that collective variable. 
+        cvType - 
+            A string refering to the type of collective variable. Currently the following variables are supported:
+                * 'bond'
+                * 'angle'
+                * 'dihedral'
+                * 'x', 'y', 'z' positions
+                * 'x', 'y', 'z' velocity components
+            
+        atomIDs - 
+            A list of the atom indecies involved in the collective variable. Should provide the right number of atom indecies for the collective variable:
+                * 'bond' -> 2 
+                * 'angle'-> 3 
+                * 'dihedral' -> 4
+                * position or velocity component -> 1
 
         """
+        # make sure we know what the cv type is. 
         __knownCVs__ = ['bond', 'angle', 'dihedral', 'x', 'y', 'z', 'vx', 'vy', 'vz']
         assert cvType in __knownCVs__, "cvType that was provided was not understood." 
         
+        # check to make sure the name is unique. 
         for cv in self.colvars:
             assert cv.name != name, "Collective variable names must be unique."
                 
-        # now append the collective variable to the walker list.      
+        # now append the collective variable to the walker list. Initialize a collective variable object.     
         self.colvars.append(collectiveVariables.collectiveVariables(name, cvType, atomIDs))
         
+        # grab a handle to the new object
         cv = self.colvars[-1]
+        
         # first set the group for the colvar
         self.command("group " + cv.name + " id " + " ".join(map(str,cv.atomIDs)))
             
-        # now set the appropriate colvar
+        # now set the appropriate colvar as a compute to LAMMPS
         if cv.type == 'bond':
             self.command("compute " + cv.name + " " + cv.name + " bond/local dist" )
         elif cv.type == 'angle':
@@ -180,6 +229,10 @@ class lammpsWalker(walker):
     def equilibrate(self, center, restraint, numSteps):
         """
         This function prepares a LAMMPS image to be at the specified target position given by the vector 'center' passed and an arguments. 
+        
+        Arguments:
+        -----------------------
+        
         """
         #print "Equilibrating walker."
         
