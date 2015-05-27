@@ -431,7 +431,6 @@ class partition:
 
             # check for a transition out of this index
             if self.umbrellas[umbrellaIndex].indicator(self.umbrellas[umbrellaIndex].samples[-1]) == 0.0:
-                
                 # choose the new j with probability {psi_0, ..., psi_N}
                 indicators = self.getBasisFunctionValues(self.umbrellas[umbrellaIndex].samples[-1])
             
