@@ -53,7 +53,7 @@ class P1:
     """
     This routine returns the TCF of the end to end distance.
     """
-    def __init__(self, name, s, stepLength, atomids, data):
+    def __init__(self, name, s, stepLength, atomids, data, cellDim):
         """
         Constructor for the time correlation function for the end to end distance.
         
@@ -65,6 +65,7 @@ class P1:
         self.name = name
         self.data = data
         self.nsamples = np.zeros(data.shape)
+        self.cellDim = cellDim
 
     def __call__(self, wlkr):
         """
@@ -72,21 +73,44 @@ class P1:
         local autocorrelation function estimation.
         """
         # check to see that we are accumulating a value at a time when it is appropriate. return otherwise 
-        if not wlkr.simulationTime % self.stepLength: return 0 
-            
-        time_indx = (wlkr.simulationTime - np.floor(wlkr.simulationTime / self.s) * self.s ) / self.stepLength
-
+        """
+        if wlkr.simulationTime % self.stepLength:     
+            return 0 
+        """ 
+        if not (wlkr.simulationTime - np.floor(wlkr.simulationTime / self.s) * self.s ) % (self.s / self.data.shape[0]) == 0.0:
+            return 0 
+        
+        time_indx = (wlkr.simulationTime - np.floor(wlkr.simulationTime / self.s) * self.s ) / (self.s / self.data.shape[0])
+        
+        time_indx = int(time_indx)
+        
         # current configuration
         config = wlkr.getConfig()
-        p1 = config[self.atomids[0]:self.atomids[0]+3]
-        p2 = config[self.atomids[1]:self.atomids[1]+3]
-        l1 = p1 - p2
+        config = np.reshape(config, (-1,3))
+        p1 = config[self.atomids[0]-1]
+        p2 = config[self.atomids[1]-1]
+        l1 = p2 - p1
+        
+        # apply minimum image to l1 
+        for dim in range(3):
+            if l1[dim] > self.cellDim[dim] / 2.0: 
+                l1[dim] -= self.cellDim[dim]
+            elif l1[dim] < -self.cellDim[dim] / 2.0: 
+                l1[dim] += self.cellDim[dim]
 
         # reference configuration
         config = wlkr.Y_s[0]
-        y1 = config[self.atomids[0]:self.atomids[0]+3]
-        y2 = config[self.atomids[1]:self.atomids[1]+3]
-        l2 = y1 - y2
+        config = np.reshape(config, (-1,3))
+        y1 = config[self.atomids[0]-1]
+        y2 = config[self.atomids[1]-1]
+        l2 = y2 - y1
+        
+        # apply minimum image to l2
+        for dim in range(3):
+            if l2[dim] > self.cellDim[dim] / 2.0: 
+                l2[dim] -= self.cellDim[dim]
+            elif l2[dim] < -self.cellDim[dim] / 2.0: 
+                l2[dim] += self.cellDim[dim]
 
         temp_val = np.dot(l1, l2)
 
