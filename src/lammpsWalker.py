@@ -124,7 +124,7 @@ class lammpsWalker(walker):
             logFilename = os.path.abspath(logFilename)
 
         # we're going to assume here that the user is taking care of the fact that LAMMPS needs to know where to find things but we will issue a worning in case they aren't. 
-        if not os.path.dirname(inputFilename) != os.getcwd():
+        if os.path.dirname(inputFilename) != os.getcwd():
             print "WARNING: Getting lammps input file from directory other than current working directory. Be sure pathnames are correct in input files." 
             
         # initialize the lammps object
