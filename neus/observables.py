@@ -13,12 +13,13 @@ class pmf:
     """
     This class represents a PMF observable.
     """
-    def __init__(self, name, data):
+    def __init__(self, name, data, data_width):
         """
         Constructor for the time correlation function for the end to end distance.
         """
         self.name = name
         self.data = data
+        self.data_width = data_width
         self.nsamples = np.zeros(data.shape)
 
     def __call__(self, sample, colvars):
@@ -41,7 +42,13 @@ class pmf:
 
                 indx[i] = self.data.shape[i] - 1 - int(np.floor(temp_sample[i] / (360.0 / self.data.shape[i] ) ) )
 
-            else:
+            elif cv.type == "bond":
+                temp_sample[i] -= self.data_width[i][0]
+            
+                # get the index to accumulate 
+                indx[i] = self.data.shape[i] - 1 - int(np.floor(temp_sample[i] / ((self.data_width[i][0] - self.data_width[i][1]) / self.data.shape[i] )))
+            
+            else: 
                 print "WARNING: accumulatePMF() does not support given collective variable."
 
         self.data[tuple(indx)] += 1.0
