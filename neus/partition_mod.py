@@ -164,7 +164,7 @@ class partition:
 
         return 0
 
-    def computeZ(self, finiteTime=False):
+    def computeZ(self, finiteTime=False, sparseSolve=True):
         """
         Solves for z vector given current G,a via solving the following linear 
         system:
@@ -183,16 +183,23 @@ class partition:
             self.z = np.linalg.solve(A, self.a)
 
         else:
-            # compute via numpy interface to LAPACK the eigenvectors v and eigenvalues w
-            # here will first convert F to sparse format before solving.
-            # The linalg routine returns this as the first (i.e. largest) eigenvalue.
-        
-            F_sparse = sparse.coo_matrix(self.F)
-            evals, evec = LA.eigs(F_sparse.transpose())
-            #evals, evec = LA.eig(self.F, left=True, right=False)
-            sort = np.argsort(evals)
-            # normalize if needed.
-            self.z[:] = evec[:,sort[-1]] / np.sum(evec[:,sort[-1]])
+            if sparseSolve:
+                # compute via numpy interface to LAPACK the eigenvectors v and eigenvalues w
+                # here will first convert F to sparse format before solving.
+                # The linalg routine returns this as the first (i.e. largest) eigenvalue.
+            
+                F_sparse = sparse.coo_matrix(self.F)
+                evals, evec = LA.eigs(F_sparse.transpose())
+                #evals, evec = LA.eig(self.F, left=True, right=False)
+                sort = np.argsort(evals)
+                # normalize if needed.
+                self.z[:] = evec[:,sort[-1]] / np.sum(evec[:,sort[-1]])
+            else:
+                
+                evals, evec = LA.eig(self.F, left=True, right=False)
+                sort = np.argsort(evals)
+                # normalize if needed.
+                self.z[:] = evec[:,sort[-1]] / np.sum(evec[:,sort[-1]])
 
         return 0
 
@@ -206,6 +213,8 @@ class partition:
             if isinstance(obs, observables.pmf): 
                 obs(sample, colvars)
             if isinstance(obs, observables.P1):
+                obs(wlkr)
+            if isinstance(obs, observables.dist_fluctuation_correlation):
                 obs(wlkr)
 
         return 0
@@ -396,13 +405,14 @@ class partition:
         We should remove the need for the output to be specified internally here. 
         
         """      
+        if debug: ntransitions = 0
+            
         assert sysParams.has_key('scratchdir'), "Scratch directory was not specified in the sampling routine."
         # assign an input filename for this walker.  
         if debug: 
             inputFilename = sysParams['scratchdir'] + "/" + str(umbrellaIndex) + "_w" + str(walkerIndex)
         else:
             inputFilename = None
-        
         # get the sample from the initial state of the walker in CV space
         self.umbrellas[umbrellaIndex].samples.append(wlkr.getColvars())
         
@@ -431,6 +441,7 @@ class partition:
 
             # check for a transition out of this index
             if self.umbrellas[umbrellaIndex].indicator(self.umbrellas[umbrellaIndex].samples[-1]) == 0.0:
+                if debug: ntransitions += 1 
                 # choose the new j with probability {psi_0, ..., psi_N}
                 indicators = self.getBasisFunctionValues(self.umbrellas[umbrellaIndex].samples[-1])
             
@@ -474,7 +485,8 @@ class partition:
         
         # flush the last data to file after sampling has finished
         self.umbrellas[umbrellaIndex].flushDataToFile(inputFilename)   
-
+        
+        if debug: print "Recorded",ntransitions,"transitions"
         return 0
 
     def metropolisMove(self, current_umb, oldConfig, newConfig): 
