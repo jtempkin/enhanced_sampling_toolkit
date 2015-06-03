@@ -157,11 +157,11 @@ class dist_fluctuation_correlation:
         """
         if wlkr.simulationTime % self.stepLength:     
             return 0 
-        """ 
+        """
         if not (wlkr.simulationTime - np.floor(wlkr.simulationTime / self.s) * self.s ) % (self.s / self.data.shape[0]) == 0.0:
             return 0 
         
-        time_indx = (wlkr.simulationTime - np.floor(wlkr.simulationTime / self.s) * self.s ) / (self.s / self.data.shape[0])
+        time_indx = (wlkr.simulationTime - np.floor(wlkr.simulationTime / self.s) * self.s ) / (self.s / self.data.shape[0]) - 1
         
         time_indx = int(time_indx)
         
