@@ -125,3 +125,84 @@ class P1:
         self.nsamples[time_indx] += 1.0
 
         return 0
+        
+
+class dist_fluctuation_correlation:
+    """
+    This routine returns the TCF of the end to end distance.
+    """
+    def __init__(self, name, s, stepLength, atomids, data, cellDim, mean):
+        """
+        Constructor for the time correlation function for the end to end distance.
+        
+        NOTE: Step Length is the time between samples taken, not necessarily the time the walker advances each timestep. 
+        """
+        self.s = s
+        self.stepLength = stepLength
+        self.atomids = atomids
+        self.name = name
+        self.data = data
+        self.nsamples = np.zeros(data.shape)
+        self.cellDim = cellDim
+        self.mean = mean
+
+    def __call__(self, wlkr):
+        """
+        This function takes the current position of the walker and updates the
+        local autocorrelation information using a fluctuation correlation function
+        i.e. < (A(0) - <A>) * (A(t) - <A>) > 
+        
+        """
+        # check to see that we are accumulating a value at a time when it is appropriate. return otherwise 
+        """
+        if wlkr.simulationTime % self.stepLength:     
+            return 0 
+        """ 
+        if not (wlkr.simulationTime - np.floor(wlkr.simulationTime / self.s) * self.s ) % (self.s / self.data.shape[0]) == 0.0:
+            return 0 
+        
+        time_indx = (wlkr.simulationTime - np.floor(wlkr.simulationTime / self.s) * self.s ) / (self.s / self.data.shape[0])
+        
+        time_indx = int(time_indx)
+        
+        # current configuration
+        config = wlkr.getConfig()
+        config = np.reshape(config, (-1,3))
+        # get the atomic coordinates 
+        p1 = config[self.atomids[0]-1]
+        p2 = config[self.atomids[1]-1]
+        # compute the norm of the displacement
+        l1 = p2 - p1
+        
+        # apply minimum image to l1 
+        for dim in range(3):
+            if l1[dim] > self.cellDim[dim] / 2.0: 
+                l1[dim] -= self.cellDim[dim]
+            elif l1[dim] < -self.cellDim[dim] / 2.0: 
+                l1[dim] += self.cellDim[dim]
+
+        # reference configuration
+        config = wlkr.Y_s[0]
+        config = np.reshape(config, (-1,3))
+        y1 = config[self.atomids[0]-1]
+        y2 = config[self.atomids[1]-1]
+        l2 = y2 - y1
+        
+        # apply minimum image to l2
+        for dim in range(3):
+            if l2[dim] > self.cellDim[dim] / 2.0: 
+                l2[dim] -= self.cellDim[dim]
+            elif l2[dim] < -self.cellDim[dim] / 2.0: 
+                l2[dim] += self.cellDim[dim]
+
+        # now get the norms of the displacements
+        norm1 = np.linalg.norm(l1)
+        norm2 = np.linalg.norm(l2)
+        
+        # now get the fluctuation correlation value 
+        temp_val = np.dot(norm1 - self.mean, norm2 - self.mean)
+
+        self.data[time_indx] = (self.data[time_indx] * self.nsamples[time_indx] + temp_val) / (self.nsamples[time_indx] + 1.0)
+        self.nsamples[time_indx] += 1.0
+
+        return 0
