@@ -479,10 +479,29 @@ class partition:
                         break
                 
             # now we check if we've transitioned in the index
-            if umbrellaIndex[0] != current_index[0]:
+            if (umbrellaIndex[0] != current_index[0]) and (umbrellaIndex[1] != current_index[1]):
+                print "transition from", umbrellaIndex, "to", tuple(current_index)
+                # trigger a transition but now we need to update M where the value added for the transition to (k,l) is 
+                # defined as P_k * P_l
+                assert indicators is not None
+                for m in range(len(self.umbrellas)):
+                    for l in range(len(self.umbrellas)):
+                        temp_prob = indicators[m] * indicators[l]
+                        self.M[self.F_index[umbrellaIndex],self.F_index[(m,l)]] += temp_prob
+                # create a new entry point and append the entry point to the new window
+                newEP = entryPoints.entryPoints(wlkr.getConfig(), wlkr.getVel(), wlkr.simulationTime, Y_s = (wlkr.Y_s))
+                
+                self.new_entry_point_library.append([umbrellaIndex, newEP])
+                
+                # reinject the walker to the current index
+                self.reinject(wlkr, umbrellaIndex)
+                
+            elif umbrellaIndex[0] != current_index[0]:
+                print "transition from", umbrellaIndex, "to", tuple(current_index)
                 # trigger a transition
                 assert indicators is not None 
-                self.M[umbrellaIndex,:] += indicators
+                # stride over X(t) values holding X(s) values fixed
+                self.M[self.F_index[umbrellaIndex],current_index[1]::len(self.umbrellas)] += indicators
                 
                 # create a new entry point and append the entry point to the new window
                 newEP = entryPoints.entryPoints(wlkr.getConfig(), wlkr.getVel(), wlkr.simulationTime, Y_s = (wlkr.Y_s))
@@ -494,9 +513,11 @@ class partition:
                 
                 
             elif umbrellaIndex[1] != current_index[1]:
+                print "transition from", umbrellaIndex, "to", tuple(current_index)
                 # if we've moved in the lag, trigger a transition
                 assert indicators is not None 
-                self.M[umbrellaIndex,:] += indicators
+                # update over all the X(s) values but keep the X(t) values fixed
+                self.M[umbrellaIndex,len(self.umbrellas)*current_index[0]:len(self.umbrellas)*(current_index+1)] += indicators
                 
                 # create a new entry point and append the entry point to the new window
                 newEP = entryPoints.entryPoints(wlkr.getConfig(), wlkr.getVel(), wlkr.simulationTime, Y_s = (wlkr.Y_s))
