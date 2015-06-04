@@ -53,51 +53,10 @@ class basisFunction:
         
         # get the last sample in the list
         lastSample = self.samples.pop()
-        #lastBasisFunction = self.basisFnxTimeSeries.pop()
-        #lastConfig = self.configs.pop() 
-        """
-        # write out the remaining data structure
-        with h5py.File(filename + ".hdf5", "a") as f_handle:
-            # check to see if we've created a group for the colvars writes
-            if 'colvars' in f_handle:
-                # if so, add in a dataset for this flush
-                dset = f_handle['colvars'].create_dataset("cv_" + str(len(f_handle['colvars'].keys())), np.asarray(self.samples).shape, dtype="f")
-                # now write out the data to the data set
-                dset = self.samples
-            else:
-                # we'll need to create a group colvars fisrt
-                f_handle.create_group("colvars")
-                # now flush the dataset
-                dset = f_handle['colvars'].create_dataset("cv_" + str(len(f_handle['colvars'].keys())), np.asarray(self.samples).shape, dtype="f")
-                dset = self.samples
-        """
+
         if filename is not None:
             with open(filename + ".colvars", "a") as f_handle:
                 np.savetxt(f_handle, self.samples)
-        """
-        # write out the basis function time series as well            
-        with h5py.File(filename + ".hdf5", "a") as f_handle:
-            # check to see if we've created a group for the colvars writes
-            if 'timeSeries' in f_handle:
-                # if so, add in a dataset for this flush
-                dset = f_handle['timeSeries'].create_dataset("ts_" + str(len(f_handle['timeSeries'].keys())), np.asarray(self.basisFnxTimeSeries).shape, dtype="f")
-                dset = self.basisFnxTimeSeries
-            else:
-                # we'll need to create a group colvars fisrt
-                f_handle.create_group("timeSeries")
-                # now flush the dataset
-                dset = f_handle['timeSeries'].create_dataset("ts_" + str(len(f_handle['timeSeries'].keys())), np.asarray(self.basisFnxTimeSeries).shape, dtype="f")
-                dset = self.basisFnxTimeSeries
-        # so now we will also cast text output files
-        with open(filename + ".timeSeries", "a") as f_handle:
-            np.savetxt(f_handle, self.basisFnxTimeSeries)
-
-        """
-        """
-        for obs in self.local_observables:
-            with open(filename + obs[0].__name__, "w") as f_handle:
-                np.save(f_handle, obs[1])
-        """
 
         # delete current reference to the list
         del self.samples
@@ -110,8 +69,6 @@ class basisFunction:
         #self.configs = [lastConfig]
 
         return 0
-
-
     
      
 class Box(basisFunction):

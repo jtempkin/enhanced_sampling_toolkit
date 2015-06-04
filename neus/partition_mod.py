@@ -20,7 +20,7 @@ class partition:
     This class defines a set of windows that partition the sampling space.
     This class will contain an array of basisFunction objects. 
     """
-    def __init__(self, N):
+    def __init__(self, N, F):
         """
         Init routine. Initializes the following values:
 
@@ -36,13 +36,19 @@ class partition:
         self.umbrellas = []
         
         # initialize the matricies needed for the NEUS
-        self.M = np.zeros((N,N))
-        self.F = np.zeros((N,N))     
+        self.F = F
+        self.M = np.zeros(F.shape)
         # we should track how many samples are taken in the M matrix
-        self.nsamples_M = np.zeros(N)
-        self.a = np.zeros(N)
-        self.m = np.zeros(N)
-        self.z = np.zeros(N)
+        self.nsamples_M = np.zeros(self.M.shape)
+        
+        # now we construct the map from the F_index to a list of observables 
+        self.local_observables_index = {}
+        for i in range(F.shape[0]):
+            self.local_observables_index[i] = []
+            
+        self.observables = []
+        
+        self.z = np.zeros(F.shape[0])
 
         # keep a list of any observable objects that should be estimated during sampling. 
         self.observables = []
@@ -55,6 +61,8 @@ class partition:
         
         # here, the variable k represents how many times the transition matrix has been updated. 
         self.k = 0
+        
+        
         
     def updateF(self, updateType=None):
         """
@@ -123,13 +131,12 @@ class partition:
         self.observables.append(A)
         
         if self.rank_window_index is None:
-            for window in self.umbrellas:
-                if not hasattr(window, "local_observables"): window.local_observables = []
-                window.local_observables.append(copy.deepcopy(A))
+            for key in self.local_observables_index.keys():
+                self.local_observables_index[key].append(copy.deepcopy(A))
         else:
             for window in self.rank_window_index:
-                if not hasattr(self.umbrellas[window], "local_observables"): self.umbrellas[window].local_observables = []
-                self.umbrellas[window].local_observables.append(copy.deepcopy(A))
+                for j in range(len(self.umbrellas)):                
+                    self.local_observables_index[(window, j)].append(copy.deepcopy(A))
 
         return 0
 
@@ -141,25 +148,29 @@ class partition:
         self.observables = []
         
         # remove local version of observables from the windows as well. 
-        for win in self.umbrellas:
-            win.local_observables = []
+        for key in self.local_observables_index.keys():
+            self.local_observables_index[key] = []
             
         return 0 
         
 
-    def computeObservables(self):
+    def computeObservables(self, rank_window_index = None):
         """
-        This routine populates the partition observables with data averaged from the windows.
+        This routine populates the partition observables with data averaged from the local windows.
         """
         for o_indx,obs in enumerate(self.observables):
             temp = np.zeros(obs.data.shape)
             
-            if self.rank_window_index is None:
-                for w_indx,win in enumerate(self.umbrellas):
-                    temp += self.z[w_indx] * win.local_observables[o_indx].data
+            if rank_window_index is None:
+                for w_indx in range(len(self.umbrellas)):
+                    for j in range(len(self.umbrellas)):
+                        k_indx = self.F_index[(w_indx,j)] 
+                        temp += self.z[k_indx] * self.local_observables_index[k_indx][o_indx].data
             else:
-                for w_indx in self.rank_window_index:
-                    temp += self.z[w_indx] * self.umbrellas[w_indx].local_observables[o_indx].data
+                for w_indx in rank_window_index:
+                    for j in range(len(self.umbrellas)): 
+                        k_indx = self.F_index[(w_indx, j)]
+                        temp += self.z[k_indx] * self.local_observables_index[k_indx][o_indx].data
 
             obs.data[:] = temp[:]
 
@@ -209,7 +220,7 @@ class partition:
         This routine loops through the observables list and updates the samples in the corresponding windows.
         """
 
-        for obs in self.umbrellas[indx].local_observables:
+        for obs in self.local_observables_index[self.F_index[indx]]:
             # use the observable call routine to accumulate a sampling in the observables data structure
             if isinstance(obs, observables.pmf): 
                 obs(sample, colvars)
@@ -237,19 +248,19 @@ class partition:
         This function initializes a simulation from the entry point list in the 
         current umbrella.
         """
-        assert len(self.umbrellas[i].entryPoints) != 0, "Reached reinjection routine with no entry points in the buffer."
+        assert len(self.entry_point_library[i]) != 0, "Reached reinjection routine with no entry points in the buffer."
     
         # now we initialize the starting coordinates from the entry points library
-        temp_indx = random.randint(0, len(self.umbrellas[i].entryPoints)-1)
+        temp_indx = random.randint(0, len(self.entry_point_library[i])-1)
     
         # you should pass this argument as a ctypes array for now
-        wlkr.setConfig(self.umbrellas[i].entryPoints[temp_indx].config)
-        wlkr.setVel(self.umbrellas[i].entryPoints[temp_indx].vel)
+        wlkr.setConfig(self.entry_point_library[i][temp_indx].config)
+        wlkr.setVel(self.entry_point_library[i][temp_indx].vel)
         
         # set the other component of the walker state
-        wlkr.Y_s = self.umbrellas[i].entryPoints[temp_indx].Y_s
+        wlkr.Y_s = self.entry_point_library[i][temp_indx].Y_s
               		
-        wlkr.simulationTime = self.umbrellas[i].entryPoints[temp_indx].time
+        wlkr.simulationTime = self.entry_point_library[i][temp_indx].time
 
         
         return 0
@@ -415,17 +426,20 @@ class partition:
         else:
             inputFilename = None
         # get the sample from the initial state of the walker in CV space
-        self.umbrellas[umbrellaIndex].samples.append(wlkr.getColvars())
+        self.umbrellas[umbrellaIndex[0]].samples.append([wlkr.getColvars(), self.F_index[umbrellaIndex]])
         
         # reset the local observables arrays for this round of sampling
-        for obs in self.umbrellas[umbrellaIndex].local_observables:
+        for obs in self.local_observables_index[self.F_index[umbrellaIndex]]:
             self.resetObservable(obs)
 
         assert sysParams.has_key('stepLength'), "StepLength was not specified in the sampling routine."
         
+        # hold a value of the indicators
+        indicators = None
+        
         # now we proceed with the sampling routine            
         for i in range(0, numSteps, sysParams['stepLength']):
-            
+            current_index = [umbrellaIndex[0], umbrellaIndex[1]]
             # propagate the dynamics
             wlkr.propagate(sysParams['stepLength'])
             
@@ -433,51 +447,69 @@ class partition:
             wlkr.simulationTime += sysParams['stepLength']
 	    
             # now we check to see if we've passed the autocorrelation length
-            # if we do, we reset the Y ( [t / s] * s) value to the current point
+            # if we do,update the current value of teh Y_s 
             if (wlkr.simulationTime % sysParams['corrLength']) == 0.0:
-                wlkr.Y_s = (wlkr.getConfig(), wlkr.getVel())
+                # here we are going to udate the index associated with the lag
             
-            # get the new sample position
-            self.umbrellas[umbrellaIndex].samples.append(wlkr.getColvars())             
+                # here X(t) = X(s), so use the current CV of the walker to check basisFunction values
+                indicators = self.getBasisFunctionValues(wlkr.getColvars())
+                
+                randVal = random.random()
+                
+                for indx in range(len(indicators)):
+                    if randVal < indicators[:indx+1].sum():                            
+                        wlkr.Y_s = (wlkr.getConfig(), wlkr.getVel(), indx)
+                        current_index[1] = indx
+                        break
+            
 
-            # check for a transition out of this index
-            if self.umbrellas[umbrellaIndex].indicator(self.umbrellas[umbrellaIndex].samples[-1]) == 0.0:
-                if debug: ntransitions += 1 
+            # now check for a transition out of this index from the X(t) component
+            if self.umbrellas[umbrellaIndex[0]].indicator(wlkr.getColvars()) == 0.0:
                 # choose the new j with probability {psi_0, ..., psi_N}
-                indicators = self.getBasisFunctionValues(self.umbrellas[umbrellaIndex].samples[-1])
-            
-                # record a transition to the matrix
-                self.M[umbrellaIndex,:] += indicators
+                indicators = self.getBasisFunctionValues(wlkr.getColvars())
                 
                 # now we select a window to which to append this new entry point
                 randVal = random.random()                
 
                 for indx in range(len(indicators)):
                     if randVal < indicators[:indx+1].sum():
-                        
-                        # now we will need to reinject the walker
-                        
-                        # create a new entry point and append the entry point to the new window
-                        newEP = entryPoints.entryPoints(wlkr.getConfig(), wlkr.getVel(), wlkr.simulationTime)
-                        newEP.Y_s = wlkr.Y_s
-                        self.umbrellas[indx].newEntryPoints.append([umbrellaIndex, newEP])
-                        
+                        # update the current index for record keeping
+                        current_index[0] = indx
                         # we're done so let's stop the loop
                         break
                 
+            # now we check if we've transitioned in the index
+            if umbrellaIndex[0] != current_index[0]:
+                # trigger a transition
+                assert indicators is not None 
+                self.M[umbrellaIndex,:] += indicators
                 
-                # drop the last point from the samples 
-                self.umbrellas[umbrellaIndex].samples.pop()
-
-                # reinject the walker into the current window 
+                # create a new entry point and append the entry point to the new window
+                newEP = entryPoints.entryPoints(wlkr.getConfig(), wlkr.getVel(), wlkr.simulationTime, Y_s = (wlkr.Y_s))
+                
+                self.new_entry_point_library.append([umbrellaIndex, newEP])
+                
+                # reinject the walker to the current index
                 self.reinject(wlkr, umbrellaIndex)
-            		
-                # get the sample from the new starting point after reinjection
-                self.umbrellas[umbrellaIndex].samples.append(wlkr.getColvars())
-
+                
+                
+            elif umbrellaIndex[1] != current_index[1]:
+                # if we've moved in the lag, trigger a transition
+                assert indicators is not None 
+                self.M[umbrellaIndex,:] += indicators
+                
+                # create a new entry point and append the entry point to the new window
+                newEP = entryPoints.entryPoints(wlkr.getConfig(), wlkr.getVel(), wlkr.simulationTime, Y_s = (wlkr.Y_s))
+                
+                self.new_entry_point_library.append([umbrellaIndex, newEP])
+                
+                # reinject the walker to the current index
+                self.reinject(wlkr, umbrellaIndex)
+                
                     
+            # get the new sample position
+            self.umbrellas[umbrellaIndex[0]].samples.append(wlkr.getColvars())
 
-            
             # let's accumulate a sample into the autocorrelation function
             self.accumulateObservables(wlkr, wlkr.getColvars(), wlkr.colvars, umbrellaIndex)
 
@@ -485,7 +517,7 @@ class partition:
             #if len(self.umbrellas[umbrellaIndex].samples) > 1000000: self.umbrellas[umbrellaIndex].flushDataToFile(inputFilename)
         
         # flush the last data to file after sampling has finished
-        self.umbrellas[umbrellaIndex].flushDataToFile(inputFilename)   
+        self.umbrellas[umbrellaIndex[0]].flushDataToFile(inputFilename)   
         
         if debug: print "Recorded",ntransitions,"transitions"
         return 0
@@ -730,14 +762,14 @@ class partition:
                 elif basisType == "Pyramid":
                     um.append(basisFunctions.Pyramid(umbrellaCoord,widthlist))
                     
-        # if we specify to build a neighborlist for the windows, let's build it here. 
         L = np.zeros(len(colVarParams))
         for i in range(len(L)):
             if wrapping[i] == 1:
                 L[i] = colVarParams[i][1] - colVarParams[i][0]
             else:
                 L[i] = -1.0
-        
+                
+        # if we specify to build a neighborlist for the windows, let's build it here.
         if neighborList:
             self.buildNeighborList(L, um)
     
