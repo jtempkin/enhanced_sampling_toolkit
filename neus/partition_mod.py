@@ -5,9 +5,10 @@ This is an update partition module that contains the flexibility to perform both
 
 import numpy as np
 import copy
-from scipy.sparse import linalg as LA
-from scipy import sparse
 import scipy as sp
+from scipy import linalg as LA
+from scipy import sparse 
+from scipy.sparse import linalg as LA_sparse
 import random
 import basisFunctions_neus_dipeptide as basisFunctions
 import entryPoints
@@ -189,7 +190,7 @@ class partition:
                 # The linalg routine returns this as the first (i.e. largest) eigenvalue.
             
                 F_sparse = sparse.coo_matrix(self.F)
-                evals, evec = LA.eigs(F_sparse.transpose())
+                evals, evec = LA_sparse.eigs(F_sparse.transpose())
                 #evals, evec = LA.eig(self.F, left=True, right=False)
                 sort = np.argsort(evals)
                 # normalize if needed.
