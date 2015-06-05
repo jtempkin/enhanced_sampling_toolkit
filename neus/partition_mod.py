@@ -517,7 +517,7 @@ class partition:
                 # if we've moved in the lag, trigger a transition
                 assert indicators is not None 
                 # update over all the X(s) values but keep the X(t) values fixed
-                self.M[umbrellaIndex,len(self.umbrellas)*current_index[0]:len(self.umbrellas)*(current_index+1)] += indicators
+                self.M[umbrellaIndex,len(self.umbrellas)*current_index[0]:len(self.umbrellas)*(current_index[0]+1)] += indicators
                 
                 # create a new entry point and append the entry point to the new window
                 newEP = entryPoints.entryPoints(wlkr.getConfig(), wlkr.getVel(), wlkr.simulationTime, Y_s = (wlkr.Y_s))
