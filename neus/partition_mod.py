@@ -490,7 +490,7 @@ class partition:
                         self.M[self.F_index[umbrellaIndex],self.F_index[(m,l)]] += temp_prob
                 # create a new entry point and append the entry point to the new window
                 newEP = entryPoints.entryPoints(wlkr.getConfig(), wlkr.getVel(), wlkr.simulationTime, Y_s = wlkr.Y_s)
-                
+                print "debug:",current_index
                 self.new_entry_point_library[tuple(current_index)].append([umbrellaIndex, newEP])
                 
                 # reinject the walker to the current index
@@ -505,7 +505,7 @@ class partition:
                 
                 # create a new entry point and append the entry point to the new window
                 newEP = entryPoints.entryPoints(wlkr.getConfig(), wlkr.getVel(), wlkr.simulationTime, Y_s = wlkr.Y_s)
-                
+                print "debug:",current_index
                 self.new_entry_point_library[tuple(current_index)].append([umbrellaIndex, newEP])
                 
                 # reinject the walker to the current index
@@ -521,7 +521,7 @@ class partition:
                 
                 # create a new entry point and append the entry point to the new window
                 newEP = entryPoints.entryPoints(wlkr.getConfig(), wlkr.getVel(), wlkr.simulationTime, Y_s = wlkr.Y_s)
-                
+                print "debug:",current_index
                 self.new_entry_point_library[tuple(current_index)].append([umbrellaIndex, newEP])
                 
                 # reinject the walker to the current index
