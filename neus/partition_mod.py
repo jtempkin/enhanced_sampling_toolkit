@@ -489,7 +489,7 @@ class partition:
                         temp_prob = indicators[m] * indicators[l]
                         self.M[self.F_index[umbrellaIndex],self.F_index[(m,l)]] += temp_prob
                 # create a new entry point and append the entry point to the new window
-                newEP = entryPoints.entryPoints(wlkr.getConfig(), wlkr.getVel(), wlkr.simulationTime, Y_s = (wlkr.Y_s))
+                newEP = entryPoints.entryPoints(wlkr.getConfig(), wlkr.getVel(), wlkr.simulationTime, Y_s = wlkr.Y_s)
                 
                 self.new_entry_point_library[tuple(current_index)].append([umbrellaIndex, newEP])
                 
@@ -504,7 +504,7 @@ class partition:
                 self.M[self.F_index[umbrellaIndex],current_index[1]::len(self.umbrellas)] += indicators
                 
                 # create a new entry point and append the entry point to the new window
-                newEP = entryPoints.entryPoints(wlkr.getConfig(), wlkr.getVel(), wlkr.simulationTime, Y_s = (wlkr.Y_s))
+                newEP = entryPoints.entryPoints(wlkr.getConfig(), wlkr.getVel(), wlkr.simulationTime, Y_s = wlkr.Y_s)
                 
                 self.new_entry_point_library[tuple(current_index)].append([umbrellaIndex, newEP])
                 
@@ -520,7 +520,7 @@ class partition:
                 self.M[umbrellaIndex,len(self.umbrellas)*current_index[0]:len(self.umbrellas)*(current_index[0]+1)] += indicators
                 
                 # create a new entry point and append the entry point to the new window
-                newEP = entryPoints.entryPoints(wlkr.getConfig(), wlkr.getVel(), wlkr.simulationTime, Y_s = (wlkr.Y_s))
+                newEP = entryPoints.entryPoints(wlkr.getConfig(), wlkr.getVel(), wlkr.simulationTime, Y_s = wlkr.Y_s)
                 
                 self.new_entry_point_library[tuple(current_index)].append([umbrellaIndex, newEP])
                 
