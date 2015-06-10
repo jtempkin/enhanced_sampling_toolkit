@@ -46,7 +46,7 @@ class pmf:
                 temp_sample[i] -= self.data_width[i][0]
             
                 # get the index to accumulate 
-                indx[i] = self.data.shape[i] - 1 - int(np.floor(temp_sample[i] / ((self.data_width[i][0] - self.data_width[i][1]) / self.data.shape[i] )))
+                indx[i] = self.data.shape[i] - 1 - int(np.floor(temp_sample[i] / ((self.data_width[i][1] - self.data_width[i][0]) / self.data.shape[i] )))
             
             else: 
                 print "WARNING: accumulatePMF() does not support given collective variable."
@@ -206,3 +206,151 @@ class dist_fluctuation_correlation:
         self.nsamples[time_indx] += 1.0
 
         return 0
+
+class electric_field:
+    """
+    This class constructs an observable that reports on the time-correlation 
+    of the electric field at a point in space. 
+    """
+    
+    def __init__(self, name, s, stepLength, atomids, data, cellDim, atom_exclusions, atom_charges, ref_atoms_ids = None):
+        """
+        Initializes the electric field observable. 
+        
+        Parameters:
+        ------------------
+        name - 
+            name of the observable instance.
+        
+        s - 
+            correlation time of the observable to compute up to.
+            
+        stepLength - 
+            the step length of the dynamics propagated in the walker. 
+            
+        atomids - 
+            the ids of the atoms on which to compute the electric field.
+            
+        data - 
+            a refernce data structure used to store the values computed by the call
+            
+        cellDim - 
+            dimensions of the periodic box
+            
+        atom_excusions - 
+            a list of atom ids to exclude from the electric field calculation
+        
+        atom_charges - 
+            a list of fixed atomic charges 
+            
+        ref_atoms_ids -
+            a list of atom ids used to compute the unit vector along which the 
+            electric field is computed. This is here to facilitate computation of 
+            electric fields along a bond-axis. 
+        
+        """
+        self.s = s
+        self.stepLength = stepLength
+        self.atomids = atomids
+        self.name = name
+        self.data = data
+        self.nsamples = np.zeros(data.shape)
+        self.cellDim = cellDim
+        self.atom_exclusions = atom_exclusions
+        self.atom_charges = atom_charges
+        self.ref_atoms_ids = ref_atoms_ids
+        # note the units here are in atomic units 
+        self.coulomb_constant = 1 / (4 * np.pi)
+        
+    def __call__(self, wlkr):
+        """
+        Updates internal data structure of the time-correlation function for the 
+        electric field at a point.
+        
+        Reminder, this sums up the instantaneous force from atoms i in the system 
+        by E = \sum_{i} k Q_i / r**2 where k = 1 / (4 * \pi * \eta_{0}) 
+        """
+
+        # btw, you can get the charges from the simulation from lmp.extract_atom("q", 1, 1)[:]
+        
+        # first check we should update a point here. 
+        
+        if not (wlkr.simulationTime - np.floor(wlkr.simulationTime / self.s) * self.s ) % (self.s / self.data.shape[0]) == 0.0:
+            return 0 
+        
+        time_indx = (wlkr.simulationTime - np.floor(wlkr.simulationTime / self.s) * self.s ) / (self.s / self.data.shape[0]) - 1
+        
+        time_indx = int(time_indx)
+        
+        # current configuration
+        config = wlkr.getConfig()
+        config = np.reshape(config, (-1,3))
+        
+        efield = self.__get_efield__(config)
+        
+        # get reference configuration
+        config = wlkr.Y_s[0]
+        config = np.reshape(config, (-1, 3))
+        
+        ref_efield = self.__get_efield__(config)
+
+        temp_val = efield * ref_efield
+        
+        self.data[time_indx] = (self.data[time_indx] * self.nsamples[time_indx] + temp_val) / (self.nsamples[time_indx] + 1.0)
+        self.nsamples[time_indx] += 1.0
+        
+        # now get the exclusion
+        
+        
+        return 0 
+        
+    def __min_image__(self, vec):
+        """
+        Applies minimum image to given vector.
+        """        
+        for dim in range(3):
+            if vec[dim] > self.cellDim[dim] / 2.0: 
+                vec[dim] -= self.cellDim[dim]
+            elif vec[dim] < -self.cellDim[dim] / 2.0: 
+                vec[dim] += self.cellDim[dim]
+        
+        return vec 
+        
+        
+    def __get_efield__(self, config):
+        """
+        Returns the value of the electric field for the given configuration. 
+        """
+        point = config[self.atomids[0]-1]
+        
+        # now get the unit vector in the direction of the reference electric field
+        unit_vec = config[self.ref_atoms_ids[1]-1] - config[self.ref_atoms_ids[0]-1]
+        
+        #apply minimum distance to the unit vector
+        unit_vec = self.__min_image__(unit_vec)
+        
+        # normalize it 
+        unit_vec /= np.linalg.norm(unit_vec)
+        
+        temp_val = 0.0        
+        
+        # now loop over the particles and add up the columbic force
+        for atom_index, atom in enumerate(config):
+            if (atom_index+1) in self.atom_exclusions: 
+                continue
+            
+            # get the inter nuclear separation
+            d = atom - point
+            
+            # apply minimum image to d 
+            d = self.__min_image__(d)
+                
+            # now get the force vector multiplying the unit vector of d against the magnitude of the force 
+            force_vec = (d / np.linalg.norm(d)) * self.coulomb_constant * self.atom_charges[atom_index] / np.linalg.norm(d)**2
+            # now get the value along the bond axis
+            temp_val += np.dot(force_vec, unit_vec)
+            
+        return temp_val
+        
+        
+            
