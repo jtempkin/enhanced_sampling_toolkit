@@ -248,20 +248,40 @@ class partition:
         This function initializes a simulation from the entry point list in the 
         current umbrella.
         """
-        assert len(self.entry_point_library[i]) != 0, "Reached reinjection routine with no entry points in the buffer."
     
-        # now we initialize the starting coordinates from the entry points library
-        temp_indx = random.randint(0, len(self.entry_point_library[i])-1)
-    
-        # you should pass this argument as a ctypes array for now
-        wlkr.setConfig(self.entry_point_library[i][temp_indx].config)
-        wlkr.setVel(self.entry_point_library[i][temp_indx].vel)
-        
-        # set the other component of the walker state
-        wlkr.Y_s = self.entry_point_library[i][temp_indx].Y_s
-              		
-        wlkr.simulationTime = self.entry_point_library[i][temp_indx].time
+        f_index = self.F_index[i]
+        prob = self.z * self.F[:,f_index]
+        prob[f_index] = 0.0
+        prob /= prob.sum()    
 
+        I = -1
+        
+        for n in range(1000):        
+            rand_val = random.random()
+        
+            for indx in range(len(self.entry_point_library[i])):
+                if rand_val <= prob[:indx+1].sum():
+
+                    if len(self.entry_point_library[i][self.tuple_index[indx]]) == 0:
+                        break
+                    else:
+                        I = self.tuple_index[indx]
+                        break
+            
+            
+        if I == -1:
+            I = i 
+            
+        assert I != -1
+        
+        temp_indx = random.randint(0, len(self.entry_point_library[i][I])-1)
+
+        wlkr.setConfig(self.entry_point_library[i][I][temp_indx].config)
+        wlkr.setVel(self.entry_point_library[i][I][temp_indx].vel)
+         
+         # set the other component of the walker state
+        wlkr.Y_s = self.entry_point_library[i][I][temp_indx].Y_s
+        wlkr.simulationTime = self.entry_point_library[i][I][temp_indx].time
         
         return 0
 
@@ -491,7 +511,7 @@ class partition:
                 # create a new entry point and append the entry point to the new window
                 newEP = entryPoints.entryPoints(wlkr.getConfig(), wlkr.getVel(), wlkr.simulationTime, Y_s = wlkr.Y_s)
                 
-                self.new_entry_point_library[tuple(current_index)].append([umbrellaIndex, newEP])
+                self.new_entry_point_library[tuple(current_index)][umbrellaIndex].append([umbrellaIndex, newEP])
                 
                 # reinject the walker to the current index
                 self.reinject(wlkr, umbrellaIndex)
@@ -506,7 +526,7 @@ class partition:
                 # create a new entry point and append the entry point to the new window
                 newEP = entryPoints.entryPoints(wlkr.getConfig(), wlkr.getVel(), wlkr.simulationTime, Y_s = wlkr.Y_s)
                 
-                self.new_entry_point_library[tuple(current_index)].append([umbrellaIndex, newEP])
+                self.new_entry_point_library[tuple(current_index)][umbrellaIndex].append([umbrellaIndex, newEP])
                 
                 # reinject the walker to the current index
                 self.reinject(wlkr, umbrellaIndex)
@@ -522,7 +542,7 @@ class partition:
                 # create a new entry point and append the entry point to the new window
                 newEP = entryPoints.entryPoints(wlkr.getConfig(), wlkr.getVel(), wlkr.simulationTime, Y_s = wlkr.Y_s)
             
-                self.new_entry_point_library[tuple(current_index)].append([umbrellaIndex, newEP])
+                self.new_entry_point_library[tuple(current_index)][umbrellaIndex].append([umbrellaIndex, newEP])
                 
                 # reinject the walker to the current index
                 self.reinject(wlkr, umbrellaIndex)
