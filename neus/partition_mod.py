@@ -237,20 +237,43 @@ class partition:
         This function initializes a simulation from the entry point list in the 
         current umbrella.
         """
-        assert len(self.umbrellas[i].entryPoints) != 0, "Reached reinjection routine with no entry points in the buffer."
     
         # now we initialize the starting coordinates from the entry points library
-        temp_indx = random.randint(0, len(self.umbrellas[i].entryPoints)-1)
+        
+        prob = self.z * self.F[:,i]
+        prob[i] = 0.0
+        prob /= prob.sum()    
+
+        I = -1
+        
+        for n in range(1000):        
+            rand_val = random.random()
+        
+            for indx in range(len(self.umbrellas[i].entryPoints)):
+                if rand_val <= prob[:indx+1].sum():
+
+                    if len(self.umbrellas[i].entryPoints[indx]) == 0: 
+                        break
+                    else:
+                        I = indx
+                        break
+            
+            
+        if I == -1:
+            I = i 
+            
+        assert I != -1
+        
+        temp_indx = random.randint(0, len(self.umbrellas[i].entryPoints[I])-1)
     
         # you should pass this argument as a ctypes array for now
-        wlkr.setConfig(self.umbrellas[i].entryPoints[temp_indx].config)
-        wlkr.setVel(self.umbrellas[i].entryPoints[temp_indx].vel)
+        wlkr.setConfig(self.umbrellas[i].entryPoints[I][temp_indx].config)
+        wlkr.setVel(self.umbrellas[i].entryPoints[I][temp_indx].vel)
         
         # set the other component of the walker state
-        wlkr.Y_s = self.umbrellas[i].entryPoints[temp_indx].Y_s
+        wlkr.Y_s = self.umbrellas[i].entryPoints[I][temp_indx].Y_s
               		
-        wlkr.simulationTime = self.umbrellas[i].entryPoints[temp_indx].time
-
+        wlkr.simulationTime = self.umbrellas[i].entryPoints[I][temp_indx].time
         
         return 0
 
@@ -336,6 +359,8 @@ class partition:
             self.resetObservable(obs)
 
         assert sysParams.has_key('stepLength'), "StepLength was not specified in the sampling routine."
+        
+        self.accumulateObservables(wlkr, wlkr.getColvars(), wlkr.colvars, umbrellaIndex)        
         
         # now we proceed with the sampling routine            
         for i in range(0, numSteps, sysParams['stepLength']):
