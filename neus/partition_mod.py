@@ -251,22 +251,24 @@ class partition:
     
         f_index = self.F_index[i]
         prob = self.z * self.F[:,f_index]
-        prob[f_index] = 0.0
+        #prob[f_index] = 0.0
+        # let's zero out any neighbors who have nonzero flux but no entry points
+        for indx in range(len(self.entry_point_library[i])):
+            if len(self.entry_point_library[i][self.tuple_index[indx]]) == 0: 
+                prob[indx] = 0
+
+
         prob /= prob.sum()    
 
         I = -1
         
-        for n in range(1000):        
-            rand_val = random.random()
-        
-            for indx in range(len(self.entry_point_library[i])):
-                if rand_val <= prob[:indx+1].sum():
+        rand_val = random.random()
+    
+        for indx in range(len(self.entry_point_library[i])):
+            if rand_val <= prob[:indx+1].sum():
 
-                    if len(self.entry_point_library[i][self.tuple_index[indx]]) == 0:
-                        break
-                    else:
-                        I = self.tuple_index[indx]
-                        break
+                I = self.tuple_index[indx]
+                break
             
             
         if I == -1:
