@@ -495,6 +495,7 @@ class partition:
                     if randVal < indicators[:indx+1].sum():
                         # update the current index for record keeping
                         current_index[0] = indx
+
                         # we're done so let's stop the loop
                         break
                 
@@ -504,14 +505,14 @@ class partition:
                 # trigger a transition but now we need to update M where the value added for the transition to (k,l) is 
                 # defined as P_k * P_l
                 assert indicators is not None
-                for m in range(len(self.umbrellas)):
-                    for l in range(len(self.umbrellas)):
+                for m in range(len(indicators)):
+                    for l in range(len(indicators)):
                         temp_prob = indicators[m] * indicators[l]
                         self.M[self.F_index[umbrellaIndex],self.F_index[(m,l)]] += temp_prob
                 # create a new entry point and append the entry point to the new window
                 newEP = entryPoints.entryPoints(wlkr.getConfig(), wlkr.getVel(), wlkr.simulationTime, Y_s = wlkr.Y_s)
                 
-                self.new_entry_point_library[tuple(current_index)][umbrellaIndex].append([umbrellaIndex, newEP])
+                self.new_entry_point_library[tuple(current_index)][umbrellaIndex].append(newEP)
                 
                 # reinject the walker to the current index
                 self.reinject(wlkr, umbrellaIndex)
@@ -526,7 +527,7 @@ class partition:
                 # create a new entry point and append the entry point to the new window
                 newEP = entryPoints.entryPoints(wlkr.getConfig(), wlkr.getVel(), wlkr.simulationTime, Y_s = wlkr.Y_s)
                 
-                self.new_entry_point_library[tuple(current_index)][umbrellaIndex].append([umbrellaIndex, newEP])
+                self.new_entry_point_library[tuple(current_index)][umbrellaIndex].append(newEP)
                 
                 # reinject the walker to the current index
                 self.reinject(wlkr, umbrellaIndex)
@@ -537,12 +538,12 @@ class partition:
                 # if we've moved in the lag, trigger a transition
                 assert indicators is not None 
                 # update over all the X(s) values but keep the X(t) values fixed
-                self.M[umbrellaIndex,len(self.umbrellas)*current_index[0]:len(self.umbrellas)*(current_index[0]+1)] += indicators
+                self.M[self.F_index[umbrellaIndex],len(self.umbrellas)*current_index[0]:len(self.umbrellas)*(current_index[0]+1)] += indicators
                 
                 # create a new entry point and append the entry point to the new window
                 newEP = entryPoints.entryPoints(wlkr.getConfig(), wlkr.getVel(), wlkr.simulationTime, Y_s = wlkr.Y_s)
             
-                self.new_entry_point_library[tuple(current_index)][umbrellaIndex].append([umbrellaIndex, newEP])
+                self.new_entry_point_library[tuple(current_index)][umbrellaIndex].append(newEP)
                 
                 # reinject the walker to the current index
                 self.reinject(wlkr, umbrellaIndex)
