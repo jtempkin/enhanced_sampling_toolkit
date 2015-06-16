@@ -46,7 +46,7 @@ class pmf:
                 temp_sample[i] -= self.data_width[i][0]
             
                 # get the index to accumulate 
-                indx[i] = self.data.shape[i] - 1 - int(np.floor(temp_sample[i] / ((self.data_width[i][0] - self.data_width[i][1]) / self.data.shape[i] )))
+                indx[i] = self.data.shape[i] - 1 - int(np.floor(temp_sample[i] / ((self.data_width[i][1] - self.data_width[i][0]) / self.data.shape[i] )))
             
             else: 
                 print "WARNING: accumulatePMF() does not support given collective variable."
