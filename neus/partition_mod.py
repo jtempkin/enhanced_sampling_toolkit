@@ -284,6 +284,8 @@ class partition:
          # set the other component of the walker state
         wlkr.Y_s = self.entry_point_library[i][I][temp_indx].Y_s
         wlkr.simulationTime = self.entry_point_library[i][I][temp_indx].time
+
+        wlkr.propagate(0, pre='yes')
         
         return 0
 
@@ -513,7 +515,7 @@ class partition:
                         self.M[self.F_index[umbrellaIndex],self.F_index[(m,l)]] += temp_prob
                 # create a new entry point and append the entry point to the new window
                 newEP = entryPoints.entryPoints(wlkr.getConfig(), wlkr.getVel(), wlkr.simulationTime, Y_s = wlkr.Y_s)
-                
+                newEP.colvar = wlkr.getColvars()
                 self.new_entry_point_library[tuple(current_index)][umbrellaIndex].append(newEP)
                 
                 # reinject the walker to the current index
@@ -528,7 +530,7 @@ class partition:
                 
                 # create a new entry point and append the entry point to the new window
                 newEP = entryPoints.entryPoints(wlkr.getConfig(), wlkr.getVel(), wlkr.simulationTime, Y_s = wlkr.Y_s)
-                
+                newEP.colvar = wlkr.getColvars()
                 self.new_entry_point_library[tuple(current_index)][umbrellaIndex].append(newEP)
                 
                 # reinject the walker to the current index
@@ -544,7 +546,7 @@ class partition:
                 
                 # create a new entry point and append the entry point to the new window
                 newEP = entryPoints.entryPoints(wlkr.getConfig(), wlkr.getVel(), wlkr.simulationTime, Y_s = wlkr.Y_s)
-            
+                newEP.colvar = wlkr.getColvars()
                 self.new_entry_point_library[tuple(current_index)][umbrellaIndex].append(newEP)
                 
                 # reinject the walker to the current index
