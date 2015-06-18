@@ -271,7 +271,7 @@ class electric_field:
         by E = \sum_{i} k Q_i / r**2 where k = 1 / (4 * \pi * \eta_{0}) 
         """
 
-        # btw, you can get the charges from the simulation from lmp.extract_atom("q", 1, 1)[:]
+        # btw, you can get the charges from the simulation from lmp.gather_atoms("q", 1, 1)[:]
         
         # first check we should update a point here. 
         
@@ -282,7 +282,7 @@ class electric_field:
         
         time_indx = int(time_indx)
 
-        self.atom_charges = wlkr.lmp.extract_atom("q", 1, 1)[:]
+        self.atom_charges = wlkr.lmp.gather_atoms("q", 1, 1)[:]
         
         # current configuration
         config = wlkr.getConfig()
