@@ -214,7 +214,7 @@ class electric_field:
     of the electric field at a point in space. 
     """
     
-    def __init__(self, name, s, stepLength, atomids, data, cellDim, atom_exclusions, atom_charges, ref_atoms_ids = None):
+    def __init__(self, name, s, stepLength, atomids, data, cellDim, atom_exclusions, ref_atoms_ids = None):
         """
         Initializes the electric field observable. 
         
@@ -282,6 +282,8 @@ class electric_field:
         time_indx = (wlkr.simulationTime - np.floor(wlkr.simulationTime / self.s) * self.s ) / (self.s / self.data.shape[0]) - 1
         
         time_indx = int(time_indx)
+
+        self.atom_charges = wlkr.lmp.extract_atom("q", 1, 1)[:]
         
         # current configuration
         config = wlkr.getConfig()
