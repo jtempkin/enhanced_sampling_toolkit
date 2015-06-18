@@ -217,7 +217,7 @@ class partition:
                 obs(wlkr)
             if isinstance(obs, observables.dist_fluctuation_correlation):
                 obs(wlkr)
-            if isinstance(obs, observables.dist_fluctuation_correlation):
+            if isinstance(obs, observables.electric_field):
                 obs(wlkr)
 
         return 0
