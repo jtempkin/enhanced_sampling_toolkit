@@ -217,6 +217,8 @@ class partition:
                 obs(wlkr)
             if isinstance(obs, observables.dist_fluctuation_correlation):
                 obs(wlkr)
+            if isinstance(obs, observables.dist_fluctuation_correlation):
+                obs(wlkr)
 
         return 0
 
