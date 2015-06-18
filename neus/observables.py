@@ -258,7 +258,6 @@ class electric_field:
         self.nsamples = np.zeros(data.shape)
         self.cellDim = cellDim
         self.atom_exclusions = atom_exclusions
-        self.atom_charges = atom_charges
         self.ref_atoms_ids = ref_atoms_ids
         # note the units here are in atomic units 
         self.coulomb_constant = 1 / (4 * np.pi)
