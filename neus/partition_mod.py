@@ -239,28 +239,31 @@ class partition:
         This function initializes a simulation from the entry point list in the 
         current umbrella.
         """
-    
-        # now we initialize the starting coordinates from the entry points library
-        
+        # let's get the current estimate of the flux
         prob = self.z * self.F[:,i]
+        # we'll reinject from the neighbors, so zero out flux from i to i 
         prob[i] = 0.0
+
+        # now let's zero out any neighbors with potentially nonzero flux but no stored entry points
+        for indx,key in enumerate(self.umbrellas[i].entryPoints.keys()):
+            if len(self.umbrellas[i].entryPoints[key]) == 0:
+                prob[indx] = 0.0
+
+        # normalize probability
         prob /= prob.sum()    
 
+        # set I 
         I = -1
         
-        for n in range(1000):        
-            rand_val = random.random()
+        # now choose neighbor proportional to prob 
+        rand_val = random.random()
+    
+        for j in range(prob.size):
+            if rand_val <= prob[0:j+1].sum():
+                I = j 
+                break
         
-            for indx in range(len(self.umbrellas[i].entryPoints)):
-                if rand_val <= prob[:indx+1].sum():
-
-                    if len(self.umbrellas[i].entryPoints[indx]) == 0: 
-                        break
-                    else:
-                        I = indx
-                        break
-            
-            
+        # if for whatever reason, we couldn't find an appropriate I, set I to i    
         if I == -1:
             I = i 
             
@@ -272,7 +275,7 @@ class partition:
         wlkr.setConfig(self.umbrellas[i].entryPoints[I][temp_indx].config)
         wlkr.setVel(self.umbrellas[i].entryPoints[I][temp_indx].vel)
         
-        # set the other component of the walker state
+        # set the lag component of the walker state
         wlkr.Y_s = self.umbrellas[i].entryPoints[I][temp_indx].Y_s
               		
         wlkr.simulationTime = self.umbrellas[i].entryPoints[I][temp_indx].time
