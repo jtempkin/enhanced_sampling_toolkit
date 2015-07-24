@@ -219,6 +219,8 @@ class partition:
                 obs(wlkr)
             if isinstance(obs, observables.electric_field):
                 obs(wlkr)
+            if isinstance(obs, observables.dihedral_fluctuation_correlation):
+                obs(wlkr)
 
         return 0
 
