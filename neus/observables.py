@@ -211,7 +211,7 @@ class dihedral_fluctuation_correlation:
     """
     This routine returns the TCF of a dihedral angle. 
     """
-    def __init__(self, name, s, stepLength, data, mean):
+    def __init__(self, name, s, stepLength, data, cvindex, mean):
         """
         Constructor for the time fluctuation correlation function of a dihedral.
         
@@ -223,6 +223,7 @@ class dihedral_fluctuation_correlation:
         self.data = data
         self.nsamples = np.zeros(data.shape)
         self.mean = mean
+        self.cvindex = cvindex
 
     def __call__(self, wlkr):
         """
@@ -245,7 +246,7 @@ class dihedral_fluctuation_correlation:
         
         # current colvars
         cv = wlkr.getColvars()
-        d1 = cv[0]
+        d1 = cv[cvindex]
 
         config = wlkr.getConfig()
 
@@ -254,7 +255,7 @@ class dihedral_fluctuation_correlation:
         wlkr.propagate(0, pre='yes')
         cv = wlkr.getColvars()
 
-        d2 = cv[0]
+        d2 = cv[cvindex]
 
         wlkr.setConfig(config)
 
