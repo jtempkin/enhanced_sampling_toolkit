@@ -246,7 +246,7 @@ class dihedral_fluctuation_correlation:
         
         # current colvars
         cv = wlkr.getColvars()
-        d1 = cv[cvindex]
+        d1 = cv[self.cvindex]
 
         config = wlkr.getConfig()
 
@@ -255,7 +255,7 @@ class dihedral_fluctuation_correlation:
         wlkr.propagate(0, pre='yes')
         cv = wlkr.getColvars()
 
-        d2 = cv[cvindex]
+        d2 = cv[self.cvindex]
 
         wlkr.setConfig(config)
 
