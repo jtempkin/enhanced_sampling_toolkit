@@ -417,4 +417,74 @@ class electric_field:
         return temp_val
         
         
-            
+class cv_indicator_correlation:
+    """
+    This routine returns the value of an indicator function over a space in a given cv. 
+    """
+    def __init__(self, name, s, stepLength, data, cv_index, cv_range):
+        """
+        Constructor for the time fluctuation correlation function of a dihedral.
+        
+        NOTE: Step Length is the time between samples taken, not necessarily the time the walker advances each timestep. 
+        """
+        self.s = s
+        self.stepLength = stepLength
+        self.name = name
+        self.data = data
+        self.nsamples = np.zeros(data.shape)
+        self.cv_index = cv_index
+        self.cv_range = cv_range
+
+    def __call__(self, wlkr):
+        """
+        This function takes the current position of the walker and updates the
+        local autocorrelation information using a fluctuation correlation function
+        i.e. < (A(0) - <A>) * (A(t) - <A>) > 
+        
+        """
+        # check to see that we are accumulating a value at a time when it is appropriate. return otherwise 
+        """
+        if wlkr.simulationTime % self.stepLength:     
+            return 0 
+        """
+        if not (wlkr.simulationTime - np.floor(wlkr.simulationTime / self.s) * self.s ) % (self.s / self.data.shape[0]) == 0.0:
+            return 0 
+        
+        time_indx = (wlkr.simulationTime - np.floor(wlkr.simulationTime / self.s) * self.s ) / (self.s / self.data.shape[0])
+        
+        time_indx = int(time_indx)
+        
+        # current colvars
+        cv = wlkr.getColvars()
+        d1 = cv[self.cv_index]
+
+        if self.cv_range[0] < d1 < self.cv_range[1]:
+            d1 = 1.0
+        else:
+            d1 = 0.0
+
+        config = wlkr.getConfig()
+
+        # now let's get the reference colvar
+        wlkr.setConfig(wlkr.Y_s[0])
+        wlkr.propagate(0, pre='yes')
+        cv = wlkr.getColvars()
+
+        d2 = cv[self.cv_index]
+
+        if self.cv_range[0] < d2 < self.cv_range[1]:
+            d2 = 1.0
+        else:
+            d2 = 0.0
+
+        wlkr.setConfig(config)
+
+        wlkr.propagate(0, pre='yes')
+        
+        # now get the fluctuation correlation value 
+        temp_val = d1 * d2
+
+        self.data[time_indx] = (self.data[time_indx] * self.nsamples[time_indx] + temp_val) / (self.nsamples[time_indx] + 1.0)
+        self.nsamples[time_indx] += 1.0
+
+        return 0

@@ -221,6 +221,8 @@ class partition:
                 obs(wlkr)
             if isinstance(obs, observables.dihedral_fluctuation_correlation):
                 obs(wlkr)
+            if isinstance(obs, observables.cv_indicator_correlation):
+                obs(wlkr)
 
         return 0
 
@@ -252,6 +254,8 @@ class partition:
                 prob[indx] = 0.0
 
         # normalize probability
+        assert prob.sum() > 0.0
+
         prob /= prob.sum()    
 
         # set I 
@@ -266,8 +270,8 @@ class partition:
                 break
         
         # if for whatever reason, we couldn't find an appropriate I, set I to i    
-        if I == -1:
-            I = i 
+        #if I == -1:
+        #    I = i 
             
         assert I != -1
         
