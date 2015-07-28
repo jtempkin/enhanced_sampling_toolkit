@@ -270,8 +270,8 @@ class partition:
                 break
         
         # if for whatever reason, we couldn't find an appropriate I, set I to i    
-        #if I == -1:
-        #    I = i 
+        if I == -1:
+            I = i 
             
         assert I != -1
         
