@@ -210,7 +210,9 @@ class lammpsWalker(walker):
         elif cv.type == "vy":
             self.command("compute " + cv.name + " " + cv.name + " property/atom vy")
         elif cv.type == "vz":
-            self.command("compute " + cv.name + " " + cv.name + " property/atom vz")  
+            self.command("compute " + cv.name + " " + cv.name + " property/atom vz")
+
+        self.propagate(0, pre='yes')
 
         
         return 0
@@ -223,6 +225,8 @@ class lammpsWalker(walker):
             self.command("uncompute " + cv.name)
             
         self.colvars = []
+
+        self.propagate(0, pre='yes')
             
         return 0    
                 
@@ -308,6 +312,8 @@ class lammpsWalker(walker):
         """
         
         self.lmp.scatter_atoms("v", 1, 3, vel.ctypes.data_as(ctypes.POINTER(ctypes.c_double)))
+
+        self.propagate(0, pre='yes')
         
         return 0
 
@@ -336,6 +342,8 @@ class lammpsWalker(walker):
         This routine sets the internal configuration. 
         """                
         self.lmp.scatter_atoms("x", 1, 3, config.ctypes.data_as(ctypes.POINTER(ctypes.c_double)))
+
+        self.propagate(0, pre='yes')
         
         return 0 
     
@@ -365,6 +373,8 @@ class lammpsWalker(walker):
         
         # set new velocities
         self.command("velocity all set v_vx v_vy v_vz")
+
+        self.propagate(0, pre='yes')
         
         return 0     
         
@@ -382,7 +392,7 @@ class lammpsWalker(walker):
         """
         This routine sets the dynamics for the walker. 
         """        
-        __knownDynamics__ = ['langevin']
+        __knownDynamics__ = ['langevin', 'baoab']
         
         assert dynamics_instance.type in __knownDynamics__, "Dynamics instance type was not recognized."        
         
@@ -409,12 +419,22 @@ class lammpsWalker(walker):
             # add the fixes to the internal list 
             self.dynamics.fixes.append("1")
             self.dynamics.fixes.append("2")
+
+        elif self.dynamics.type is 'baoab':
+            if self.dynamics.seed is None:
+                self.command("fix 1 all baoab " + " ".join([str(self.dynamics.damping_coefficient), str(self.dynamics.temperature), str(random.randint(100000, 999999))]))
+            else:
+                self.command("fix 1 all baoab " + " ".join([str(self.dynamics.damping_coefficient), str(self.dynamics.temperature), str(self.dynamics.seed)]))
             
         # set shake
         if self.dynamics.shake is True:
             self.command("fix shk all shake 0.0001 20 0 m 1.0")
             self.dynamics.fixes.append("shk")
-        
+
+        if self.dynamics.linear_momentum == False:
+            self.command("fix mom all  momentum 1 linear 1 1 1")
+            self.dynamics.fixes.append("mom")
+
         self.propagate(0, pre='yes')
         
         return 0
