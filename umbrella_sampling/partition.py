@@ -333,5 +333,96 @@ class partition:
                 umbrellas.append(Box(center, width))
         
         return umbrellas
-     
+
+
+    def sample_US(self, wlkr, numSteps, umbrellaIndex, walkerIndex, sysParams, debug=False):
+        """
+        This routine samples the given box via the equilibrium overlap method.
+        """
+        assert sysParams.has_key('scratchdir'), "Scratch directory was not specified in the sampling routine."
+
+        assert sysParams['transitionMatrixType'] in ['transition','overlap']
+        # assign an input filename for this walker.
+        if debug:
+            inputFilename = sysParams['scratchdir'] + "/" + str(umbrellaIndex) + "_w" + str(walkerIndex)
+        else:
+            inputFilename = None
+
+        oldConfig = wlkr.getConfig()
+        oldSample = wlkr.getColvars()
+
+        f_handle = h5py.File(sysParams['scratchdir'] + "/ep." + str(umbrellaIndex) + ".h5py", "a")
+
+        #print self.umbrellas[umbrellaIndex](oldSample, self.umbrellas), self.umbrellas[umbrellaIndex].indicator(oldSample)
+        assert self.umbrellas[umbrellaIndex].indicator(oldSample) > 0.0, "The walker is not in the support of the current window."
+
+        # get the sample from the initial state of the walker in CV space
+        self.umbrellas[umbrellaIndex].samples.append(oldSample)
+
+        # reset the local observables arrays for this round of sampling
+        for obs in self.umbrellas[umbrellaIndex].local_observables:
+            self.resetObservable(obs)
+
+        assert sysParams.has_key('stepLength'), "StepLength was not specified in the sampling routine."
+
+        self.accumulateObservables(wlkr, wlkr.getColvars(), wlkr.colvars, umbrellaIndex)
+
+        # now we proceed with the sampling routine
+        for i in range(0, numSteps, sysParams['stepLength']):
+
+            # propagate the dynamics
+            wlkr.propagate(sysParams['stepLength'])
+
+            newConfig = wlkr.getConfig()
+            newSample = wlkr.getColvars()
+
+            if sysParams['transitionMatrixType'] == 'transition':
+                # update the M matrix based on this sample
+                self.M[umbrellaIndex,:] += self.getBasisFunctionValues(newSample, umbrellaIndex)
+                # increment the number of samples
+                self.nsamples_M[umbrellaIndex] += 1
+
+            # get the new configuration
+            if self.metropolisMove(self.umbrellas[umbrellaIndex], oldSample, newSample):
+                # get the new sample position and append it to the samples list
+                self.umbrellas[umbrellaIndex].samples.append(newSample)
+
+                # set current position to "old position"
+                oldConfig = newConfig
+                oldSample = newSample
+
+                # append the new sample to the observables
+                self.accumulateObservables(wlkr, newSample, wlkr.colvars, umbrellaIndex)
+
+            else:
+                # if we reject the proposed position, append the old config
+                self.umbrellas[umbrellaIndex].samples.append(oldSample)
+
+                # set the walker configuration to the old state
+                wlkr.setConfig(oldConfig)
+
+                # redraw the velocities
+                wlkr.drawVel(distType = 'gaussian', temperature = 310.0)
+
+                # append the new sample to the observables
+                self.accumulateObservables(wlkr, oldSample, wlkr.colvars, umbrellaIndex)
+
+            # now check to see if the data buffer has become too large and flush buffer to file
+            #if len(self.umbrellas[umbrellaIndex].samples) > 1000000: self.umbrellas[umbrellaIndex].flushDataToFile(inputFilename)
+
+            if sysParams['transitionMatrixType'] == 'overlap':
+                self.M[umbrellaIndex,:] += self.getBasisFunctionValues(oldSample, umbrellaIndex)
+                # increment the number of samples
+                self.nsamples_M[umbrellaIndex] += 1
+
+            if i % 1000 == 0: f_handle.create_dataset(str(self.k) + "." + str(i) + ".config", data=wlkr.getConfig())
+
+
+        # flush the last data to file after sampling has finished
+        self.umbrellas[umbrellaIndex].flushDataToFile(inputFilename)
+
+        f_handle.flush()
+        f_handle.close()
+
+        return 0
     
