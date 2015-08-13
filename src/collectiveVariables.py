@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-A container class for collective variable definiions. We provide here a container class for 
+A container class for collective variable definitions. We provide here a container class for
 """
 
 class collectiveVariables(object):

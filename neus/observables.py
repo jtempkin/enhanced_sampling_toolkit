@@ -21,6 +21,7 @@ class pmf:
         self.data = data
         self.data_width = data_width
         self.nsamples = np.zeros(data.shape)
+        self.weights = np.zeros(data.shape)
 
     def __call__(self, sample, colvars):
 
@@ -72,6 +73,7 @@ class P1:
         self.name = name
         self.data = data
         self.nsamples = np.zeros(data.shape)
+        self.weights = np.zeros(data.shape)
         self.cellDim = cellDim
 
     def __call__(self, wlkr):
@@ -143,6 +145,7 @@ class dist_fluctuation_correlation:
         self.name = name
         self.data = data
         self.nsamples = np.zeros(data.shape)
+        self.weights = np.zeros(data.shape)
         self.cellDim = cellDim
         self.mean = mean
 
@@ -222,6 +225,7 @@ class dihedral_fluctuation_correlation:
         self.name = name
         self.data = data
         self.nsamples = np.zeros(data.shape)
+        self.weights = np.zeros(data.shape)
         self.mean = mean
         self.cvindex = cvindex
 
@@ -318,6 +322,7 @@ class electric_field:
         self.name = name
         self.data = data
         self.nsamples = np.zeros(data.shape)
+        self.weights = np.zeros(data.shape)
         self.cellDim = cellDim
         self.atom_exclusions = atom_exclusions
         self.ref_atoms_ids = ref_atoms_ids
@@ -432,6 +437,7 @@ class cv_indicator_correlation:
         self.name = name
         self.data = data
         self.nsamples = np.zeros(data.shape)
+        self.weights = np.zeros(data.shape)
         self.cv_index = cv_index
         self.cv_range = cv_range
 

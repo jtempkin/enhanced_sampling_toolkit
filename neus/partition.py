@@ -1,354 +1,463 @@
+# -*- coding: utf-8 -*-
 """
-This file contains the partition class definition that allows 
-
-
-Potentially create a class here called "simulation" which will contain an array
-of partitions (just starting with one) and an array of "walkers" (in serial
-this will be just one). The code will then pair walkers (i.e. LAMMPS instances)
-with windows contained in the partition. 
+This is an update partition module that contains the flexibility to perform both umbrella and NEUS sampling. 
 """
-from scipy import linalg as LA
-import scipy as sp
-import fileIO
-import sys
-import walker
-#import acor
-import errors
-import random
-import h5py
+
 import numpy as np
+import copy
+import scipy as sp
+from scipy import linalg as LA
+from scipy import sparse 
+from scipy.sparse import linalg as LA_sparse
+import random
+import basisFunctions
+import entryPoints
+import observables
+
+try:
+    from mpi4py import MPI
+except:
+    print "assuming serial job."
+    pass
 
 class partition:
     """
     This class defines a set of windows that partition the sampling space.
     This class will contain an array of basisFunction objects. 
     """
-    umbrellas = []
-    
-    def __init__(self, N):
-        self.F = self.initializeFMat(N)
-        self.F_error = np.zeros(self.F.shape)
-        
-        # this matrix will store transition counts 
-        self.trans = self.initializeFMat(N)
-        
-        # this will be a list that stores the total time spent sampling each
-        # basis window
-        self.samplingTimes = [0.0]*N
-        
+    def __init__(self, N, scratchdir, parallel=False):
+        """
+        Init routine. Initializes the following values:
 
-    def computeFij(self, i, j):
+        The obervables list is a bookkeeping of the observables of the self one
+        wants to record during the simulaiton. This list needs to be set prior to sampling.
+
+        The list shoud contain elements that are tuples of a function and a data array.
+
+        Each element should take two arguments, one the walker object and one the umbrella index for which the sample is
+        associated.
         """
-        This function computes and returns the value of the entry Fij according 
-        to summing over the value of the jth basis function. (The overlap 
-        version)
+
+        # create an umbrella list
+        self.umbrellas = []
+        
+        # initialize the matricies needed for the NEUS
+        self.M = np.zeros((N,N))
+        self.F = np.zeros((N,N))     
+        # we should track how many samples are taken in the M matrix
+        self.nsamples_M = np.zeros(N)
+        self.z = np.zeros(N)
+
+        # keep a list of any observable objects that should be estimated during sampling. 
+        self.observables = []
+        
+        # start a list of the windows associated with this partition. 
+        self.rank_window_index = None
+
+        self.simulationTime = np.zeros(N)
+        
+        # here, the variable k represents how many times the transition matrix has been updated. 
+        self.k = np.zeros(N)
+
+        self.scratchdir = scratchdir
+
+        self.active_windows = np.zeros(N, dtype=np.bool)
+        
+    def updateF(self, row):
         """
-        cv_sum = 0.0
-        for k in range(0, len(self.umbrellas[i].samples), 1):
-            cv_sum += self.umbrellas[j](self.umbrellas[i].samples[k], self.umbrellas)
+        This routine update G according to:
             
-        cv_sum /= len(self.umbrellas[i].samples)
-        
-        return cv_sum
-    
-    def accumulateFij(self, i, cvs):
-        """
-        This function will update the current value of Fij with the given cvs.
-        Note that this function expects cvs to be a ctypes array that can be fed
-        to umbrellas()
-        """
-        self.F[i,:] = (self.F[i,:] * (self.umbrellas[i].numSamples-1) + cvs) / (self.umbrellas[i].numSamples)
+            G_{ij}^{k+1} = (1 - \epsilon_{k}) * G_{ij}^{k} + \epsilon_{k} * M_{ij} / T_{i}
 
+        for a finite time problem. 
         """
-        self.F[i][j] = (self.F[i][j] * self.umbrellas[i].numSamples + self.umbrellas[j](cvs, self.umbrellas)) / (self.umbrellas[i].numSamples + 1)
+
+        temp_M = np.zeros(self.M[row].shape)
+
+        # update elements
+        temp_M[:] = self.M[row,:] / self.nsamples_M[row]
+        temp_M[row] = 1 - temp_M.sum()
+
+        self.F[row] = (self.k[row] * self.F[row] + temp_M) / (self.k[row] + 1)
+
+        self.k[row] += 1
+
+        return 0
+
+    def addObservable(self, A, rank_index=None):
         """
+        This routine adds an observable and initializes local copies of the observables in the basis windows.
+        """
+        assert hasattr(self, "observables"), "The partition observables lists were not properly initialized."
+
+        # add the observable to both the partition and each window own by the ranks
+        self.observables.append(A)
         
+        if self.rank_window_index is None:
+            for window in self.umbrellas:
+                if not hasattr(window, "local_observables"): window.local_observables = []
+                window.local_observables.append(copy.deepcopy(A))
+        else:
+            for window in self.rank_window_index:
+                if not hasattr(self.umbrellas[window], "local_observables"): self.umbrellas[window].local_observables = []
+                self.umbrellas[window].local_observables.append(copy.deepcopy(A))
+
+        return 0
+
+    def removeObservable(self):
+        """
+        This routine removes all observables from the list for the partition. 
+        """
+        # remove global version of observables
+        self.observables = []
+        
+        # remove local version of observables from the windows as well. 
+        for win in self.umbrellas:
+            win.local_observables = []
+            
+        return 0 
+        
+
+    def computeObservables(self, rank=None):
+        """
+        This routine populates the partition observables with data averaged from the windows.
+        """
+        for o_indx,obs in enumerate(self.observables):
+            temp = np.zeros(obs.data.shape)
+            temp_weights = np.zeros(obs.nsamples.shape)
+            
+            if rank is None:
+                for w_indx,win in enumerate(self.umbrellas):
+                    temp += self.z[w_indx] * win.local_observables[o_indx].data
+                    temp_weights += self.z[w_indx] * win.local_observables[o_indx].nsamples.astype(bool)
+            else:
+                for w_indx in self.rank_window_index[rank]:
+                    temp += self.z[w_indx] * self.umbrellas[w_indx].local_observables[o_indx].data
+                    temp_weights += self.z[w_indx] * self.umbrellas[w_indx].local_observables[o_indx].nsamples.astype(bool)
+
+
+            obs.data[:] = temp[:]
+            obs.weights[:] = temp_weights[:]
+
+        return 0
+
+    def computeZ(self, sparseSolve=True):
+        """
+        Solves for z vector given current G,a via solving the following linear 
+        system:
+            
+            (I - G)^T z = a 
+	
+	    for a finite time process and
+	
+            zG = z 
+
+	    for infinite time process.
+        """
+        # let's compute a z only for the list of active windows
+        temp_F = self.F[self.active_windows, :][:, self.active_windows]
+
+        if sparseSolve:
+            # compute via numpy interface to LAPACK the eigenvectors v and eigenvalues w
+            # here will first convert F to sparse format before solving.
+            # The linalg routine returns this as the first (i.e. largest) eigenvalue.
+            
+            F_sparse = sparse.coo_matrix(temp_F)
+            evals, evec = LA_sparse.eigs(F_sparse.transpose())
+            #evals, evec = LA.eig(self.F, left=True, right=False)
+            sort = np.argsort(evals)
+            # normalize if needed.
+
+            self.z[self.active_windows] = evec[:,sort[-1]] / np.sum(evec[:,sort[-1]])
+            self.z[np.logical_not(self.active_windows)] = 0.0
+
+        else:
+                
+            evals, evec = LA.eig(temp_F, left=True, right=False)
+            sort = np.argsort(evals)
+            # normalize if needed.
+
+            self.z[self.active_windows] = evec[:,sort[-1]] / np.sum(evec[:,sort[-1]])
+            self.z[np.logical_not(self.active_windows)] = 0.0
+
+
+        return 0
+
+    def accumulateObservables(self, wlkr, sample, colvars, indx):
+        """
+        This routine loops through the observables list and updates the samples in the corresponding windows.
+        """
+
+        for obs in self.umbrellas[indx].local_observables:
+            # use the observable call routine to accumulate a sampling in the observables data structure
+            if isinstance(obs, observables.pmf): 
+                obs(sample, colvars)
+            elif isinstance(obs, observables.P1):
+                obs(wlkr)
+            elif isinstance(obs, observables.dist_fluctuation_correlation):
+                obs(wlkr)
+            elif isinstance(obs, observables.electric_field):
+                obs(wlkr)
+            elif isinstance(obs, observables.dihedral_fluctuation_correlation):
+                obs(wlkr)
+            elif isinstance(obs, observables.cv_indicator_correlation):
+                obs(wlkr)
+            else:
+                raise Exception('Called unknown observable type.')
+
+        return 0
+
+    def resetObservable(self, obs):
+        """
+        Set each element in the data of the passed observable to zero.
+        """
+
+        obs.data.fill(0.0)
+        obs.nsamples.fill(0.0)
+
         return 0
         
-    def computeAcor(self, traj):
+    def reinject(self, wlkr, i):
         """
-        This function will compute the autocorrelation time and the std dev of the
-        given data set. 
+        This function initializes a simulation from the entry point list in the 
+        current umbrella.
         """
-        tau, mean, sigma = acor.acor(traj)
-        
-        return tau, mean, sigma
+        # let's get the current estimate of the flux
+        prob = self.z * self.F[:,i]
 
-    def getBasisFunctionValues(self, coord):
+        # zero out flux from i to i
+        prob[i] = 0.0
+
+        # now let's zero out any neighbors with potentially nonzero flux but no stored entry points
+        for indx in range(prob.size):
+            # lets get the key to this index
+            key = self.index_to_key[indx]
+            # check size of this neighbor specifically and zero out probability if zero
+            if self.umbrellas[i].getNumberOfEntryPoints(key=key) == 0:
+                prob[indx] = 0.0
+
+        # normalize probability
+        assert prob.sum() > 0.0
+        prob /= prob.sum()
+
+        # now choose neighbor proportional to prob 
+        I = np.random.choice(np.arange(prob.size), p=prob)
+
+        # get the entry point from the umbrella window
+
+        EP = self.umbrellas[i].getEntryPoint(self.index_to_key[I])
+
+        # you should pass this argument as a ctypes array for now
+        wlkr.setConfig(EP.config)
+        wlkr.setVel(EP.vel)
+
+        # set the lag component of the walker state
+        wlkr.Y_s = EP.Y_s
+
+        wlkr.simulationTime = EP.time
+
+        return 0
+
+    def getBasisFunctionValues(self, coord, umbrella_index = None):
         """
         This function takes a point in collective variable space and returns 
-        an array of the value of the basis functions.
+        an array of the value of the basis functions at that point. 
+        
+        If no umbrella index is passed, then search the whole space 
         """
         # build an array 
         indicators = np.zeros(len(self.umbrellas))
-        # go through the basis functions and construct the indicators array
-        for i in range(len(self.umbrellas)):
-            if self.umbrellas[i].indicator == 0.0:
-                continue
-            else:
+        
+        if umbrella_index is None:
+    	
+            # go through the basis functions and construct the indicators array
+            for i in range(len(self.umbrellas)):
+                if self.umbrellas[i].indicator(coord) == 0.0:
+                    continue
+                else:
+                    indicators[i] = self.umbrellas[i].indicator(coord)
+                    
+        elif len(self.umbrellas[umbrella_index].neighborList) == 0: 
+            # go through the basis functions and construct the indicators array
+            for i in range(len(self.umbrellas)):
+                if self.umbrellas[i].indicator(coord) == 0.0:
+                    continue
+                else:
+                    indicators[i] = self.umbrellas[i].indicator(coord)
+        else:
+            
+            # make sure the partition has a neighborlist
+            assert hasattr(self.umbrellas[umbrella_index], 'neighborList'), "There is no neighborlist defined."
+            # now loop over neighbors and populate the indicator
+            for i in self.umbrellas[umbrella_index].neighborList:
+                
                 indicators[i] = self.umbrellas[i].indicator(coord)
                 
+            # if we don't find any support, let's try this again and search the whole space. 
+            if np.sum(indicators) == 0.0:
+                indicators = self.getBasisFunctionValues(coord, umbrella_index=None)
+                
         # normalize the values of the basis functions
+        assert np.sum(indicators) != 0.0
         indicators = indicators / np.sum(indicators)
         
         return indicators
-    
-    def initializeFMat(self, ncells):
-        """
-        This function constructs the matrix F.
-        """
-        F = np.zeros((ncells, ncells))
         
-        return F   
-    
-    def sample(self, wlkr, numSteps, umbrellaIndex, walkerIndex, sysParams, rank=-1):
+    def sample(self, wlkr, umbrellaIndex, numSteps, stepLength, walkerIndex, corrLength=None, debug=False):
         """    
         This function takes a system lmp and propagates the dynamics to generate
-        the required samples. 
+        the required samples but storing and generating samples via NEUS algorithm.
+        
+        Specifically, this performs an umbrella sampling routine using NEUS reinjection procedure for reinitializing the walker. 
+        
+        We should remove the need for the output to be specified internally here. 
         
         """
-        # if we are passing in a value of the rank, we know it is MPI and report the rank
-        if rank <= 0:
-            print "Rank", rank            
+        # count the number of transitions made in this sampling routine if debug.
+        if debug: ntransitions = 0
             
-        print "Sampling umbrella " + str(umbrellaIndex) + " walker " + str(walkerIndex) + " for " + str(numSteps) + " steps."
-        # print "Umbrella: ", self.umbrellas[umbrellaIndex]
-        
-        # This block of code is for the implementation of the abstracted walker
-        # assign an input filename for this walker. 
-        inputFilename = sysParams['scratchdir'] + "/in_" + str(umbrellaIndex) + "_w" + str(walkerIndex) + ".diala"
-        
-        
-        # assign an output file for the LAMMPS trajectory:
-        wlkr.command("dump 1 all dcd 10 " + inputFilename + ".dcd")
-        
-        # we will assign a time-index associated with this umbrella
-        self.umbrellas[umbrellaIndex].time = 0.0
-        
-        # if we are using a transition type, we cannot directly reconstruct F 
-        # from post-processing only the cvs's trajectory so we create a data
-        # structure here to store values of this transition
-        self.umbrellas[umbrellaIndex].basisFnxTimeSeries = []
-            
-        # allocate an variable to compute the metropolis accenptance percentange
-        self.umbrellas[umbrellaIndex].metropolis_acceptance = 0.0
-        
-        # get initial points 
-        # note that configs[0] refers to Y_t, while configs[1] refers to Y_t+1 proposal 
-        self.umbrellas[umbrellaIndex].configs.append(wlkr.getConfig())
+        assert hasattr(self, 'scratchdir'), "Scratch directory was not specified for this partition object."
+
+        # assign an input filename for this walker.  
+        if debug: 
+            inputFilename = self.scratchdir + "/" + str(umbrellaIndex) + "_w" + str(walkerIndex)
+        else:
+            inputFilename = None
+
+        # get the sample from the initial state of the walker in CV space
         self.umbrellas[umbrellaIndex].samples.append(wlkr.getColvars())
         
-        # note to increment numSamples as a record keeping for the value of N
-        self.umbrellas[umbrellaIndex].numSamples += 1
+        # reset the local observables arrays for this round of sampling
+        for obs in self.umbrellas[umbrellaIndex].local_observables:
+            self.resetObservable(obs)
         
-        # append the starting values of the basis functions 
-        self.umbrellas[umbrellaIndex].basisFnxTimeSeries.append(self.getBasisFunctionValues(self.umbrellas[umbrellaIndex].samples[-1]))
-        
-        for i in range(0, numSteps, sysParams['stepLength']):
-                # propagate the dynamics
-            if i == 0:
-                wlkr.propagate(sysParams['stepLength'], pre='yes')
-                #wlkr.propagate(sysParams['stepLength'])
-            else:
-                wlkr.propagate(sysParams['stepLength'])
-                
-                # shift values and get new configs
-            self.umbrellas[umbrellaIndex].configs.append(wlkr.getConfig())
-            self.umbrellas[umbrellaIndex].samples.append(wlkr.getColvars())
-            self.umbrellas[umbrellaIndex].numSamples += 1
-
-            # now we check to see if we've made an exit and reset if so 
-            if self.umbrellas[umbrellaIndex].indicator(self.umbrellas[umbrellaIndex].samples[-1]) == 0.0:
-                
-                for ind in range(len(self.umbrellas)):
-                    if self.umbrellas[ind].indicator(self.umbrellas[umbrellaIndex].samples[-1]) == 1.0:
-                        #print "added entry from " + str(umbrellaIndex) + " to " + str(ind)
-                        self.umbrellas[ind].entryPoints.append(np.asarray(self.umbrellas[umbrellaIndex].configs[-1][:]))
-                        break
-                        
-                # print "Simulation has exited, restarting with stored coordinates."
-                # scatter old config to the walker
-                wlkr.setConfig(self.umbrellas[umbrellaIndex].configs[-1])
+        # now we proceed with the sampling routine            
+        for i in range(0, numSteps, stepLength):
             
-                # set the "rejected" step to the previous config
-                self.umbrellas[umbrellaIndex].configs[-1] = self.umbrellas[umbrellaIndex].configs[-2]
-                    
-                # now set the "rejected" step to the current CV point
-                self.umbrellas[umbrellaIndex].samples[-1] = self.umbrellas[umbrellaIndex].samples[-2]   
-                        
-                # print "Simulation has exited, restarting with stored coordinates."
-                # scatter old config to the walker
-                wlkr.setConfig(self.umbrellas[umbrellaIndex].configs[-1])
-                    
-                # redraw the velocities
-                if issubclass(type(wlkr),walker.velocityWalker):
-                    wlkr.drawVel()
-                
-                # now check to see if the data buffer has become too large and flush buffer to file
-            if not (i % (1000*sysParams['stepLength'])):
-                self.umbrellas[umbrellaIndex].flushDataToFile(inputFilename)
-
-        # flush the last data to file
-        self.umbrellas[umbrellaIndex].flushDataToFile(inputFilename)
-        
-        # compute the metropolis acceptance if it was computed             
-        if hasattr(self.umbrellas[umbrellaIndex], 'metropolis_acceptance'):
-            self.umbrellas[umbrellaIndex].metropolis_acceptance = self.umbrellas[umbrellaIndex].metropolis_acceptance / self.umbrellas[umbrellaIndex].numSamples
-            #print "Acceptance ratio: ", self.umbrellas[umbrellaIndex].metropolis_acceptance
-        
-        return 0
-        
-    def sampleNeus(self, wlkr, numSteps, umbrellaIndex, walkerIndex, sysParams, rank=-1):
-        """    
-        This function takes a system lmp and propagates the dynamics to generate
-        the required samples but storing and generating samples via NEUS. 
-        
-        """
-        # if we are passing in a value of the rank, we know it is MPI and report the rank
-        if rank <= 0:
-            print "Rank", rank            
+            # propagate the dynamics
+            wlkr.propagate(stepLength)
             
-        print "Sampling umbrella " + str(umbrellaIndex) + " walker " + str(walkerIndex) + " for " + str(numSteps) + " steps."
-        # print "Umbrella: ", self.umbrellas[umbrellaIndex]
-        
-        # This block of code is for the implementation of the abstracted walker
-        # assign an input filename for this walker. 
-        inputFilename = sysParams['scratchdir'] + "/in_" + str(umbrellaIndex) + "_w" + str(walkerIndex) + ".diala"
-        
-        # assign an output file for the LAMMPS trajectory:
-        wlkr.command("dump 1 all dcd 10 " + inputFilename + ".dcd")
-        
-        # get initial points 
-        # note that configs[0] refers to Y_t, while configs[1] refers to Y_t+1 proposal 
-        #self.umbrellas[umbrellaIndex].configs.append(wlkr.getConfig())
-        #self.umbrellas[umbrellaIndex].samples.append(wlkr.getColvars())
-        
-        # note to increment numSamples as a record keeping for the value of N
-        #self.umbrellas[umbrellaIndex].numSamples += 1
-        
-        for i in range(0, numSteps, sysParams['stepLength']):
-                # propagate the dynamics
-            if i == 0:
-                wlkr.propagate(sysParams['stepLength'], pre='yes')
-                #wlkr.propagate(sysParams['stepLength'])
-            else:
-                wlkr.propagate(sysParams['stepLength'])
+            # update the record of the simulation time for the walker object. 
+            wlkr.simulationTime += stepLength
+	    
+            # now we check to see if we've passed the autocorrelation length
+            # if we do, we reset the Y ( [t / s] * s) value to the current point
+            if corrLength is not None:
+                if (wlkr.simulationTime % corrLength) == 0.0:
+                    wlkr.Y_s = (wlkr.getConfig(), wlkr.getVel())
+            
+            # get the new sample position
+            new_sample = wlkr.getColvars()
+            self.umbrellas[umbrellaIndex].samples.append(new_sample)
+
+            # check for a transition out of this index
+            if self.umbrellas[umbrellaIndex].indicator(new_sample) == 0.0:
+                if debug: ntransitions += 1 
+                # choose the new j with probability {psi_0, ..., psi_N}
+
+                indicators = self.getBasisFunctionValues(new_sample)
+            
+                # record a transition to the matrix
+                self.M[umbrellaIndex,:] += indicators
                 
-                # shift values and get new configs
-            #self.umbrellas[umbrellaIndex].configs.append(wlkr.getConfig())
-            self.umbrellas[umbrellaIndex].samples.append(wlkr.getColvars())
-            self.umbrellas[umbrellaIndex].numSamples += 1
-                
-            # check for transition
-            if self.umbrellas[umbrellaIndex].indicator(self.umbrellas[umbrellaIndex].samples[-1]) == 0.0:
-                # find to which box the transition was made 
-                for indx in range(len(self.umbrellas)):
-                    
-                    if self.umbrellas[indx].indicator(self.umbrellas[umbrellaIndex].samples[-1]) == 1.0:        
+                # now we select a window to which to append this new entry point,use numpy to choose window index
+                ep_targets = np.arange(indicators.size)[indicators.astype(bool)]
                         
-                        # record a transition from the matrix
-                        self.trans[umbrellaIndex][indx] += 1.0
-                        
-                        # append the entry point to the new window
-                        self.umbrellas[indx].entryPoints.append(wlkr.getConfig())
-                        
-                        # drop the last point from the samples 
-                        self.umbrellas[umbrellaIndex].samples.pop()
-                        
-                        # now reset the dynamics from an entry point
-                        temp_indx = random.randint(0, len(self.umbrellas[umbrellaIndex].entryPoints)-1)
-                        wlkr.setConfig(self.umbrellas[umbrellaIndex].entryPoints[temp_indx])
-                        
-                        # redraw velocities at this point
-                        wlkr.drawVel(distType = 'gaussian', temperature = 310.0)
-                        # we're done so let's stop the loop
-                        break
-                
-                    
+                # create a new entry point and append the entry point to the new window
+                newEP = entryPoints.entryPoints(wlkr.getConfig(), wlkr.getVel(), wlkr.simulationTime)
+                newEP.Y_s = wlkr.Y_s
+
+                for indx in ep_targets:
+                    self.umbrellas[indx].addNewEntryPoint(newEP, self.index_to_key[umbrellaIndex])
+
+                # drop the last point from the samples 
+                self.umbrellas[umbrellaIndex].samples.pop()
+
+                # reinject the walker into the current window 
+                self.reinject(wlkr, umbrellaIndex)
+            		
+                # get the sample from the new starting point after reinjection
+                self.umbrellas[umbrellaIndex].samples.append(wlkr.getColvars())
+            
+            # let's accumulate a sample into the observables we are accumulating on this window
+            self.accumulateObservables(wlkr, wlkr.getColvars(), wlkr.colvars, umbrellaIndex)
+
             # now check to see if the data buffer has become too large and flush buffer to file
-            if not (i % (1000*sysParams['stepLength'])):
-                self.umbrellas[umbrellaIndex].flushDataToFile(inputFilename)
-
-        # flush the last data to file
+            #if len(self.umbrellas[umbrellaIndex].samples) > 1000000: self.umbrellas[umbrellaIndex].flushDataToFile(inputFilename)
+        
+        # flush the last data to file after sampling has finished
         self.umbrellas[umbrellaIndex].flushDataToFile(inputFilename)
+
+        # record the number of samples taken here
+        self.nsamples_M[umbrellaIndex] = numSteps
+
         
-        # update the F matrix with the transitions 
-        self.F[umbrellaIndex,:] = (self.F[umbrellaIndex,:] * self.samplingTimes[umbrellaIndex] + self.trans[umbrellaIndex,:]) / (self.samplingTimes[umbrellaIndex] + sysParams['timestep'] * sysParams['stepLength'] * self.umbrellas[umbrellaIndex].numSamples)
-        
-        # update the time spent sampling this window
-        self.samplingTimes[umbrellaIndex] += sysParams['timestep'] * sysParams['stepLength'] * self.umbrellas[umbrellaIndex].numSamples    
+        if debug: print "Recorded",ntransitions,"transitions"
 
         return 0
 
-    def metropolisMove(self, current_umb, wlkr): 
+    def metropolisMove(self, current_umb, oldConfig, newConfig): 
         """
         This function returns True if the proposed move is accepted and false if 
         rejected based on a metropolization rule for the current Index.
-        
-        Here we add 
         """
-        if current_umb.indicator(current_umb.samples[-2]) == 0.0:
-            print "An error occured. umb(umb.samples[-2]) == 0.0."
-            sys.exit(0)
+        assert current_umb(oldConfig, self.umbrellas) > 0.0, "The old walker configuration is not in the support of the window."
+        
         # probability of accepting new point.
-        prob = min(1.0, current_umb(current_umb.samples[-1], self.umbrellas) / current_umb(current_umb.samples[-2], self.umbrellas) )
+        prob = min(1.0, current_umb(newConfig, self.umbrellas) / current_umb(oldConfig, self.umbrellas) )
+        
         # evaluate probability
         if random.random() <= prob:
-            current_umb.metropolis_acceptance += 1.0
+        
             return True
             
-        else:
+        else:        
             
-            # print "Simulation has exited, restarting with stored coordinates."
-            # scatter old config to the walker
-            wlkr.setConfig(current_umb.configs[-1])
-            
-            # set the "rejected" step to the previous config
-            current_umb.configs[-1] = current_umb.configs[-2]
-                    
-            # now set the "rejected" step to the current CV point
-            current_umb.samples[-1] = current_umb.samples[-2]   
-                        
-            # print "Simulation has exited, restarting with stored coordinates."
-            # scatter old config to the walker
-            wlkr.setConfig(current_umb.configs[-1])
-                    
-            # redraw the velocities
-            if issubclass(type(wlkr),walker.velocityWalker):
-                wlkr.drawVel()
-        
             return False
         
         # if something went wrong, raise an error 
         raise Exception("Something went wrong in the Metropolis Move Section. We don't know what.")
-
-    def getZ(self):
-        """
-        This function takes the matrix F and returns the eigenvector with 
-        eigenvalue 1.
-        
-        """
-        # compute via numpy interface to LAPACK the eigenvectors v and eigenvalues w
-        # The linalg routine returns this as the first (i.e. largest) eigenvalue. 
-        evals, evec = LA.eig(self.F, left=True, right=False)
-        sort = np.argsort(evals)
-        # normalize if needed. 
-        self.z = evec[:,sort[-1]] / np.sum(evec[:,sort[-1]]) 
-        
-        return self.z 
     
-    def buildNeighborList(self):
+    def buildNeighborList(self, L, umbrellas):
         """
         This routine constructs a neighborlist based on the radius of the basis 
-        function. 
-        """
+        function.
         
-        for i in range(len(self.umbrellas)):
-            for j in range(i+1, len(self.umbrellas), 1):
-                dist = np.linalg.norm(self.umbrellas[i].center - self.umbrellas[j].center)
-                if dist < (self.umbrellas[i].radius + self.umbrellas[j].radius):
-                    self.umbrellas[i].neighborList.append(j)
-                    self.umbrellas[j].neighborList.append(i)
+        L is the vector specifying the box lengths in each dimension. 
+        """      
+        # we should make sure that ever basisFunction has a radius defined. 
+        for win in umbrellas:
+            assert hasattr(win, 'radius')
+            
+        # now let's find all of the neighbors and populate a list of neighbors for each 
+        for i in range(len(umbrellas)):
+            # add the current window to it's own neighborList
+            umbrellas[i].neighborList.append(i)
+            # now search the other windows
+            for j in range(i+1, len(umbrellas)):
+                # get the distance between the centers                    
+                dr = umbrellas[i].center - umbrellas[j].center
+                
+                # apply minimum image convention if the dimension wraps 
+                for indx,dim in enumerate(L):
+                    if dim == -1.0: 
+                        continue
+                    else:
+                        # now apply the minimum image criteria
+                        if abs(dr[indx]) > dim / 2.0:
+                            if dr[indx] > 0.0: 
+                                dr[indx] -= dim
+                            elif dr[indx] < 0.0: 
+                                dr [indx] += dim
+                        else: 
+                            continue 
+                            
+                dist = np.linalg.norm(dr)
+                # append i,j to each other's list
+                
+                if dist <= (umbrellas[i].radius + umbrellas[j].radius):
+                    umbrellas[i].neighborList.append(j)
+                    umbrellas[j].neighborList.append(i)
     
             
         return 0
@@ -434,27 +543,190 @@ class partition:
         
         # Note that this is returns in ln (log base e), not log base 10.
         return logpji
-        
-        
-    def createUmbrellas(self, umbs):
+
+    def createUmbrellas(self, colVarParams, wrapping, basisType="Box", neighborList=True):
         """
-        This function creates a gridding of umbrellas based on a collective 
-        variable specification passed as arguments. 
-        
-        OK, there are definitely better ways of doing this but I don't want to 
-        implement them now. For now, I support just two dimentions and boxes. 
-        """
-        umbrellas = []
-        
-        # the stride is a list of the spacing of the centers of each box in each axis
-        stride = [(umbs[0][1] - umbs[0][0]) / umbs[0][2], (umbs[1][1] - umbs[1][0]) / umbs[1][2]]
-        
-        for i in range(umbs[0][2]): 
-            for j in range(umbs[1][2]):
-                center = [umbs[0][0] + stride[0]*i + stride[0] / 2.0, umbs[1][0] + stride[1]*j + stride[1] / 2.0]
-                width = [umbs[0][3], umbs[1][3]]
-                umbrellas.append(Box(center, width))
-        
-        return umbrellas
-     
+        We create a grid of Umbrellas on the collective variable space.  Each collective variable is divided by evenly spaced umbrellas.
+        It takes in as input:
+            Params          A dictionary, which includes parameters which specify how to manipulate the collective parameters.
+                                Currently, the following keywords are implemented:
+                                    cvrangeN        Here, N is some integer, e.g. cvrange1, or cvrange2.
+                                                        cvrange should have a value of a string of 4 scalars, separated by a comma, e.g. "-180,180,12,30"
+                                                        These represent (respectively) the min and max values of the collective variable, the number of breaks in that axs, and 1/2 the width of the umbrella.
+                                Theoretically, you can pass it the sysParams array in the main statement, and it should work.  However, this might be an unsafe practice.
+                                It might be better to collect the collective variable params somewhere else, and just pass those as an argument.
+        The function should return:
+            um               A list of umbrella objects which cover the space of all the collective variables.
     
+        """
+        assert type(colVarParams) is np.ndarray, "The colvars array passed is not of the correct type."
+        
+        assert basisType in ['Box', 'Gaussian', 'Pyramid']
+        
+        # We check if the user provided any input to wrap the basis functions.
+        if 'wrapping' is None:
+            wrapping=np.zeros(len(colVarParams))
+        
+        # We make the following three lists:
+        #       rangelist, a list where element i is a list of all the possible center values for 
+        #                   collective variable i
+        #       widthlist, a list where each element is the width of the Box in that dimension
+        #       divisions, a list where element i is the number of divisions in collective variable i.
+        centersList=[]
+        widthlist=[]
+        divisions=[]
+        # We also create the boxwrap array.  This array will give the domain of each wrapping collective variable.
+        # For example, it would contain 360 for an angle going from -180 to 180 degrees.
+        boxwrap=[]
+        for cvindex in xrange(len(colVarParams)):
+            doeswrap = (wrapping[cvindex] != 0.0)
+            v=colVarParams[cvindex]
+            # We make an evenly spaced array containing all the points along a collective coordinate 
+            # where we want to center a box.  We will have to do this differently idepending on whether
+            # the coordinate wraps around:  the reason for this is that if the coordinate wraps around,
+            # we will want overlap over the boundaries.
+            if doeswrap:
+                c1=(np.linspace(v[0],v[1],v[2]+1))
+                centersList.append([(c1[i]+c1[i+1])/2 for i in xrange(len(c1)-1)])
+                boxwrap.append(v[1]-v[0])
+            else:
+                isIncreasing=v[1]>v[0]
+                if isIncreasing:
+                    centersList.append(np.linspace(v[0]+v[3],v[1]-v[3],v[2]))
+                else:
+                    centersList.append(np.linspace(v[0]-v[3],v[1]+v[3],v[2]))
+                boxwrap.append(0.0)
+            widthlist.append(v[3])
+            divisions.append(v[2])
+        # We define some constants which will be useful:  the number of umbrellas numum, and the
+        # cumulative product of the number of divisions for each successive collective variable, numthingie
+        # (It's important for integer rounding)
+        numum=np.product(divisions)
+        numheirarchy=np.flipud(np.cumprod(np.flipud(divisions)))
+        
+        # We create the boxwrap array.  This array will give the domain of each wrapping collective variable.
+        # For example, it would contain 360 for an angle going from -180 to 180 degrees.
+        
+        # We make um, the list of all our partition function objects.
+        um=[]
+        for i in xrange(int(numum)):
+            umbrellaCoord=[]
+            # We loop through the collective coordinates.
+            for j in xrange(len(divisions)):
+                # We figure out which center to use for the box, using integer rounding tricks and 
+                # modular arithmetic.
+                centerindex=int(np.floor(numheirarchy[j]*i/(numum))%divisions[j])
+                umbrellaCoord.append(centersList[j][centerindex])
+            # We make da box.
+            wraparray=np.array(boxwrap)
+            # We check if any elements of wraparray are nonzero.
+            if wraparray.any():
+   	        if basisType == "Box":
+   	            um.append(basisFunctions.Box(umbrellaCoord,widthlist,boxwrap))
+   	        elif basisType == "Gaussian":
+   	            um.append(basisFunctions.Gaussian(umbrellaCoord,widthlist,boxwrap))
+   	        elif basisType == "Pyramid":
+   	            um.append(basisFunctions.Pyramid(umbrellaCoord,widthlist,boxwrap))
+            else:
+   	        if basisType =="Box":
+  		    um.append(basisFunctions.Box(umbrellaCoord,widthlist))
+   	        elif basisType == "Gaussian":
+                    um.append(basisFunctions.Gaussian(umbrellaCoord,widthlist))
+                elif basisType == "Pyramid":
+                    um.append(basisFunctions.Pyramid(umbrellaCoord,widthlist))
+                    
+        # if we specify to build a neighborlist for the windows, let's build it here. 
+        L = np.zeros(len(colVarParams))
+        for i in range(len(L)):
+            if wrapping[i] == 1:
+                L[i] = colVarParams[i][1] - colVarParams[i][0]
+            else:
+                L[i] = -1.0
+        
+        if neighborList:
+            self.buildNeighborList(L, um)
+    
+        return um
+
+    def buildKeylistIndexMap(self, keylist):
+        """
+        This routine takes the input keylist and constructs internal dictionaries that convert between indicies of F
+        and elements of the keylist.
+        """
+        # lets put the keylist in the partition object
+        self.keylist = keylist
+
+        # these dictionaries convert between the index of F and the key
+        self.key_to_index = {}
+        self.index_to_key = {}
+
+        # populate the dictionaries
+        for i,key in enumerate(keylist):
+            self.key_to_index[key] = i
+            self.index_to_key[i] = key
+
+        return 0
+
+    def communicateMPI(self, rank, comm, sparseSolve=False, debug=False):
+        """
+        This routine performs a round of MPI communication to synchronize information across all ranks.
+
+        Let's note here that there is a sequence of communication / computation that takes place in this section.
+        Therefore it makes the most sense to interleave the two components here.
+
+        It should be noted that this being a initial version of the parallel neus code, an optimization of the
+        MPI communication could be implemented at a later date.
+        """
+
+        """
+        Step 1) Communication of M as an all reduce
+        """
+
+        # first we need to communicate the M matricies in which we've accumulated transition statistics
+
+        # now reduce the M matrix at root, first making a send buffer,
+        self.Mbuff = copy.deepcopy(self.M)
+        comm.Allreduce([self.Mbuff, MPI.DOUBLE], [self.M, MPI.DOUBLE], op=MPI.SUM)
+
+        # now we should all reduce the
+        self.buff = copy.deepcopy(self.active_windows)
+        comm.Allreduce([self.buff, MPI.BOOL], [self.active_windows, MPI.BOOL], op=MPI.LOR)
+
+        if rank == 0: print rank, "after", self.active_windows.sum()
+
+        """
+        Step 2) solution of the eigenvalue problem at each rank
+        """
+        # at rank, update F and compute z
+        for row in range(self.F.shape[0]):
+            if self.nsamples_M[row] > 0:
+                self.updateF(row)
+
+        self.computeZ(sparseSolve=sparseSolve)
+
+        if rank == 0: print self.z
+
+        """
+        Step 3) estimation of observables on each rank
+        """
+        self.computeObservables()
+
+        """
+        Step 4) all reduction of averaged observables to each processor
+        """
+
+        for obs in self.observables:
+            self.lbuff = copy.deepcopy(obs.data)
+            comm.Allreduce([self.lbuff, MPI.DOUBLE], [obs.data, MPI.DOUBLE], op=MPI.SUM)
+
+            self.lbuff = copy.deepcopy(obs.weights)
+            comm.Allreduce([self.lbuff, MPI.DOUBLE], [obs.weights, MPI.DOUBLE], op=MPI.SUM)
+
+            # normalize by the weights for nonzero weights only
+            obs.data[obs.weights.astype(bool)] /= obs.weights[obs.weights.astype(bool)]
+
+        if debug: print self.observables[0].data, rank
+
+
+        return 0
+

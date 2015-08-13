@@ -19,15 +19,9 @@ add a new subclass defining that particular basis function.
 """
 
 import numpy as np
-from scipy import linalg as LA
 import scipy as sp
-import fileIO
-import sys
-import walker
-#import acor
-import errors
 import random
-import h5py
+import copy
 
 class basisFunction:
     """
@@ -55,60 +49,159 @@ class basisFunction:
         
         # get the last sample in the list
         lastSample = self.samples.pop()
-        #lastBasisFunction = self.basisFnxTimeSeries.pop()
-        #lastConfig = self.configs.pop() 
-        
-        # write out the remaining data structure
-        with h5py.File(filename + ".hdf5", "a") as f_handle:
-            # check to see if we've created a group for the colvars writes
-            if 'colvars' in f_handle:
-                # if so, add in a dataset for this flush
-                dset = f_handle['colvars'].create_dataset("cv_" + str(len(f_handle['colvars'].keys())), np.asarray(self.samples).shape, dtype="f")
-                # now write out the data to the data set
-                dset = self.samples
-            else:
-                # we'll need to create a group colvars fisrt
-                f_handle.create_group("colvars")
-                # now flush the dataset
-                dset = f_handle['colvars'].create_dataset("cv_" + str(len(f_handle['colvars'].keys())), np.asarray(self.samples).shape, dtype="f")
-                dset = self.samples
-         
-       
-        with open(filename + ".colvars", "a") as f_handle:
-            np.savetxt(f_handle, self.samples)
-        """
-        # write out the basis function time series as well            
-        with h5py.File(filename + ".hdf5", "a") as f_handle:
-            # check to see if we've created a group for the colvars writes
-            if 'timeSeries' in f_handle:
-                # if so, add in a dataset for this flush
-                dset = f_handle['timeSeries'].create_dataset("ts_" + str(len(f_handle['timeSeries'].keys())), np.asarray(self.basisFnxTimeSeries).shape, dtype="f")
-                dset = self.basisFnxTimeSeries
-            else:
-                # we'll need to create a group colvars fisrt
-                f_handle.create_group("timeSeries")
-                # now flush the dataset
-                dset = f_handle['timeSeries'].create_dataset("ts_" + str(len(f_handle['timeSeries'].keys())), np.asarray(self.basisFnxTimeSeries).shape, dtype="f")
-                dset = self.basisFnxTimeSeries
-        # so now we will also cast text output files
-        with open(filename + ".timeSeries", "a") as f_handle:
-            np.savetxt(f_handle, self.basisFnxTimeSeries)
 
-        """
+        if filename is not None:
+            with open(filename + ".colvars", "a") as f_handle:
+                np.savetxt(f_handle, self.samples)
 
         # delete current reference to the list
         del self.samples
-        #del self.basisFnxTimeSeries
-        #del self.configs
             
         #now replace the data structure with the endpoint
         self.samples = [lastSample]
-        #self.basisFnxTimeSeries = [lastBasisFunction]
-        #self.configs = [lastConfig]
 
-        return 0 
-    
-     
+        return 0
+
+    def getEntryPoint(self, key = None):
+        """
+        This routine returns an entry point from the entry point.
+        """
+        if not hasattr(self, 'entryPoints'): raise Exception('Window has not initialized entry point library.')
+
+        if self.eptype == 'set':
+
+            EP = random.sample(self.entryPoints, 1)
+
+        elif self.eptype == 'dictionary':
+
+            if key is None: raise Exception('key was not provided to draw entry point.')
+
+            EP = random.sample(self.entryPoints[key], 1)
+
+        return EP[0]
+
+    def addEntryPoint(self, ep, key = None):
+        """
+        This routine adds a new entry point to the current list
+        """
+        if not hasattr(self, 'entryPoints'): raise Exception('Window has not initialized entry point library.')
+
+        if self.eptype is 'set':
+
+            self.entryPoints.add(ep)
+
+        elif self.eptype is 'dictionary':
+
+            if key is None: raise Exception('key was not provided to add entry point.')
+
+            self.entryPoints[key].add(ep)
+
+        return 0
+
+    def addNewEntryPoint(self, ep, key_from):
+        """
+        This routine add an entry point to the list of proposed entry points.
+        """
+        if not hasattr(self, 'newEntryPoints'): raise Exception('Window has not initialized new entry point library.')
+
+        self.newEntryPoints.add((ep, key_from))
+
+        return 0
+
+    def emptyNewEntryPoints(self):
+        """
+        This routine empties the new entry points data structure locally.
+        """
+
+        self.newEntryPoints.clear()
+
+        return 0
+
+    def initializeEntryPoints(self, eptype='set', keylist = None):
+        """
+        This routine initializes the entry point data structure in the umbrella.
+
+        The structure of the entry Point library is designed to be flexible as to how one wants to track entries from
+        neightbors. There are two schemes that are supported now. The first option is a single set containing all
+        entry points to this window (we're actually using the Python set structure). The second type is a dictionary
+        of sets. This allows one to group contributions to the entry point list for this window by assigning a key to
+        each neighbor and add/draw entry points from these separate sets by passing a key value to the respective add/draw
+        operations.
+
+        To construct the second type of structure you specify the key structure with a list of keys that define the
+        categories from which one can group entry points.
+        """
+
+        if eptype == 'set':
+
+            self.eptype = eptype
+
+            self.entryPoints = set()
+
+        elif eptype == 'dictionary':
+
+            self.eptype = eptype
+
+            self.entryPoints = {}
+
+            if keylist is None: print "WARNING: no keys were initialized in the entry point structure in this window."
+
+            for key in keylist:
+                self.entryPoints[key] = set()
+
+            self.keylist = keylist
+
+        else:
+            raise Exception('eptype was not understood.')
+
+        # now we need to create a deep copy called newEntryPoints
+        self.newEntryPoints = set()
+
+        return 0
+
+    def addLocalObserbale(self, obs):
+        """
+        This routine adds a local observable to this window.
+        """
+
+        self.local_observables.append(obs)
+
+        return 0
+
+    def removeLocalObservales(self):
+        """
+        This routine removes all local observables contained by this window.
+        """
+
+        self.local_observables = []
+
+        return 0
+
+    def getLocalObservales(self):
+        """
+        This routine returns a list of the local observables.
+        """
+
+        return self.local_observables
+
+    def getNumberOfEntryPoints(self, key=None):
+        """
+        This routine counts the size of the entrypoint library and returns it.
+        """
+        count = 0
+
+        if self.eptype == 'set':
+            count = len(self.entryPoints)
+        elif self.eptype == 'dictionary':
+            if key is None:
+                for key in self.entryPoints.keys():
+                    count += len(self.entryPoints[key])
+            else:
+                count = len(self.entryPoints[key])
+
+        return count
+
+
 class Box(basisFunction):
     """
     This class impements a rectangle in CV space. 
@@ -137,7 +230,8 @@ class Box(basisFunction):
         self.dimension = len(center)
       
         # set the radius to use for computing neighbors.
-        self.radius = np.max(self.width) * 2.0 * np.sqrt(2)
+        self.radius = np.sqrt(np.sum(self.width**2)) * 2.0
+        #self.radius = np.linalg.norm(self.width)**2
         self.neighborList = []
         
         
@@ -181,7 +275,7 @@ class Box(basisFunction):
         # create a distance vector
         distancevec = sp.asarray(coord) - sp.asarray(self.center)
         # if any collective variable is periodic, construct dr, the adjuct for minimum image convetion for the periodic cv's
-        if self.wrapping != None:
+        if self.wrapping is not None:
             # build dr 
             dr = np.zeros(distancevec.shape)
             # add values to dr if the CV wraps
@@ -239,4 +333,84 @@ class Gaussian(basisFunction):
         vals = np.exp(-(dist)**2/ (2.0*self.width**2))
         # return the product
         return np.prod(vals)
+
+
+class Pyramid(basisFunction):
+    """
+    This class implements a pyramidal basis function
+    - Erik 
+
+    """
+    def __init__(self, center, width, periodicLength = None):
+        """
+        Initializes the pyramid at a center, given a width in each dimension.
+        """
+        self.center = np.asarray(center)
+        self.width = np.asarray(width)
+        self.dimension = len(center)
+        self.radius = np.sqrt(np.sum(self.width**2))
+        
+        self.neighborList = []
+        
+        # for storing CV's and configs
+        self.samples = []
+        self.numSamples = 0
+        self.configs = []
+        
+        # We calculate the slope of the pyramid.
+        self.slopes = 1.0/self.width
+        
+        # We check if the box wraps around.
+        if periodicLength != None:
+            self.wrapping=np.asarray(periodicLength)
+        else:
+            self.wrapping = None
+        #print "Gaussian created at ", mu, " with stdev ", sig
+    
+            
+    def __call__(self, coord, umb):
+        """
+        Return the value of the basis function at this coordinate. 
+        """
+        # get sum of box indicators. 
+        if self.indicator(coord) == 0.0:
+            return 0.0
+        elif len(self.neighborList) > 0:
+            norm = 0.0
+            for i in self.neighborList:
+                norm += umb[i].indicator(coord)
+            
+            
+        else: 
+            norm = 0.0
+            for win in umb:
+                norm += win.indicator(coord)
+            
+        assert norm != 0.0
+        return self.indicator(coord) / norm
+            
+    def indicator(self, coord):
+        """
+        Return the value of the indicator of the box at this point.  This will be 1.0 if coord is contained inside the box, and 0.0 if it is not.
+        """
+        # create a distance vector
+        distancevec = np.asarray(coord) - np.asarray(self.center)
+        # if any collective variable is periodic, construct dr, the adjuct for minimum image convention for the periodic cv's
+        if self.wrapping is not None:
+            # build dr 
+            dr = np.zeros(distancevec.shape)
+            # add values to dr if the CV wraps
+            for i in xrange(len(self.wrapping)):
+                if self.wrapping[i] != 0.0:
+                    # This is an old trick from MD codes to find the minimum distance between two points.
+                    dr[i] = self.wrapping[i] * np.rint(distancevec[i]/self.wrapping[i])
+            # add min image vector
+            distancevec -= dr
+
+        # We calculate the value of 
+        psiparts = 1.0-self.slopes*np.abs(distancevec)
+         
+        # We remove negative entries and return the minimum value.
+        return min(psiparts.clip(min=0))
+
         
