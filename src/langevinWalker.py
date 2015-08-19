@@ -12,7 +12,7 @@ http://lammps.sandia.gov/doc/Section_python.html
 Here we will outline basic usage guides for the walker API usage in LAMMPS.
 """
 
-import random
+import random, copy
 from walker_base import walker
 import collectiveVariables
 import outputClass
@@ -51,6 +51,10 @@ class langevinWalker(walker):
 
         self.logFilename = logFilename
 
+        if inputFilename is not None:
+            from zuckerman_potential import U
+            self.U = U
+
         # walker index
         self.index = index
 
@@ -66,8 +70,8 @@ class langevinWalker(walker):
         self.equilCmds = []
 
         # set an initial array for coordinates and velocities
-        self.coordinates = np.array([0.0, 0.0, 0.0])
-        self.velocity = np.array([0.0, 0.0, 0.0])
+        self.coordinates = np.array([0.0])
+        self.velocity = np.array([0.0])
 
 
 
@@ -136,53 +140,7 @@ class langevinWalker(walker):
         """
         #print "Equilibrating walker."
 
-        assert len(center) == len(restraint), "The dimension of the center array and the restraint array do not match."
-        assert len(center) == len(self.colvars), "The dimension of the center array and the number of collective variables do not match."
-
-
-        # first enter the restraints based on computes data structure
-        restCommand = "fix REST all restrain "
-
-        # here we apply the constraints based on the collective variable definition
-        # check to make sure we have collective variables defined.
-        if len(self.colvars) == 0:
-            print "There are no collective variables defined in walker " + str(self.index)
-            print "Aborting equilibration of walker " + str(self.index)
-            return 0
-
-        # let's get a string representation of the colvars, it's friendly
-        """
-        cv = []
-        for entry in self.colvars:
-            cv.append(map(str, entry))
-        """
-        # now loop through each
-        for index, entry in enumerate(self.colvars):
-            if entry.type == 'dihedral':
-                #restCommand += " " + entry.type + " " + " ".join(map(str, entry.atomIDs)) + " " + " ".join(map(str, restraint[index])) + " " + str(center[index])
-                restCommand += " " + entry.type + " " + " ".join(map(str,entry.atomIDs)) + " " + " ".join(map(str, restraint[index])) + " " + str(center[index] + 180.0)
-            else:
-                restCommand += " " + entry.type + " " + " ".join(map(str, entry.atomIDs)) + " " + " ".join(map(str, restraint[index])) + " " + str(center[index])
-
-        # now issue restraint definition to the lammps object
-        self.command(restCommand)
-
-        self.command("fix_modify REST energy yes")
-
-        # now run the equilibration dynamics
-        self.command("run " + str(numSteps) + " post no")
-
-        """
-        # apply SHAKE if used
-        if self.shakeH:
-            self.lmp.command("fix 10 all shake 0.0001 500 0 m 1.008")
-        """
-
-        # now remove constraints for subsequent dynamics
-        self.command("unfix REST")
-
-        # this resets the dynamics environment after the equilibration run
-        self.command("run 0 post no")
+        self.setConfig(center)
 
         return 0
 
@@ -190,7 +148,7 @@ class langevinWalker(walker):
         """
         This function returns the current position of the simulation.
         """
-        config = self.coordinates
+        config = copy.deepcopy(self.coordinates)
 
         return config
 
@@ -198,7 +156,7 @@ class langevinWalker(walker):
         """
         This function returns the current velocities from the LAMMPS simulation.
         """
-        vel = self.velocity
+        vel = copy.deepcopy(self.velocity)
 
         return vel
 
@@ -209,7 +167,7 @@ class langevinWalker(walker):
 
         if self.velocity.shape != vel.shape: raise Exception('The velocity provided is not the correct dimension.')
 
-        self.velocity = vel
+        self.velocity = copy.deepcopy(vel)
 
         return 0
 
@@ -223,12 +181,11 @@ class langevinWalker(walker):
 
         # now get cv's one by one from each compute defined
         for cv in self.colvars:
-            if cv.type in ['x', 'y', 'z', 'vx', 'vy', 'vz']:
-                cvarray.append(self.lmp.extract_compute(cv.name, 1, 1)[0])
+            cvarray.append(self.coordinates)
 
         assert len(cvarray) == len(self.colvars), "Not all collective variables were added."
 
-        return cvarray
+        return copy.deepcopy(cvarray)
 
     def setConfig(self, config):
         """
@@ -237,7 +194,7 @@ class langevinWalker(walker):
 
         if self.coordinates.shape != config.shape: raise Exception('The coordinates array provided is not the correct dimension.')
 
-        self.coordinates = config
+        self.coordinates = copy.deepcopy(config)
 
         return 0
 
@@ -245,13 +202,6 @@ class langevinWalker(walker):
         """
         This function redraws the velocities from a maxwell-boltzmann dist.
         """
-        if seed is None:
-            seed = random.randint(100000,999999)
-
-        if distType == 'gaussian':
-            self.command("velocity all create " + str(temperature) + " " + str(seed) + " dist gaussian")
-        else:
-            print "The drawVel() routine was passed a distribution Type that was not understood."
 
         return 0
 
@@ -260,27 +210,23 @@ class langevinWalker(walker):
         This function reverses the velocities of a given LAMMPS simulation
         """
 
-        # set varibales for reversing velocities
-        self.command("variable vx atom -vx")
-        self.command("variable vy atom -vy")
-        self.command("variable vz atom -vz")
-
-        # set new velocities
-        self.command("velocity all set v_vx v_vy v_vz")
-
-        self.propagate(0, pre='yes')
-
         return 0
 
-    def propagate(self, numSteps, pre='no', post='no'):
+    def propagate(self, numSteps, pre='yes', post='no'):
         """
         This function issues a run command to the underlying dynamics to propagate
         the dynamics a given number of steps.
         """
 
         for i in range(numSteps):
-            self.coordinates += 1
-            self.time +=
+            # generate proposal dx in [-pi/2, pi/2]
+            dx = (np.pi/2.0) * (random.random()*2 - 1)
+
+            rand_val = random.random()
+
+            if rand_val < min(1.0, np.exp(-self.U(self.coordinates+dx))/ np.exp(-self.U(self.coordinates))):
+                self.coordinates += dx
+
 
         return 0
 
@@ -288,40 +234,6 @@ class langevinWalker(walker):
         """
         This routine sets the dynamics for the walker.
         """
-        __knownDynamics__ = ['langevin']
-
-        assert dynamics_instance.type in __knownDynamics__, "Dynamics instance type was not recognized."
-
-        # first we should check to see if there is already a dynamics defined.
-        if self.dynamics is not None:
-            # if there is a dynamics already present, remove it's fixes from LAMMPS
-            for item in self.dynamics.fixes:
-                self.command("unfix " + item)
-
-        # now replace with new dynamics instance
-        self.dynamics = dynamics_instance
-
-        self.dynamics.fixes = []
-
-        # and set the required fixes
-        if self.dynamics.type is 'langevin':
-            # send the fixes to the underlying lammps object
-            self.command("fix 1 all nve")
-            if self.dynamics.seed is None:
-                self.command("fix 2 all langevin " + " ".join([str(self.dynamics.temperature), str(self.dynamics.temperature)]) + " " + str(self.dynamics.damping_coefficient) + " " + str(random.randint(100000, 999999)))
-            else:
-                self.command("fix 2 all langevin " + " ".join([str(self.dynamics.temperature), str(self.dynamics.temperature)]) + " " + str(self.dynamics.damping_coefficient) + " " + str(self.dynamics.seed))
-
-            # add the fixes to the internal list
-            self.dynamics.fixes.append("1")
-            self.dynamics.fixes.append("2")
-
-        # set shake
-        if self.dynamics.shake is True:
-            self.command("fix shk all shake 0.0001 20 0 m 1.0")
-            self.dynamics.fixes.append("shk")
-
-        self.propagate(0, pre='yes')
 
         return 0
 
@@ -336,9 +248,6 @@ class langevinWalker(walker):
         """
         This function sets the temperature of the walker object.
         """
-        self.dynamics.temperature = temp
-
-        self.setDynamics(self.dynamics)
 
         return 0
 
@@ -346,7 +255,6 @@ class langevinWalker(walker):
         """
         This routine sets the dynamics time step.
         """
-        self.dt = timestep
 
         return 0
 
