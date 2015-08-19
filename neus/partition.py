@@ -690,7 +690,7 @@ class partition:
 
         # now we should all reduce the
         self.buff = copy.deepcopy(self.active_windows)
-        comm.Allreduce([self.buff, MPI.BOOL], [self.active_windows, MPI.BOOL], op=MPI.LOR)
+        comm.Allreduce([self.buff, MPI.LOGICAL], [self.active_windows, MPI.LOGICAL], op=MPI.LOR)
 
         if rank == 0: print rank, "after", self.active_windows.sum()
 
