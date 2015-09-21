@@ -72,11 +72,13 @@ class partition:
         for a finite time problem. 
         """
 
-        temp_M = np.zeros(self.M[row].shape)
-
+       
+        temp_M = self.M[row]
+        """
         # update elements
         temp_M[:] = self.M[row,:] / self.nsamples_M[row]
         temp_M[row] = 1 - temp_M.sum()
+        """
 
         self.F[row] = (self.k[row] * self.F[row] + temp_M) / (self.k[row] + 1)
 
@@ -155,7 +157,7 @@ class partition:
 	    for infinite time process.
         """
         # let's compute a z only for the list of active windows
-        temp_F = self.F[self.active_windows, :][:, self.active_windows]
+        #temp_F = self.F[self.active_windows, :][:, self.active_windows]
 
         if sparseSolve:
             # compute via numpy interface to LAPACK the eigenvectors v and eigenvalues w
@@ -173,12 +175,15 @@ class partition:
 
         else:
                 
-            evals, evec = LA.eig(temp_F, left=True, right=False)
+            evals, evec = LA.eig(self.F, left=True, right=False)
             sort = np.argsort(evals)
             # normalize if needed.
 
-            self.z[self.active_windows] = evec[:,sort[-1]] / np.sum(evec[:,sort[-1]])
-            self.z[np.logical_not(self.active_windows)] = 0.0
+            #self.z[self.active_windows] = evec[:,sort[-1]] / np.sum(evec[:,sort[-1]])
+            #self.z[np.logical_not(self.active_windows)] = 0.0
+
+            self.z = evec[:,sort[-1]] / np.sum(evec[:,sort[-1]])
+            
 
 
         return 0
@@ -228,6 +233,7 @@ class partition:
         # zero out flux from i to i
         prob[i] = 0.0
 
+        """
         # now let's zero out any neighbors with potentially nonzero flux but no stored entry points
         for indx in range(prob.size):
             # lets get the key to this index
@@ -235,6 +241,7 @@ class partition:
             # check size of this neighbor specifically and zero out probability if zero
             if self.umbrellas[i].getNumberOfEntryPoints(key=key) == 0:
                 prob[indx] = 0.0
+        """
 
         # normalize probability
         assert prob.sum() > 0.0
@@ -244,6 +251,8 @@ class partition:
         I = np.random.choice(np.arange(prob.size), p=prob)
 
         # get the entry point from the umbrella window
+
+        assert self.umbrellas[i].getNumberOfEntryPoints(key=self.index_to_key[I])
 
         EP = self.umbrellas[i].getEntryPoint(self.index_to_key[I])
 
@@ -391,7 +400,13 @@ class partition:
         # record the number of samples taken here
         self.nsamples_M[umbrellaIndex] = numSteps
 
-        
+        # now we compute the estimate of the flux from thsi iteration
+        self.M[umbrellaIndex,umbrellaIndex] = numSteps - self.M[umbrellaIndex, :].sum()
+
+        self.M[umbrellaIndex, :] /= self.M[umbrellaIndex,:].sum()
+
+        if debug: print "row" ,umbrellaIndex, "of M:", self.M[umbrellaIndex,:]
+    
         if debug: print "Recorded",ntransitions,"transitions"
 
         return 0
@@ -688,23 +703,31 @@ class partition:
         self.Mbuff = copy.deepcopy(self.M)
         comm.Allreduce([self.Mbuff, MPI.DOUBLE], [self.M, MPI.DOUBLE], op=MPI.SUM)
 
-        # now we should all reduce the
+        # now we should all reduce the active windows
         self.buff = copy.deepcopy(self.active_windows)
         comm.Allreduce([self.buff, MPI.INT], [self.active_windows, MPI.INT], op=MPI.SUM)
 
-        if rank == 0: print rank, "after", self.active_windows.sum()
+        comm.Barrier()
+
+        #if rank == 0: print rank, "after", self.active_windows.sum()
 
         """
         Step 2) solution of the eigenvalue problem at each rank
         """
         # at rank, update F and compute z
+        
         for row in range(self.F.shape[0]):
-            if self.nsamples_M[row] > 0:
+            if self.M[row].sum() > 0.0:
                 self.updateF(row)
+
+
+        #if rank == 0: print self.z
 
         self.computeZ(sparseSolve=sparseSolve)
 
-        if rank == 0: print self.z
+        #if rank == 0: print self.z
+
+
 
         """
         Step 3) estimation of observables on each rank
