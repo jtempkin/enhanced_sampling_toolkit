@@ -157,7 +157,7 @@ class partition:
 	    for infinite time process.
         """
         # let's compute a z only for the list of active windows
-        #temp_F = self.F[self.active_windows, :][:, self.active_windows]
+        temp_F = self.F[self.active_windows, :][:, self.active_windows]
 
         if sparseSolve:
             # compute via numpy interface to LAPACK the eigenvectors v and eigenvalues w
@@ -228,10 +228,10 @@ class partition:
         current umbrella.
         """
         # let's get the current estimate of the flux
-        prob = self.z * self.F[:,i]
+        #prob = self.z * self.F[:,i]
 
         # zero out flux from i to i
-        prob[i] = 0.0
+        #prob[i] = 0.0
 
         """
         # now let's zero out any neighbors with potentially nonzero flux but no stored entry points
@@ -244,17 +244,17 @@ class partition:
         """
 
         # normalize probability
-        assert prob.sum() > 0.0
-        prob /= prob.sum()
+        #assert prob.sum() > 0.0
+        #prob /= prob.sum()
 
         # now choose neighbor proportional to prob 
-        I = np.random.choice(np.arange(prob.size), p=prob)
+        #I = np.random.choice(np.arange(prob.size), p=prob)
 
         # get the entry point from the umbrella window
 
-        assert self.umbrellas[i].getNumberOfEntryPoints(key=self.index_to_key[I])
+        #assert self.umbrellas[i].getNumberOfEntryPoints(key=self.index_to_key[I])
 
-        EP = self.umbrellas[i].getEntryPoint(self.index_to_key[I])
+        EP = self.umbrellas[i].getEntryPoint(self.index_to_key[i])
 
         # you should pass this argument as a ctypes array for now
         wlkr.setConfig(EP.config)
@@ -702,10 +702,6 @@ class partition:
         # now reduce the M matrix at root, first making a send buffer,
         self.Mbuff = copy.deepcopy(self.M)
         comm.Allreduce([self.Mbuff, MPI.DOUBLE], [self.M, MPI.DOUBLE], op=MPI.SUM)
-
-        # now we should all reduce the active windows
-        self.buff = copy.deepcopy(self.active_windows)
-        comm.Allreduce([self.buff, MPI.INT], [self.active_windows, MPI.INT], op=MPI.SUM)
 
         comm.Barrier()
 

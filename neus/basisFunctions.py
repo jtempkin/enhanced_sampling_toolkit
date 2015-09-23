@@ -80,6 +80,17 @@ class basisFunction:
 
         return EP[0]
 
+    def updateEntryPointsFluxes(self, flux):
+        """
+        This routine updates the sizes of the discretization of the entry point flux lists based on the maximum size of the entry point buffer.
+        """
+
+        # now build a collection of points whose composition is constructed based on the current estimate of the flux. 
+
+         
+
+        return 0 
+
     def addEntryPoint(self, ep, key = None):
         """
         This routine adds a new entry point to the current list
@@ -88,7 +99,12 @@ class basisFunction:
 
         if self.eptype is 'set':
 
-            self.entryPoints.add(ep)
+            if len(self.entryPoints) > self.max_entrypoints:
+                discard = self.entryPoints.pop()
+                self.entryPoints.add(ep)
+
+            else: 
+                self.entryPoints.add(ep)
 
         elif self.eptype is 'dictionary':
 
@@ -206,7 +222,7 @@ class Box(basisFunction):
     """
     This class impements a rectangle in CV space. 
     """
-    def __init__(self, center, width, periodicLength = None):
+    def __init__(self, center, width, periodicLength = None, max_entrypoints = 1000):
         """
         Initialize the box object.
         This takes as input:
@@ -233,6 +249,7 @@ class Box(basisFunction):
         self.radius = np.sqrt(np.sum(self.width**2)) * 2.0
         #self.radius = np.linalg.norm(self.width)**2
         self.neighborList = []
+        self.max_entrypoints = max_entrypoints
         
         
         # for storing CV's and configs
@@ -295,7 +312,7 @@ class Gaussian(basisFunction):
     """
     This class implements a Gaussian function. 
     """
-    def __init__(self, mu, sig):
+    def __init__(self, mu, sig, max_entrypoints = 1000):
         """
         Initializes a Gaussian at a point with a given width in each dimension. 
         """
@@ -309,6 +326,7 @@ class Gaussian(basisFunction):
         self.configs = []
         # stores the dimension of the CV space. 
         self.dimension = self.center.size
+        self.max_entrypoints = max_entrypoints
         
         #print "Gaussian created at ", mu, " with stdev ", sig
         
@@ -341,14 +359,21 @@ class Pyramid(basisFunction):
     - Erik 
 
     """
-    def __init__(self, center, width, periodicLength = None):
+    def __init__(self, center, width, ref_center=None, ref_width=None, time=None, periodicLength = None, max_entrypoints = 1000):
         """
         Initializes the pyramid at a center, given a width in each dimension.
         """
         self.center = np.asarray(center)
         self.width = np.asarray(width)
+        self.ref_center = ref_center
+        self.ref_width = ref_width
+        # if we get passed a time boundary, let's save the start and end points
+        if time is not None:
+            self.time_start = time[0]
+            self.time_end = time[1]
         self.dimension = len(center)
         self.radius = np.sqrt(np.sum(self.width**2))
+        self.max_entrypoints = max_entrypoints
         
         self.neighborList = []
         
@@ -372,15 +397,15 @@ class Pyramid(basisFunction):
         """
         Return the value of the basis function at this coordinate. 
         """
-        # get sum of box indicators. 
+        # get sum of box indicators for 
         if self.indicator(coord) == 0.0:
             return 0.0
+
         elif len(self.neighborList) > 0:
             norm = 0.0
             for i in self.neighborList:
                 norm += umb[i].indicator(coord)
-            
-            
+
         else: 
             norm = 0.0
             for win in umb:
