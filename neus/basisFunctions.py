@@ -76,20 +76,45 @@ class basisFunction:
 
             if key is None: raise Exception('key was not provided to draw entry point.')
 
-            EP = random.sample(self.entryPoints[key], 1)
+            #EP = random.sample(self.entryPoints[key], 1)
+            EP = random.sample(self.entryPointsList, 1)
 
         return EP[0]
 
-    def updateEntryPointsFluxes(self, flux):
+    def updateEntryPointsFluxes(self, flux, key_map, flush=False):
         """
         This routine updates the sizes of the discretization of the entry point flux lists based on the maximum size of the entry point buffer.
+
+        The flush keyword moves all stored points to the active buffer regardless of the fluxes
         """
+
+        assert self.eptype == 'dictionary'
+
+        self.entryPointsList.clear()
 
         # now build a collection of points whose composition is constructed based on the current estimate of the flux. 
 
-         
+        for i in xrange(flux.size):
+            size = int(self.max_entrypoints * flux[i])
+            if size == 0: 
+                continue
+
+            self.entryPointsList = self.entryPointsList.union(random.sample(self.entryPoints[key_map[i]], min(size, len(self.entryPoints[key_map[i]]) ) ))
 
         return 0 
+
+    def flushAllToBuffer(self):
+        """
+        This routine adds all entry points to the selection buffer regardless of the fluxes.
+        """
+        assert self.eptype == 'dictionary'
+
+        self.entryPointsList.clear()
+    
+        for key in self.entryPoints.keys():
+            self.entryPointsList = self.entryPointsList.union(self.entryPoints[key])
+
+        return 0
 
     def addEntryPoint(self, ep, key = None):
         """
@@ -110,7 +135,14 @@ class basisFunction:
 
             if key is None: raise Exception('key was not provided to add entry point.')
 
-            self.entryPoints[key].add(ep)
+            #self.entryPoints[key].add(ep)
+
+            if len(self.entryPoints[key]) > self.max_entrypoints:
+                discard = self.entryPoints[key].pop()
+                self.entryPoints[key].add(ep)
+
+            else: 
+                self.entryPoints[key].add(ep)
 
         return 0
 
@@ -167,6 +199,8 @@ class basisFunction:
 
             self.keylist = keylist
 
+            self.entryPointsList = set()
+
         else:
             raise Exception('eptype was not understood.')
 
@@ -213,7 +247,8 @@ class basisFunction:
                 for key in self.entryPoints.keys():
                     count += len(self.entryPoints[key])
             else:
-                count = len(self.entryPoints[key])
+                #count = len(self.entryPoints[key])
+                count = len(self.entryPointsList)
 
         return count
 
@@ -222,7 +257,7 @@ class Box(basisFunction):
     """
     This class impements a rectangle in CV space. 
     """
-    def __init__(self, center, width, periodicLength = None, max_entrypoints = 1000):
+    def __init__(self, center, width, periodicLength = None, max_entrypoints = 10000):
         """
         Initialize the box object.
         This takes as input:
@@ -312,7 +347,7 @@ class Gaussian(basisFunction):
     """
     This class implements a Gaussian function. 
     """
-    def __init__(self, mu, sig, max_entrypoints = 1000):
+    def __init__(self, mu, sig, max_entrypoints = 10000):
         """
         Initializes a Gaussian at a point with a given width in each dimension. 
         """
@@ -359,7 +394,7 @@ class Pyramid(basisFunction):
     - Erik 
 
     """
-    def __init__(self, center, width, ref_center=None, ref_width=None, time=None, periodicLength = None, max_entrypoints = 1000):
+    def __init__(self, center, width, ref_center=None, ref_width=None, time=None, periodicLength = None, max_entrypoints = 500):
         """
         Initializes the pyramid at a center, given a width in each dimension.
         """
