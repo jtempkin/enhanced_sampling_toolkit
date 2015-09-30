@@ -98,6 +98,8 @@ class basisFunction:
             size = int(self.max_entrypoints * flux[i])
             if size == 0: 
                 continue
+            if size > self.max_entrypoints:
+                size = self.max_entrypoints
 
             self.entryPointsList = self.entryPointsList.union(random.sample(self.entryPoints[key_map[i]], min(size, len(self.entryPoints[key_map[i]]) ) ))
 
