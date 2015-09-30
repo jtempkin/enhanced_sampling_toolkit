@@ -267,7 +267,7 @@ class partition:
 
         return 0
 
-    def getBasisFunctionValues(self, coord, umbrella_index = None):
+    def getBasisFunctionValues(self, wlkr, umbrella_index = None):
         """
         This function takes a point in collective variable space and returns 
         an array of the value of the basis functions at that point. 
@@ -276,19 +276,21 @@ class partition:
         """
         # build an array 
         indicators = np.zeros(len(self.umbrellas))
+
+        coord = wlkr.getColvars()
         
         if umbrella_index is None:
     	
             # go through the basis functions and construct the indicators array
-            for i in range(len(self.umbrellas)):
+            for i in xrange(len(self.umbrellas)):
                 if self.umbrellas[i].indicator(coord) == 0.0:
                     continue
                 else:
-                    indicators[i] = self.umbrellas[i].indicator(coord)
+                    indicators[i] = self.umbrellas[i](wlkr, self.umbrellas)
                     
         elif len(self.umbrellas[umbrella_index].neighborList) == 0: 
             # go through the basis functions and construct the indicators array
-            for i in range(len(self.umbrellas)):
+            for i in xrange(len(self.umbrellas)):
                 if self.umbrellas[i].indicator(coord) == 0.0:
                     continue
                 else:
@@ -304,10 +306,14 @@ class partition:
                 
             # if we don't find any support, let's try this again and search the whole space. 
             if np.sum(indicators) == 0.0:
-                indicators = self.getBasisFunctionValues(coord, umbrella_index=None)
+                indicators = self.getBasisFunctionValues(wlkr, umbrella_index=None)
                 
         # normalize the values of the basis functions
-        assert np.sum(indicators) != 0.0
+        if np.sum(indicators) == 0.0:
+            print wlkr.getColvars()
+            print wlkr.simulationTime
+            print wlkr.Y_s
+        assert np.sum(indicators) != 0.0, str(wlkr.getColvars())
         indicators = indicators / np.sum(indicators)
         
         return indicators
@@ -353,18 +359,19 @@ class partition:
             # if we do, we reset the Y ( [t / s] * s) value to the current point
             if corrLength is not None:
                 if (wlkr.simulationTime % corrLength) == 0.0:
-                    wlkr.Y_s = (wlkr.getConfig(), wlkr.getVel())
+                    wlkr.Y_s = (wlkr.getConfig(), wlkr.getVel(), wlkr.getColvars())
+                    wlkr.simulationTime = 0.0
             
             # get the new sample position
             new_sample = wlkr.getColvars()
             self.umbrellas[umbrellaIndex].samples.append(new_sample)
 
             # check for a transition out of this index
-            if self.umbrellas[umbrellaIndex].indicator(new_sample) == 0.0:
+            if self.umbrellas[umbrellaIndex](wlkr, self.umbrellas) == 0.0:
                 if debug: ntransitions += 1 
                 # choose the new j with probability {psi_0, ..., psi_N}
 
-                indicators = self.getBasisFunctionValues(new_sample)
+                indicators = self.getBasisFunctionValues(wlkr)
             
                 # record a transition to the matrix
                 self.M[umbrellaIndex,:] += indicators
@@ -377,6 +384,7 @@ class partition:
                 newEP.Y_s = wlkr.Y_s
 
                 for indx in ep_targets:
+                    #if not self.active_windows[indx]: print "added entry point", indx
                     self.umbrellas[indx].addNewEntryPoint(newEP, self.index_to_key[umbrellaIndex])
 
                 # drop the last point from the samples 
@@ -404,6 +412,11 @@ class partition:
         self.M[umbrellaIndex,umbrellaIndex] = numSteps - self.M[umbrellaIndex, :].sum()
 
         self.M[umbrellaIndex, :] /= self.M[umbrellaIndex,:].sum()
+
+        # here we will store the current position of the walker in an entry point structure
+        newEP = entryPoints.entryPoints(wlkr.getConfig(), wlkr.getVel(), wlkr.simulationTime)
+        newEP.Y_s = wlkr.Y_s
+        self.umbrellas[umbrellaIndex].walker_restart = newEP
 
         if debug: print "row" ,umbrellaIndex, "of M:", self.M[umbrellaIndex,:]
     
@@ -559,7 +572,7 @@ class partition:
         # Note that this is returns in ln (log base e), not log base 10.
         return logpji
 
-    def createUmbrellas(self, colVarParams, wrapping, basisType="Box", neighborList=True):
+    def createUmbrellas(self, colVarParams, wrapping, basisType="Box", neighborList=True, max_entryPoints = 500):
         """
         We create a grid of Umbrellas on the collective variable space.  Each collective variable is divided by evenly spaced umbrellas.
         It takes in as input:
@@ -641,14 +654,14 @@ class partition:
    	        elif basisType == "Gaussian":
    	            um.append(basisFunctions.Gaussian(umbrellaCoord,widthlist,boxwrap))
    	        elif basisType == "Pyramid":
-   	            um.append(basisFunctions.Pyramid(umbrellaCoord,widthlist,boxwrap))
+   	            um.append(basisFunctions.Pyramid(umbrellaCoord,widthlist,boxwrap,max_entryPoints))
             else:
    	        if basisType =="Box":
   		    um.append(basisFunctions.Box(umbrellaCoord,widthlist))
    	        elif basisType == "Gaussian":
                     um.append(basisFunctions.Gaussian(umbrellaCoord,widthlist))
                 elif basisType == "Pyramid":
-                    um.append(basisFunctions.Pyramid(umbrellaCoord,widthlist))
+                    um.append(basisFunctions.Pyramid(umbrellaCoord,widthlist,max_entryPoints))
                     
         # if we specify to build a neighborlist for the windows, let's build it here. 
         L = np.zeros(len(colVarParams))

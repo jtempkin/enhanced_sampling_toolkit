@@ -293,7 +293,7 @@ class Box(basisFunction):
         self.configs = []
         
         # if the cv is periodic, build a wrapping array 
-        if periodicLength != None:
+        if periodicLength is not None:
             self.wrapping = np.asarray(periodicLength)
         else:
             # set to the default value of None if not periodic
@@ -406,9 +406,12 @@ class Pyramid(basisFunction):
         if time is not None:
             self.time_start = time[0]
             self.time_end = time[1]
+        else:
+            self.time_start = None
         self.dimension = len(center)
         self.radius = np.sqrt(np.sum(self.width**2))
         self.max_entrypoints = max_entrypoints
+        self.walker_restart = None
         
         self.neighborList = []
         
@@ -421,17 +424,21 @@ class Pyramid(basisFunction):
         self.slopes = 1.0/self.width
         
         # We check if the box wraps around.
-        if periodicLength != None:
+        if periodicLength is not None:
             self.wrapping=np.asarray(periodicLength)
         else:
             self.wrapping = None
         #print "Gaussian created at ", mu, " with stdev ", sig
     
             
-    def __call__(self, coord, umb):
+    def __call__(self, wlkr, umb):
         """
         Return the value of the basis function at this coordinate. 
         """
+        coord = wlkr.getColvars()
+        ref_coord = wlkr.Y_s[2]
+        time = wlkr.simulationTime
+
         # get sum of box indicators for 
         if self.indicator(coord) == 0.0:
             return 0.0
@@ -447,7 +454,16 @@ class Pyramid(basisFunction):
                 norm += win.indicator(coord)
             
         assert norm != 0.0
-        return self.indicator(coord) / norm
+
+        if self.ref_center is not None:
+            norm *= self.refIndicator(ref_coord)
+        if self.time_start is not None:
+            norm *= self.timeIndicator(time)
+
+        if norm > 0.0:
+            return self.indicator(coord) / norm
+        else: 
+            return 0.0
             
     def indicator(self, coord):
         """
@@ -473,4 +489,42 @@ class Pyramid(basisFunction):
         # We remove negative entries and return the minimum value.
         return min(psiparts.clip(min=0))
 
-        
+    def refIndicator(self, coord):
+        """
+        Return the value of the indicator for the reference coordinates if appropriate.
+
+        NOTE: Currently we will simply implement the reference discretization as non-overlapping boxes. 
+        """
+        # create a distance vector
+        distancevec = sp.asarray(coord) - sp.asarray(self.ref_center)
+
+        # if any collective variable is periodic, construct dr, the adjuct for minimum image convetion for the periodic cv's
+        if self.wrapping is not None:
+
+            # build dr 
+            dr = np.zeros(distancevec.shape)
+
+            # add values to dr if the CV wraps
+            for i in xrange(len(self.wrapping)):
+                if self.wrapping[i] != 0.0:
+                    # This is an old trick from MD codes to find the minimum distance between two points.
+                    dr[i] = self.wrapping[i] * np.rint(distancevec[i]/self.wrapping[i])
+
+            # add min image vector
+            distancevec -= dr
+            
+        # We return 1.0 if all the distances are smaller than the width of the box from the center, 0.0 otherwise.
+        return float(np.prod(self.ref_width > np.abs(distancevec)))
+
+
+    def timeIndicator(self, coord):
+        """
+        Return the value of the indicator function for the time coordinate.
+
+        This will be implemented currently as non-overlapping discretization in time. 
+        """ 
+
+        if self.time_start <= coord < self.time_end:
+            return 1.0
+        else:
+            return 0.0
