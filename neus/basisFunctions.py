@@ -99,7 +99,11 @@ class basisFunction:
             if size == 0: 
                 continue
 
-            self.entryPointsList = self.entryPointsList.union(random.sample(self.entryPoints[key_map[i]], min(size, len(self.entryPoints[key_map[i]]) ) ))
+            nentries = min(len(self.entryPoints[key_map[i]]), size)
+
+            update_list = self.entryPoints[key_map[i]][0:nentries]
+
+            self.entryPointsList.update(update_list)
 
         return 0 
 
@@ -112,7 +116,7 @@ class basisFunction:
         self.entryPointsList.clear()
     
         for key in self.entryPoints.keys():
-            self.entryPointsList = self.entryPointsList.union(self.entryPoints[key])
+            self.entryPointsList.update(self.entryPoints[key])
 
         return 0
 
@@ -137,12 +141,16 @@ class basisFunction:
 
             #self.entryPoints[key].add(ep)
 
+            #print key
+
             if len(self.entryPoints[key]) > self.max_entrypoints:
-                discard = self.entryPoints[key].pop()
-                self.entryPoints[key].add(ep)
+                # if we're too large, pop the first (oldest) entry and add to the end
+                discard = self.entryPoints[key].pop(0)
+
+                self.entryPoints[key].append(ep)
 
             else: 
-                self.entryPoints[key].add(ep)
+                self.entryPoints[key].append(ep)
 
         return 0
 
@@ -192,10 +200,17 @@ class basisFunction:
 
             self.entryPoints = {}
 
-            if keylist is None: print "WARNING: no keys were initialized in the entry point structure in this window."
+            #if keylist is None: print "WARNING: no keys were initialized in the entry point structure in this window."
 
-            for key in keylist:
-                self.entryPoints[key] = set()
+            if len(self.neighborList) > 0:
+                for neighbor in self.neighborList:
+                    self.entryPoints[neighbor] = []
+            else:
+                for key in keylist:
+                    self.entryPoints[key] = []
+
+            #for key in keylist:
+                #self.entryPoints[key] = []
 
             self.keylist = keylist
 
@@ -251,7 +266,6 @@ class basisFunction:
                 count = len(self.entryPointsList)
 
         return count
-
 
 class Box(basisFunction):
     """
@@ -464,17 +478,20 @@ class Pyramid(basisFunction):
             return self.indicator(coord) / norm
         else: 
             return 0.0
-            
+
     def indicator(self, coord):
         """
         Return the value of the indicator of the box at this point.  This will be 1.0 if coord is contained inside the box, and 0.0 if it is not.
         """
         # create a distance vector
         distancevec = np.asarray(coord) - np.asarray(self.center)
+
         # if any collective variable is periodic, construct dr, the adjuct for minimum image convention for the periodic cv's
         if self.wrapping is not None:
+
             # build dr 
             dr = np.zeros(distancevec.shape)
+            
             # add values to dr if the CV wraps
             for i in xrange(len(self.wrapping)):
                 if self.wrapping[i] != 0.0:

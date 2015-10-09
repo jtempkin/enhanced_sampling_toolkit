@@ -291,10 +291,10 @@ class partition:
         elif len(self.umbrellas[umbrella_index].neighborList) == 0: 
             # go through the basis functions and construct the indicators array
             for i in xrange(len(self.umbrellas)):
-                if self.umbrellas[i].indicator(coord) == 0.0:
+                if self.umbrellas[i](wlkr, self.umbrellas) == 0.0:
                     continue
                 else:
-                    indicators[i] = self.umbrellas[i].indicator(coord)
+                    indicators[i] = self.umbrellas[i](wlkr, self.umbrellas)
         else:
             
             # make sure the partition has a neighborlist
@@ -302,7 +302,7 @@ class partition:
             # now loop over neighbors and populate the indicator
             for i in self.umbrellas[umbrella_index].neighborList:
                 
-                indicators[i] = self.umbrellas[i].indicator(coord)
+                indicators[i] = self.umbrellas[i](wlkr, self.umbrellas)
                 
             # if we don't find any support, let's try this again and search the whole space. 
             if np.sum(indicators) == 0.0:
@@ -446,12 +446,12 @@ class partition:
         # if something went wrong, raise an error 
         raise Exception("Something went wrong in the Metropolis Move Section. We don't know what.")
     
-    def buildNeighborList(self, L, umbrellas):
+    def buildNeighborList(self, umbrellas, s, debug=False):
         """
         This routine constructs a neighborlist based on the radius of the basis 
         function.
         
-        L is the vector specifying the box lengths in each dimension. 
+        L is the vector specifying the periodic lengths in each dimension. 
         """      
         # we should make sure that ever basisFunction has a radius defined. 
         for win in umbrellas:
@@ -462,12 +462,13 @@ class partition:
             # add the current window to it's own neighborList
             umbrellas[i].neighborList.append(i)
             # now search the other windows
+
             for j in range(i+1, len(umbrellas)):
                 # get the distance between the centers                    
                 dr = umbrellas[i].center - umbrellas[j].center
                 
                 # apply minimum image convention if the dimension wraps 
-                for indx,dim in enumerate(L):
+                for indx,dim in enumerate(umbrellas[i].wrapping):
                     if dim == -1.0: 
                         continue
                     else:
@@ -482,8 +483,26 @@ class partition:
                             
                 dist = np.linalg.norm(dr)
                 # append i,j to each other's list
-                
-                if dist <= (umbrellas[i].radius + umbrellas[j].radius):
+                #if dist <= 2.0 * (umbrellas[i].radius + umbrellas[j].radius):
+
+                i_start = umbrellas[i].time_start % s
+                i_end = umbrellas[i].time_end % s
+                j_start = umbrellas[j].time_start % s
+                j_end = umbrellas[j].time_end % s
+
+                # we should also check here that we connect in time as well.
+                if i_start == j_end:
+                    if debug: print "added pair:", i, umbrellas[i].center, umbrellas[i].time_start, umbrellas[i].time_end, j, umbrellas[j].center, umbrellas[j].time_start, umbrellas[j].time_end
+                    #umbrellas[j].neighborList.append(i)
+                    umbrellas[i].neighborList.append(j)
+
+                elif i_end == j_start:
+                    if debug: print "added pair:", i, umbrellas[i].center, umbrellas[i].time_start, umbrellas[i].time_end, j, umbrellas[j].center, umbrellas[j].time_start, umbrellas[j].time_end
+                    #umbrellas[i].neighborList.append(j)
+                    umbrellas[j].neighborList.append(i)
+
+                elif i_start == j_start:
+                    if debug: print "added pair:", i, umbrellas[i].center, umbrellas[i].time_start, umbrellas[i].time_end, j, umbrellas[j].center, umbrellas[j].time_start, umbrellas[j].time_end
                     umbrellas[i].neighborList.append(j)
                     umbrellas[j].neighborList.append(i)
     
