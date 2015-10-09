@@ -98,6 +98,8 @@ class basisFunction:
             size = int(self.max_entrypoints * flux[i])
             if size == 0: 
                 continue
+            if size > self.max_entrypoints:
+                size = self.max_entrypoints
 
             nentries = min(len(self.entryPoints[key_map[i]]), size)
 
