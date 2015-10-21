@@ -273,6 +273,94 @@ class dihedral_fluctuation_correlation:
 
         return 0
 
+class dihedral_fluctuation_correlation_2:
+    """
+    This routine returns the TCF of a dihedral angle. 
+    """
+    def __init__(self, name, s, stepLength, data, atomids, mean):
+        """
+        Constructor for the time fluctuation correlation function of a dihedral.
+        
+        NOTE: Step Length is the time between samples taken, not necessarily the time the walker advances each timestep. 
+        """
+        self.s = s
+        self.stepLength = stepLength
+        self.name = name
+        self.data = data
+        self.nsamples = np.zeros(data.shape)
+        self.weights = np.zeros(data.shape)
+        self.mean = mean
+        self.atomids = atomids
+
+    def __call__(self, wlkr):
+        """
+        This function takes the current position of the walker and updates the
+        local autocorrelation information using a fluctuation correlation function
+        i.e. < (A(0) - <A>) * (A(t) - <A>) > 
+        
+        """
+        # check to see that we are accumulating a value at a time when it is appropriate. return otherwise 
+        """
+        if wlkr.simulationTime % self.stepLength:     
+            return 0 
+        """
+        if not (wlkr.simulationTime - np.floor(wlkr.simulationTime / self.s) * self.s ) % (self.s / self.data.shape[0]) == 0.0:
+            return 0 
+        
+        time_indx = (wlkr.simulationTime - np.floor(wlkr.simulationTime / self.s) * self.s ) / (self.s / self.data.shape[0])
+        
+        time_indx = int(time_indx)
+        
+        # current colvars
+        config = wlkr.getConfig()
+
+        d1 = self.__get_dihedral__(config, self.atomids)
+
+        ref_config = wlkr.Y_s[0]
+
+        d2 = self.__get_dihedral__(ref_config, self.atomids)
+        
+        # now get the fluctuation correlation value 
+        temp_val = np.dot(d1 - self.mean, d2 - self.mean)
+
+        self.data[time_indx] = (self.data[time_indx] * self.nsamples[time_indx] + temp_val) / (self.nsamples[time_indx] + 1.0)
+        self.nsamples[time_indx] += 1.0
+
+        return 0
+
+    def __get_dihedral__(self, config, atomids):
+        """
+        A routine to compute a dihedral angle from a molecular configuration.
+
+        *** THIS IMPLEMENTATION IS NOT TESTED ***
+        """
+
+        xyz = np.reshape(config, (config.size/3, 3))
+
+        p1 = xyz[atomids[0] - 1]
+        p2 = xyz[atomids[1] - 1]
+        p3 = xyz[atomids[2] - 1]
+        p4 = xyz[atomids[3] - 1]
+
+        b1 = p2 - p1
+        b2 = p3 - p2
+        b3 = p4 - p3
+
+        n1 = np.cross(b1, b2)
+        n1 /= np.linalg.norm(n1)
+
+        n2 = np.cross(b2, b3)
+        n2 /= np.linalg.norm(n2)
+
+        m1 = np.cross(n1, b2 / np.linalg.norm(b2))
+
+        x = np.dot(n1, n2)
+        y = np.dot(m1, n2)
+
+        dihed = np.arctan2(x, y) * -180.0 / np.pi
+
+        return dihed
+
 
 class electric_field:
     """

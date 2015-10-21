@@ -205,6 +205,8 @@ class partition:
                 obs(wlkr)
             elif isinstance(obs, observables.dihedral_fluctuation_correlation):
                 obs(wlkr)
+            elif isinstance(obs, observables.dihedral_fluctuation_correlation_2):
+                obs(wlkr)
             elif isinstance(obs, observables.cv_indicator_correlation):
                 obs(wlkr)
             else:

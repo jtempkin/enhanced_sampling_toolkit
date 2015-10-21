@@ -453,6 +453,11 @@ class Pyramid(basisFunction):
         """
         coord = wlkr.getColvars()
         ref_coord = wlkr.Y_s[2]
+
+        # adjust for the current 
+        coord = coord[0:self.dimension]
+        ref_coord = coord[0:self.dimension]
+
         time = wlkr.simulationTime
 
         # get sum of box indicators for 
