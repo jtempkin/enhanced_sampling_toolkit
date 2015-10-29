@@ -427,7 +427,13 @@ class Pyramid(basisFunction):
         self.dimension = len(center)
         self.radius = np.sqrt(np.sum(self.width**2))
         self.max_entrypoints = max_entrypoints
+
+        # this parameter sets the last phase space point at each iteration
         self.walker_restart = None
+
+        # this sets the initial distribution at time zero
+        self.initial_distribution_prob = 0.0
+
         
         self.neighborList = []
         

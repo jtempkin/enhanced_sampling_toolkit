@@ -44,6 +44,7 @@ class partition:
         # initialize the matricies needed for the NEUS
         self.M = np.zeros((N,N))
         self.F = np.zeros((N,N))     
+        self.a = np.zeros(N)
         # we should track how many samples are taken in the M matrix
         self.nsamples_M = np.zeros(N)
         self.z = np.zeros(N)
@@ -63,7 +64,7 @@ class partition:
 
         self.active_windows = np.zeros(N, dtype=np.bool)
         
-    def updateF(self, row):
+    def updateF(self, row, epsilon):
         """
         This routine update G according to:
             
@@ -80,7 +81,8 @@ class partition:
         temp_M[row] = 1 - temp_M.sum()
         """
 
-        self.F[row] = (self.k[row] * self.F[row] + temp_M) / (self.k[row] + 1)
+        #self.F[row] = (self.k[row] * self.F[row] + temp_M) / (self.k[row] + 1)
+        self.F[row] = ((1-epsilon) * self.F[row] + epsilon * temp_M)
 
         self.k[row] += 1
 
@@ -143,7 +145,7 @@ class partition:
 
         return 0
 
-    def computeZ(self, sparseSolve=True):
+    def computeZ(self, sparseSolve=True, finiteTime=False):
         """
         Solves for z vector given current G,a via solving the following linear 
         system:
@@ -155,9 +157,24 @@ class partition:
             zG = z 
 
 	    for infinite time process.
+
+        A = (np.identity(self.G.shape[0]) - self.G).transpose()
+        
+        self.z = np.linalg.solve(A, self.a)
+
         """
         # let's compute a z only for the list of active windows
         temp_F = self.F[self.active_windows, :][:, self.active_windows]
+
+        if finiteTime:
+            A = (np.identity(self.F.shape[0]) - self.F).transpose()
+        
+            self.z = np.linalg.solve(A, self.a)
+
+            self.z /= self.z.sum()
+
+            return 0 
+
 
         if sparseSolve:
             # compute via numpy interface to LAPACK the eigenvectors v and eigenvalues w
@@ -256,7 +273,13 @@ class partition:
 
         #assert self.umbrellas[i].getNumberOfEntryPoints(key=self.index_to_key[I])
 
-        EP = self.umbrellas[i].getEntryPoint(self.index_to_key[i])
+        # we choose from the initial distribution with prob. stored in this window
+        if random.random() < self.umbrellas[i].initial_distribution_prob:
+            dist = self.umbrellas[i].entryPoints[i]
+            EP = random.sample(dist, 1)[0]
+
+        else:
+            EP = self.umbrellas[i].getEntryPoint(self.index_to_key[i])
 
         # you should pass this argument as a ctypes array for now
         wlkr.setConfig(EP.config)
@@ -356,13 +379,30 @@ class partition:
             
             # update the record of the simulation time for the walker object. 
             wlkr.simulationTime += stepLength
+
+            # if this is a finite time version, we should kill the walker if it hits the boundary
+            if 30.0 < wlkr.getColvars()[0] < 90.0:
+                #print "hit target", self.umbrellas[umbrellaIndex].center, wlkr.simulationTime, self.z[umbrellaIndex]
+                self.reinject(wlkr, umbrellaIndex)
+
+                self.umbrellas[umbrellaIndex].nhits += 1 
+
+                # now update the statistics for hitting vs stopping. 
+
+                continue
 	    
             # now we check to see if we've passed the autocorrelation length
             # if we do, we reset the Y ( [t / s] * s) value to the current point
             if corrLength is not None:
                 if (wlkr.simulationTime % corrLength) == 0.0:
-                    wlkr.Y_s = (wlkr.getConfig(), wlkr.getVel(), wlkr.getColvars())
-                    wlkr.simulationTime = 0.0
+                    #wlkr.Y_s = (wlkr.getConfig(), wlkr.getVel(), wlkr.getColvars())
+                    #wlkr.simulationTime = 0.0
+                    #print "stopping time hit"
+                    # if we hit the stopping time, reset the walker
+                    self.reinject(wlkr, umbrellaIndex)
+                    continue
+
+
             
             # get the new sample position
             new_sample = wlkr.getColvars()
@@ -376,7 +416,7 @@ class partition:
                 indicators = self.getBasisFunctionValues(wlkr)
             
                 # record a transition to the matrix
-                self.M[umbrellaIndex,:] += indicators
+                self.M[umbrellaIndex,:] += indicators * stepLength
                 
                 # now we select a window to which to append this new entry point,use numpy to choose window index
                 ep_targets = np.arange(indicators.size)[indicators.astype(bool)]
@@ -397,6 +437,10 @@ class partition:
             		
                 # get the sample from the new starting point after reinjection
                 self.umbrellas[umbrellaIndex].samples.append(wlkr.getColvars())
+
+            # if we do not detect a transition and handle that, we should add a count to M_ii
+            else:
+                self.M[umbrellaIndex, umbrellaIndex] += stepLength
             
             # let's accumulate a sample into the observables we are accumulating on this window
             self.accumulateObservables(wlkr, wlkr.getColvars(), wlkr.colvars, umbrellaIndex)
@@ -411,9 +455,9 @@ class partition:
         self.nsamples_M[umbrellaIndex] = numSteps
 
         # now we compute the estimate of the flux from thsi iteration
-        self.M[umbrellaIndex,umbrellaIndex] = numSteps - self.M[umbrellaIndex, :].sum()
+        #self.M[umbrellaIndex,umbrellaIndex] = numSteps - self.M[umbrellaIndex, :].sum()
 
-        self.M[umbrellaIndex, :] /= self.M[umbrellaIndex,:].sum()
+        self.M[umbrellaIndex, :] /= numSteps
 
         # here we will store the current position of the walker in an entry point structure
         newEP = entryPoints.entryPoints(wlkr.getConfig(), wlkr.getVel(), wlkr.simulationTime)
@@ -716,7 +760,7 @@ class partition:
 
         return 0
 
-    def communicateMPI(self, rank, comm, sparseSolve=False, debug=False):
+    def communicateMPI(self, rank, comm, sparseSolve=False, finiteTime=False, debug=False):
         """
         This routine performs a round of MPI communication to synchronize information across all ranks.
 
@@ -748,12 +792,12 @@ class partition:
         
         for row in range(self.F.shape[0]):
             if self.M[row].sum() > 0.0:
-                self.updateF(row)
+                self.updateF(row, self.epsilon)
 
 
         #if rank == 0: print self.z
 
-        self.computeZ(sparseSolve=sparseSolve)
+        self.computeZ(sparseSolve=sparseSolve, finiteTime=finiteTime)
 
         #if rank == 0: print self.z
 
