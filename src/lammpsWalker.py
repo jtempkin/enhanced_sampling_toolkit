@@ -77,9 +77,15 @@ class lammpsWalker(walker):
         
         # walker index         
         self.index = index
+
+        if logFilename is not None:
+            logfile = ".".join([logFilename, str(index)])
+        else:
+            logfile = None
+
         
         # start walker object from the passed lammps input file name
-        self.lmp = self.__initLAMMPS__(inputFilename = inputFilename, logFilename = ".".join([logFilename, str(index)]), verbose = debug)
+        self.lmp = self.__initLAMMPS__(inputFilename = inputFilename, logFilename = logfile, verbose = debug)
         
         # a list of the relevant collective variables
         self.colvars = []
@@ -100,7 +106,7 @@ class lammpsWalker(walker):
         self.lmp.close()
         return 0 
         
-    def __initLAMMPS__(self, inputFilename=None, logFilename="log", verbose = False):
+    def __initLAMMPS__(self, inputFilename=None, logFilename=None, verbose = False):
         """
         This function initializes a LAMMPS simulation given an input file. 
         
@@ -119,9 +125,6 @@ class lammpsWalker(walker):
         # check to see we are handing an absolute pathname. 
         if not os.path.isabs(inputFilename):
             inputFilename = os.path.abspath(inputFilename)
-            
-        if not os.path.isabs(logFilename):
-            logFilename = os.path.abspath(logFilename)
 
         # we're going to assume here that the user is taking care of the fact that LAMMPS needs to know where to find things but we will issue a worning in case they aren't. 
         if os.path.dirname(inputFilename) != os.getcwd():
@@ -138,13 +141,21 @@ class lammpsWalker(walker):
         # specify general log file parameters
         self.command("echo none")
 
+        # write out log file if needed
+        if logFilename is not None:
+            if not os.path.isabs(logFilename):
+                logFilename = os.path.abspath(logFilename)
+                
+            self.command("log " + logFilename)
+        else:
+            self.command("log none")
+
+
         # if there is a specified filename, use it to set up the simulation.         
         if inputFilename != None:
-            self.command("log " + logFilename)
+            #self.command("log " + logFilename)
                 
             self.lmp.file(inputFilename)
-        else:
-            self.command("log " + logFilename)
         
         #self.__setupLAMMPS__(filename)
 
