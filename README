@@ -1,4 +1,4 @@
-README FILE FOR THE UMBRELLA SAMPLING CODEBASE
+README FILE FOR THE ENHANCED SAMPLING TOOLKIT
 ---------------------------------------------------
 Primary Author: Jeremy Tempkin
 Created: 5/8/2014
@@ -9,26 +9,29 @@ Erik Thiede
 
 Description:
 
-This codebase is developed in order to provide a flexible and extensible code for performing generalized umbrella sampling calculations in molecular systems. 
+This codebase is developed in order to provide a flexible and extensible toolkit for rapidly prototyping enhanced sampling algorithms for use in molecular simulations. The codebase is written entirely in Python and acts as a wrapper to various well-established molecular dynamics engines. The design of this toolkit prioritzes facilitating rapid code development at the algorithm level. This priority is what motivates the decision to use Python as the primary language. This decision also facilitates simple connections between this code and well-developed Python tools already established. 
 
-The codebase is written entirely in Python and acts as a wrapper to the LAMMPS molecular dynamics engine. Since LAMMPS can be built and imported as a shared Python library, only Python is required to interact with a molecular simulation running in LAMMPS (which is itself compiled in C++, but you only have to work with it's Python wrapping for this umbrella sampling code). Installing the LAMMPS distribution as a shared Python library must be done prior to running this code. 
-
+This code consists of two components. The first is what we call the Walker API. This part consists of an API specification that abstracts the interaction between an enhanced sampling algorithm and the underlying MD engine that performs the integration. The Walker API facilitates the rapid construction of higher-level algorithm level code built on top of these basic interactions. Implementations built on this API have the benefit of rapid portability between various MD codes that implement the models and dynamics a user may want by a single algorithm code. Ideally, since the API consists of fairly high-level interactions, this allows the programmer to focus solely on the algorithm design in a manner agnostic to the specifics of the MD engine. 
 
 System Prerequisits:
 
-1) Python (commonly v. 2.7.x)
-2) LAMMPS distribution built as a shared python library. To install LAMMPS see: 
+1) Python v2.7.x (v2.7.9 or higher is prefered)
+
+2) LAMMPS distribution built as a shared library. To install LAMMPS see: http://lammps.sandia.gov/doc/Section_python.html
+
 3) mpi4py distribution for MPI parallelization.
-
-http://lammps.sandia.gov/doc/Section_python.html
-
 
 Folders:
 
-src - The main source code repository for this project.
+src - The main source code for this project. This contains the core API of the toolkit in the *Walker.py files.
 
 data - This folder contains data files that specify the construction of the molecular system you wish to simulate. These files are written using the LAMMPS format. See the LAMMPS documentation for more details. 
 
 input - This folder contains input files that configure input settings. 
 
 profiling - A folder for storing profiling information generated from cProfile information.  
+
+neus - a NEUS implementation written in the Walker API. 
+
+repex - a simple replica exchange code implemented in the Walker API.
+
