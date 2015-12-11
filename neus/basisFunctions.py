@@ -74,12 +74,19 @@ class basisFunction:
 
         elif self.eptype == 'dictionary':
 
-            if key is None: raise Exception('key was not provided to draw entry point.')
+            #if key is None: raise Exception('key was not provided to draw entry point.')
 
-            #EP = random.sample(self.entryPoints[key], 1)
-            EP = random.sample(self.entryPointsList, 1)
+            choice = np.random.choice(self.flux.size, p=self.flux)
 
-        return EP[0]
+            if len(self.entryPoints[choice]) == 0: 
+                print self.flux
+                print self.entryPoints[choice]
+                raise Exception('Flux to empty list.')
+
+            EP = random.choice(self.entryPoints[choice])
+            #EP = random.sample(self.entryPointsList, 1)
+
+        return EP
 
     def updateEntryPointsFluxes(self, flux, key_map, flush=False):
         """
@@ -92,9 +99,17 @@ class basisFunction:
 
         self.entryPointsList.clear()
 
+        self.flux = flux
+
         # now build a collection of points whose composition is constructed based on the current estimate of the flux. 
 
-        for i in xrange(flux.size):
+        for i in self.neighborList:
+            # if we don't find entries, set the flux to zero so we don't draw from this
+            if len(self.entryPoints[key_map[i]]) == 0: 
+                if self.flux[i] > 0.0: print "zeroing out", i
+                self.flux[i] = 0.0
+
+
             size = int(self.max_entrypoints * flux[i])
             if size == 0: 
                 continue
@@ -103,11 +118,21 @@ class basisFunction:
 
             nentries = min(len(self.entryPoints[key_map[i]]), size)
 
+            #update_list = np.sample(self.entryPoints, nentries)
             update_list = self.entryPoints[key_map[i]][0:nentries]
 
             self.entryPointsList.update(update_list)
 
+        # remove negative fluxes
+        self.flux[self.flux < 0.0] = 0.0
+        
+        # normalize if needed
+        if self.flux.sum() > 0.0: 
+            self.flux /= self.flux.sum()
+
         return 0 
+
+
 
     def flushAllToBuffer(self):
         """
@@ -162,7 +187,7 @@ class basisFunction:
         """
         if not hasattr(self, 'newEntryPoints'): raise Exception('Window has not initialized new entry point library.')
 
-        self.newEntryPoints.add((ep, key_from))
+        self.newEntryPoints[key_from].append(ep)
 
         return 0
 
@@ -171,7 +196,8 @@ class basisFunction:
         This routine empties the new entry points data structure locally.
         """
 
-        self.newEntryPoints.clear()
+        for key in self.newEntryPoints.keys():
+            self.newEntryPoints[key] = []
 
         return 0
 
@@ -222,7 +248,7 @@ class basisFunction:
             raise Exception('eptype was not understood.')
 
         # now we need to create a deep copy called newEntryPoints
-        self.newEntryPoints = set()
+        self.newEntryPoints = copy.deepcopy(self.entryPoints)
 
         return 0
 

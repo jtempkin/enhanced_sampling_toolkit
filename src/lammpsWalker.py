@@ -132,7 +132,8 @@ class lammpsWalker(walker):
             
         # initialize the lammps object
         if verbose == True:
-            self.lmp = lammps()
+            self.lmp=lammps()
+            #self.lmp = lammps("", ["-c", "on", "-sf", "cuda"])
         else:
             args = ["-sc", "none", "-echo", "none", "-log", "none"]
             self.lmp = lammps("", args)

@@ -44,6 +44,8 @@ class partition:
         # initialize the matricies needed for the NEUS
         self.M = np.zeros((N,N))
         self.F = np.zeros((N,N))     
+        self.F_list = []
+        [self.F_list.append([]) for i in range(N)]
         self.a = np.zeros(N)
         # we should track how many samples are taken in the M matrix
         self.nsamples_M = np.zeros(N)
@@ -81,10 +83,27 @@ class partition:
         temp_M[row] = 1 - temp_M.sum()
         """
 
-        #self.F[row] = (self.k[row] * self.F[row] + temp_M) / (self.k[row] + 1)
-        self.F[row] = ((1-epsilon) * self.F[row] + epsilon * temp_M)
+        # update an total average
+        self.F[row] = (self.k[row] * self.F[row] + temp_M) / (self.k[row] + 1)
 
-        self.k[row] += 1
+        # keep a list of the most recent F 
+        """
+        if len(self.F_list[row]) >= epsilon:
+            self.F_list[row].pop(0)
+
+        self.F_list[row].append(temp_M)
+        self.F[row].fill(0.0)
+        for m in self.F_list[row]:
+            self.F[row] += m
+        
+        self.F[row] /= len(self.F_list[row])
+        """
+
+        # the one with the decay parameter
+        #self.F[row] = ((1-epsilon) * self.F[row] + epsilon * temp_M)
+
+        if self.k[row] / (self.k[row] + 1) < epsilon:
+            self.k[row] += 1
 
         return 0
 
@@ -167,11 +186,62 @@ class partition:
         temp_F = self.F[self.active_windows, :][:, self.active_windows]
 
         if finiteTime:
-            A = (np.identity(self.F.shape[0]) - self.F).transpose()
-        
-            self.z = np.linalg.solve(A, self.a)
 
-            self.z /= self.z.sum()
+            """
+            Construct G_bar as
+
+            G_bar = [[ G     1-G1
+
+                        a     0   ]]
+
+            Then solve the eigenvalue problem choosing "pivot" off maximum z excluding the final row.
+
+            We'll choose a max_z
+
+            and solve the equation z_bar^T = z_bar^t G_bar
+
+            using the following strategy:
+            """
+
+            G_bar = np.zeros((self.F.shape[0]+1, self.F.shape[0]+1))
+
+            G_bar[:-1, :-1] = self.F
+            G_bar[-1, :-1] = self.a
+            G_bar[:-1, -1] = np.ones(self.a.shape) - np.dot(self.F, np.ones(self.a.shape))
+
+            #evals, evec = LA.eig(G_bar, left=True, right=False)
+            #sort = np.argsort(evals)
+
+            #temp_z = evec[:,sort[-1]] / np.sum(evec[:,sort[-1]])
+
+            #self.z = temp_z[:-1].real
+
+            #return 0
+
+            # get the maximum z value 
+            max_z = np.argmax(self.z)
+
+            # slice out the row corresponding to maximum z
+            temp_F = np.delete(np.delete(G_bar, max_z, 0), max_z, 1)
+
+            # now construct A and run through solver.
+            A = (np.identity(temp_F.shape[0]) - temp_F).transpose()
+            temp_z = np.linalg.solve(A, np.delete(G_bar[max_z], max_z).transpose())
+
+            z_bar = np.zeros(self.z.size+1)
+
+            z_bar[max_z] = 1.0
+
+            z_bar[0:max_z] = temp_z[0:max_z]
+            z_bar[max_z+1:] = temp_z[max_z:]
+
+            # now we renormalize the z_bar so that the last entry is one and take the rest
+            z_bar /= z_bar[-1]
+
+            # set remainig weights and return
+            self.z = z_bar[:-1]
+
+            #self.z /= self.z.sum()   
 
             return 0 
 
@@ -191,6 +261,8 @@ class partition:
             self.z[np.logical_not(self.active_windows)] = 0.0
 
         else:
+
+            # here we will do a different eigenvalue solution procedure to solve for the weights
                 
             evals, evec = LA.eig(self.F, left=True, right=False)
             sort = np.argsort(evals)
@@ -279,7 +351,7 @@ class partition:
             EP = random.sample(dist, 1)[0]
 
         else:
-            EP = self.umbrellas[i].getEntryPoint(self.index_to_key[i])
+            EP = self.umbrellas[i].getEntryPoint(i)
 
         # you should pass this argument as a ctypes array for now
         wlkr.setConfig(EP.config)
@@ -385,7 +457,7 @@ class partition:
                 #print "hit target", self.umbrellas[umbrellaIndex].center, wlkr.simulationTime, self.z[umbrellaIndex]
                 self.reinject(wlkr, umbrellaIndex)
 
-                self.umbrellas[umbrellaIndex].nhits += 1 
+                self.umbrellas[umbrellaIndex].nhits += 1.0 
 
                 # now update the statistics for hitting vs stopping. 
 
@@ -398,11 +470,12 @@ class partition:
                     #wlkr.Y_s = (wlkr.getConfig(), wlkr.getVel(), wlkr.getColvars())
                     #wlkr.simulationTime = 0.0
                     #print "stopping time hit"
+
+                    self.umbrellas[umbrellaIndex].nstops += 1.0
+
                     # if we hit the stopping time, reset the walker
                     self.reinject(wlkr, umbrellaIndex)
                     continue
-
-
             
             # get the new sample position
             new_sample = wlkr.getColvars()
@@ -416,7 +489,7 @@ class partition:
                 indicators = self.getBasisFunctionValues(wlkr)
             
                 # record a transition to the matrix
-                self.M[umbrellaIndex,:] += indicators * stepLength
+                self.M[umbrellaIndex,:] += indicators
                 
                 # now we select a window to which to append this new entry point,use numpy to choose window index
                 ep_targets = np.arange(indicators.size)[indicators.astype(bool)]
@@ -427,7 +500,7 @@ class partition:
 
                 for indx in ep_targets:
                     #if not self.active_windows[indx]: print "added entry point", indx
-                    self.umbrellas[indx].addNewEntryPoint(newEP, self.index_to_key[umbrellaIndex])
+                    self.umbrellas[indx].addNewEntryPoint(newEP, umbrellaIndex)
 
                 # drop the last point from the samples 
                 self.umbrellas[umbrellaIndex].samples.pop()
@@ -440,7 +513,9 @@ class partition:
 
             # if we do not detect a transition and handle that, we should add a count to M_ii
             else:
-                self.M[umbrellaIndex, umbrellaIndex] += stepLength
+                self.M[umbrellaIndex, umbrellaIndex] += 1.0
+
+            #print self.M[umbrellaIndex, :]
             
             # let's accumulate a sample into the observables we are accumulating on this window
             self.accumulateObservables(wlkr, wlkr.getColvars(), wlkr.colvars, umbrellaIndex)
@@ -452,12 +527,12 @@ class partition:
         self.umbrellas[umbrellaIndex].flushDataToFile(inputFilename)
 
         # record the number of samples taken here
-        self.nsamples_M[umbrellaIndex] = numSteps
+        self.nsamples_M[umbrellaIndex] = numSteps / stepLength
 
         # now we compute the estimate of the flux from thsi iteration
         #self.M[umbrellaIndex,umbrellaIndex] = numSteps - self.M[umbrellaIndex, :].sum()
 
-        self.M[umbrellaIndex, :] /= numSteps
+        self.M[umbrellaIndex, :] /= self.nsamples_M[umbrellaIndex]
 
         # here we will store the current position of the walker in an entry point structure
         newEP = entryPoints.entryPoints(wlkr.getConfig(), wlkr.getVel(), wlkr.simulationTime)
@@ -789,7 +864,7 @@ class partition:
         Step 2) solution of the eigenvalue problem at each rank
         """
         # at rank, update F and compute z
-        
+    
         for row in range(self.F.shape[0]):
             if self.M[row].sum() > 0.0:
                 self.updateF(row, self.epsilon)
