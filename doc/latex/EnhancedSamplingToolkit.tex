@@ -12,11 +12,16 @@
 \usepackage{sphinx}
 \usepackage{multirow}
 
+\addto\captionsenglish{\renewcommand{\figurename}{Fig. }}
+\addto\captionsenglish{\renewcommand{\tablename}{Table }}
+\floatname{literal-block}{Listing }
+
+
 
 \title{Enhanced Sampling Toolkit Documentation}
-\date{April 07, 2015}
-\release{1.0}
-\author{Jeremy Tempkin}
+\date{January 06, 2016}
+\release{0.1a}
+\author{Jeremy O. B. Tempkin}
 \newcommand{\sphinxlogo}{}
 \renewcommand{\releasename}{Release}
 \makeindex
@@ -124,93 +129,146 @@
 \phantomsection\label{index::doc}
 
 
-Contents:
+
+\chapter{Introduction}
+\label{intro.doc:introduction}\label{intro.doc:welcome-to-enhanced-sampling-toolkit-s-documentation}\label{intro.doc::doc}
+The objective of the Enhanced Sampling Toolkit is to provide a programming toolkit that facilitates rapid prototyping and development of enhanced sampling algorithms for use in molecular dynamics applications.
+
+The toolkit is implemented in 100\% Python and is targeted for development in the Python language. One reason for this decision is that Python is a popular language in the broader scientific community and has a wide support base in terms of scienfitic code. However, more importantly, a strength of the language lies in the speed at which ideas can be implemented into working code. Since rapid prototyping of new algorithms is the core priority of the toolkit, Python seems a natural choice in language. However, if the need arises in a future date, ports to other languages may be considered and integrated into the package.
+
+In many places of the toolkit some care has been made to adhere to the powerful Python object design principles inherent in the Python data model. We find this to be a powerful feature of the Python language since it facilitates clean, ``Pythonic'' use of the toolkit in our applications. We are continually working to improve this aspect of the toolkit as the project develops.
+
+In the basic sense, the toolkit serves to wrap commonly used MD codes and in the process abstract the interactions between algorithm level code and the MD engine. This abstractions provides useful extensibilty in the sense that algorthm codes that are implemented in the Walker API can be reused and swapped between MD models and even entire MD codes. Furthermore, the expensive integration steps are executed in faster compiled codes and avoids some of the inefficiencies introduced in the choice of Python.
+
+In addition to rapid algorthm prototyping, we've found in it's development that the toolkit is effective in HPC environments as well. Because the underlying dynamics are executed in commonly used MD codes, the toolkit has access to the HPC features that have been optimized in these codes and can therefore leverage MPI parallelism concurrently at the algorithm level and the MD level as well as support for accelerators such as GPU's or Intel MIC cards.
+
+The structure of the toolkit comprises of two parts. At the core, we provide a specification we call the Walker API. The core API serves to define a set of interactions between algorithm level code and the underlying MD engine. This specification also defines the features developers need to implement for a new dynamics engine to leverage the full features of the toolkit.
+
+On top of this core API, we've implemented several common enhanced sampling algorithms. These tools are built as importable Python modules which can be used to develop new variants of these
 
 
 \chapter{Walker API}
-\label{src/src.doc:welcome-to-enhanced-sampling-toolkit-s-documentation}\label{src/src.doc:module-walker}\label{src/src.doc::doc}\label{src/src.doc:walker-api}\index{walker (module)}
-NOTE: we may want to use abstract properties in the future.
-\index{velocityWalker (class in walker)}
+\label{walker_api/walker_api.doc::doc}\label{walker_api/walker_api.doc:walker-api}
+The central design principle of the Walker API is to provide an
+abstracted interface between the ``algorithm'' level code and the
+code that integrates the dynamics of the model. This section describes the base API used to define the walker objects. The base class is declared internally using Python's abstract base class module. The implementations of the bindings specific to the dynamics packages are registered to this base class definition through direct subclassing of the modules. A key feature of this decision is that it enforces the implementation of the dynamics bindings to implement each of the following methods in their class declarations. However, many of the methods can be overridden with empty methods if an implementation is incomplete or does not require all of the base class methods.
+
+
+\section{The Core Walker Application Programming Interface (API)}
+\label{walker_api/walker_api.doc:module-walker_base}\label{walker_api/walker_api.doc:the-core-walker-application-programming-interface-api}\index{walker\_base (module)}
+DEVELOPER NOTE: we may want to use abstract properties in the future.
+\index{walker (class in walker\_base)}
 
 \begin{fulllineitems}
-\phantomsection\label{src/src.doc:walker.velocityWalker}\pysigline{\strong{class }\code{walker.}\bfcode{velocityWalker}}
-This is an abstract class for dynamics which have a velocity component, such as 
-a protein under Langevin dynamics.  It extends the walker abstract class by
-adding additional abstract methods that are necessary for a walker that has
-a velocity.
-\index{drawVel() (walker.velocityWalker method)}
+\phantomsection\label{walker_api/walker_api.doc:walker_base.walker}\pysigline{\strong{class }\code{walker\_base.}\bfcode{walker}}
+This object acts as an abstract base class that sets the core specification defining the Walker API. These routines
+\index{addColvars() (walker\_base.walker method)}
 
 \begin{fulllineitems}
-\phantomsection\label{src/src.doc:walker.velocityWalker.drawVel}\pysiglinewithargsret{\bfcode{drawVel}}{}{}
-Draws a new value of the velocities for the walker.
+\phantomsection\label{walker_api/walker_api.doc:walker_base.walker.addColvars}\pysiglinewithargsret{\bfcode{addColvars}}{\emph{cv}}{}
+Adds a new collective variable to the walker. Subsequent calls to routines that act on the defined collective variables will use the complete list of collective variables in the order they are added. To wipe this list of variables, see the destroyColvars() routine.
 
 \end{fulllineitems}
 
-\index{reverseVel() (walker.velocityWalker method)}
+\index{close() (walker\_base.walker method)}
 
 \begin{fulllineitems}
-\phantomsection\label{src/src.doc:walker.velocityWalker.reverseVel}\pysiglinewithargsret{\bfcode{reverseVel}}{}{}
-This function reverses the velocity of the walker.
-
-\end{fulllineitems}
-
-
-\end{fulllineitems}
-
-\index{walker (class in walker)}
-
-\begin{fulllineitems}
-\phantomsection\label{src/src.doc:walker.walker}\pysigline{\strong{class }\code{walker.}\bfcode{walker}}
-Defines an abstract walker object.  It functions as an interface, providing methods that other
-walkers should implement.
-\index{close() (walker.walker method)}
-
-\begin{fulllineitems}
-\phantomsection\label{src/src.doc:walker.walker.close}\pysiglinewithargsret{\bfcode{close}}{}{}
+\phantomsection\label{walker_api/walker_api.doc:walker_base.walker.close}\pysiglinewithargsret{\bfcode{close}}{}{}
 Destroys the walker.
 
 \end{fulllineitems}
 
-\index{equilibrate() (walker.walker method)}
+\index{destroyColvars() (walker\_base.walker method)}
 
 \begin{fulllineitems}
-\phantomsection\label{src/src.doc:walker.walker.equilibrate}\pysiglinewithargsret{\bfcode{equilibrate}}{\emph{colvar}}{}
-This function sets the walker at a specific configuration in the collective variable space.
-At minimum, any implementation will need to give it the configuration.
+\phantomsection\label{walker_api/walker_api.doc:walker_base.walker.destroyColvars}\pysiglinewithargsret{\bfcode{destroyColvars}}{}{}
+Removes all collective variables from the walker.
 
 \end{fulllineitems}
 
-\index{getColvars() (walker.walker method)}
+\index{drawVel() (walker\_base.walker method)}
 
 \begin{fulllineitems}
-\phantomsection\label{src/src.doc:walker.walker.getColvars}\pysiglinewithargsret{\bfcode{getColvars}}{}{}
-This function returns the location of the walker in the collective variable space.
+\phantomsection\label{walker_api/walker_api.doc:walker_base.walker.drawVel}\pysiglinewithargsret{\bfcode{drawVel}}{}{}
+Draws a new value of the velocities for the walker. Can redraw velocities according to a uniform or Gaussian distributions.
 
 \end{fulllineitems}
 
-\index{getConfig() (walker.walker method)}
+\index{equilibrate() (walker\_base.walker method)}
 
 \begin{fulllineitems}
-\phantomsection\label{src/src.doc:walker.walker.getConfig}\pysiglinewithargsret{\bfcode{getConfig}}{}{}
-This function should return the configuration of the walker in configurtion space.
-
+\phantomsection\label{walker_api/walker_api.doc:walker_base.walker.equilibrate}\pysiglinewithargsret{\bfcode{equilibrate}}{\emph{center}, \emph{restraint}, \emph{numSteps}}{}
 \end{fulllineitems}
 
-\index{propagate() (walker.walker method)}
+\index{getColvars() (walker\_base.walker method)}
 
 \begin{fulllineitems}
-\phantomsection\label{src/src.doc:walker.walker.propagate}\pysiglinewithargsret{\bfcode{propagate}}{\emph{numsteps}}{}
-This function propagates the simulation forward a given number of steps.
-It takes as an argument at least numsteps, the number of steps to progagate forward.
+\phantomsection\label{walker_api/walker_api.doc:walker_base.walker.getColvars}\pysiglinewithargsret{\bfcode{getColvars}}{}{}
+This function returns the location of the walker in the collective variable space. Values are returned as a one-dimensional numpy array
 
 \end{fulllineitems}
 
-\index{setConfig() (walker.walker method)}
+\index{getConfig() (walker\_base.walker method)}
 
 \begin{fulllineitems}
-\phantomsection\label{src/src.doc:walker.walker.setConfig}\pysiglinewithargsret{\bfcode{setConfig}}{\emph{configuration}}{}
-This function should set the system at a specific place in configurtin space.
-At minimum, it should take some sort of specification of the configuration.
+\phantomsection\label{walker_api/walker_api.doc:walker_base.walker.getConfig}\pysiglinewithargsret{\bfcode{getConfig}}{}{}
+This function should return the postition of the walker in configuration space as a one-dimensional numpy array. The coordinates are returned as {[}x1, y1, z1, x2, y2, z2, ...{]}.
+
+\end{fulllineitems}
+
+\index{getVel() (walker\_base.walker method)}
+
+\begin{fulllineitems}
+\phantomsection\label{walker_api/walker_api.doc:walker_base.walker.getVel}\pysiglinewithargsret{\bfcode{getVel}}{}{}
+This function returns the velocities of the system as a one-dimensional numpy array. The velocities are returned in a format that matches the getConfig() routine, specifically {[}v\_x1, v\_y1, v\_z1, v\_x2, v\_y2, v\_z2, ...{]}.
+
+\end{fulllineitems}
+
+\index{propagate() (walker\_base.walker method)}
+
+\begin{fulllineitems}
+\phantomsection\label{walker_api/walker_api.doc:walker_base.walker.propagate}\pysiglinewithargsret{\bfcode{propagate}}{\emph{numsteps}}{}
+Integrates the dynamics of the model forward in time. Takes the numSteps argument specifying the number of time steps to take.
+
+\end{fulllineitems}
+
+\index{removeOutput() (walker\_base.walker method)}
+
+\begin{fulllineitems}
+\phantomsection\label{walker_api/walker_api.doc:walker_base.walker.removeOutput}\pysiglinewithargsret{\bfcode{removeOutput}}{}{}
+This routine adds a source of output for the walker to write information to disk.
+
+\end{fulllineitems}
+
+\index{reverseVel() (walker\_base.walker method)}
+
+\begin{fulllineitems}
+\phantomsection\label{walker_api/walker_api.doc:walker_base.walker.reverseVel}\pysiglinewithargsret{\bfcode{reverseVel}}{}{}
+This function reverses the velocity of the walker. The new velocities are given as
+
+\end{fulllineitems}
+
+\index{setConfig() (walker\_base.walker method)}
+
+\begin{fulllineitems}
+\phantomsection\label{walker_api/walker_api.doc:walker_base.walker.setConfig}\pysiglinewithargsret{\bfcode{setConfig}}{\emph{configuration}}{}
+Sets the configuration of the At minimum, it should take some sort of specification of the configuration.
+
+\end{fulllineitems}
+
+\index{setOutput() (walker\_base.walker method)}
+
+\begin{fulllineitems}
+\phantomsection\label{walker_api/walker_api.doc:walker_base.walker.setOutput}\pysiglinewithargsret{\bfcode{setOutput}}{}{}
+This routine adds a source of output for the walker to write information to disk.
+
+\end{fulllineitems}
+
+\index{setVel() (walker\_base.walker method)}
+
+\begin{fulllineitems}
+\phantomsection\label{walker_api/walker_api.doc:walker_base.walker.setVel}\pysiglinewithargsret{\bfcode{setVel}}{}{}
+This routine sets the velocities of the system.
 
 \end{fulllineitems}
 
@@ -219,28 +277,860 @@ At minimum, it should take some sort of specification of the configuration.
 
 
 
-\chapter{LAMMPS Walker Module}
-\label{src/src.doc:lammps-walker-module}
+\subsection{Dynamics Modules}
+\label{walker_api/walker_api.doc:module-dynamics}\label{walker_api/walker_api.doc:dynamics-modules}\index{dynamics (module)}
+This module contains definitions of the dynamics classes using to wrap information about driving dynamics inside the walkers.
+\index{baoab (class in dynamics)}
 
-\chapter{Indices and tables}
-\label{index:indices-and-tables}\begin{itemize}
+\begin{fulllineitems}
+\phantomsection\label{walker_api/walker_api.doc:dynamics.baoab}\pysiglinewithargsret{\strong{class }\code{dynamics.}\bfcode{baoab}}{\emph{temperature}, \emph{damping\_coefficient}, \emph{shake=False}, \emph{seed=None}, \emph{linear\_momentum=True}}{}
+This class implements the baoab integrator.
+
+\end{fulllineitems}
+
+\index{langevin (class in dynamics)}
+
+\begin{fulllineitems}
+\phantomsection\label{walker_api/walker_api.doc:dynamics.langevin}\pysiglinewithargsret{\strong{class }\code{dynamics.}\bfcode{langevin}}{\emph{temperature}, \emph{damping\_coefficient}, \emph{shake=False}, \emph{seed=None}, \emph{linear\_momentum=True}}{}
+This class specifies the langevin dynamcis parameters needed.
+
+\end{fulllineitems}
+
+
+
+\subsection{Setting Walker Output Files}
+\label{walker_api/walker_api.doc:setting-walker-output-files}\label{walker_api/walker_api.doc:module-outputClass}\index{outputClass (module)}
+Created on Thu Apr 16 15:03:56 2015
+
+@author: jeremytempkin
+\index{outputClass (class in outputClass)}
+
+\begin{fulllineitems}
+\phantomsection\label{walker_api/walker_api.doc:outputClass.outputClass}\pysiglinewithargsret{\strong{class }\code{outputClass.}\bfcode{outputClass}}{\emph{name}, \emph{outputType}, \emph{filename}, \emph{nSteps=1000}}{}
+This class acts a container object for an output for a walker object.
+
+\end{fulllineitems}
+
+
+
+\subsection{Setting Walker Collective Variables}
+\label{walker_api/walker_api.doc:module-collectiveVariables}\label{walker_api/walker_api.doc:setting-walker-collective-variables}\index{collectiveVariables (module)}
+A container class for collective variable definitions. We provide here a container class for
+
+
+\section{LAMMPS Walker Module}
+\label{walker_api/walker_api.doc:lammps-walker-module}
+This module implements the Walker API for the LAMMPS MD engine. See walker\_base.py for a specification of the API. For details concerning the usage of the LAMMPS MD package see the excellent documentation at the LAMMPS webpage:
+
+\href{http://lammps.sandia.gov/}{http://lammps.sandia.gov/}
+
+In particular, you may want to see how the Python wrapper to LAMMPS on which this implementation is based:
+
+\href{http://lammps.sandia.gov/doc/Section\_python.html}{http://lammps.sandia.gov/doc/Section\_python.html}
+
+Here we will outline basic usage guides for the walker API usage in LAMMPS.
+\phantomsection\label{walker_api/walker_api.doc:module-lammpsWalker}\index{lammpsWalker (module)}
+This module implements the Walker API for the LAMMPS MD engine. See walker\_base.py for a specification of the API. For details concerning the usage of the LAMMPS MD package see the excellent documentation at the LAMMPS webpage:
+
+\href{http://lammps.sandia.gov/}{http://lammps.sandia.gov/}
+
+In particular, you may want to see how the Python wrapper to LAMMPS on which this implementation is based:
+
+\href{http://lammps.sandia.gov/doc/Section\_python.html}{http://lammps.sandia.gov/doc/Section\_python.html}
+
+Here we will outline basic usage guides for the walker API usage in LAMMPS. To begin using the lammpsWalker module
+\begin{itemize}
 \item {} 
-\emph{genindex}
-
-\item {} 
-\emph{modindex}
-
-\item {} 
-\emph{search}
+highlight here an example code which shows how to use the LAMMPS walker module.
 
 \end{itemize}
+\index{lammpsWalker (class in lammpsWalker)}
+
+\begin{fulllineitems}
+\phantomsection\label{walker_api/walker_api.doc:lammpsWalker.lammpsWalker}\pysiglinewithargsret{\strong{class }\code{lammpsWalker.}\bfcode{lammpsWalker}}{\emph{inputFilename}, \emph{logFilename}, \emph{index=0}, \emph{debug=False}}{}
+This class implements the enhanced sampling walker API for the bindings to the LAMMPS package.
+
+Some usage issues to note:
+
+1) Collective variables (CVs) are defined to the walker by constructing a list of
+CVs internally in the walker.colvars object. These CVs list takes the following
+format:
+
+{[}''coordinateType'', atomids....{]}
+
+The coordinate type specifies which type of coordinate the CV is 
+(i.e. bond, angle, dihedral, etc.). The next items in the list are the atom 
+indecies involved in this specific instance of the CV.
+
+The walker will use this list to initialize them to the underlying LAMMPS objects.
+\index{addColvars() (lammpsWalker.lammpsWalker method)}
+
+\begin{fulllineitems}
+\phantomsection\label{walker_api/walker_api.doc:lammpsWalker.lammpsWalker.addColvars}\pysiglinewithargsret{\bfcode{addColvars}}{\emph{name}, \emph{cvType}, \emph{atomIDs}}{}
+Implements the addition of a collective variable to the list of collective variables held by this walker.
+\begin{description}
+\item[{name - }] \leavevmode
+A internal string used to reference this collective variable. Collective variable names must be unique.
+
+\item[{cvType - }] \leavevmode\begin{description}
+\item[{A string refering to the type of collective variable. Currently the following variables are supported:}] \leavevmode\begin{itemize}
+\item {} 
+`bond'
+
+\item {} 
+`angle'
+
+\item {} 
+`dihedral'
+
+\item {} 
+`x', `y', `z' positions
+
+\item {} 
+`x', `y', `z' velocity components
+
+\end{itemize}
+
+\end{description}
+
+\item[{atomIDs - }] \leavevmode\begin{description}
+\item[{A list of the atom indecies involved in the collective variable. Should provide the right number of atom indecies for the collective variable:}] \leavevmode\begin{itemize}
+\item {} 
+`bond' -\textgreater{} 2
+
+\item {} 
+`angle'-\textgreater{} 3
+
+\item {} 
+`dihedral' -\textgreater{} 4
+
+\item {} 
+position or velocity component -\textgreater{} 1
+
+\end{itemize}
+
+\end{description}
+
+\end{description}
+
+\end{fulllineitems}
+
+\index{close() (lammpsWalker.lammpsWalker method)}
+
+\begin{fulllineitems}
+\phantomsection\label{walker_api/walker_api.doc:lammpsWalker.lammpsWalker.close}\pysiglinewithargsret{\bfcode{close}}{}{}
+This function closes the LAMMPS object.
+
+\end{fulllineitems}
+
+\index{command() (lammpsWalker.lammpsWalker method)}
+
+\begin{fulllineitems}
+\phantomsection\label{walker_api/walker_api.doc:lammpsWalker.lammpsWalker.command}\pysiglinewithargsret{\bfcode{command}}{\emph{command}}{}
+This function allows the user to issue a LAMMPS command directly to the
+LAMMPS object.
+
+\end{fulllineitems}
+
+\index{destroyColvars() (lammpsWalker.lammpsWalker method)}
+
+\begin{fulllineitems}
+\phantomsection\label{walker_api/walker_api.doc:lammpsWalker.lammpsWalker.destroyColvars}\pysiglinewithargsret{\bfcode{destroyColvars}}{}{}
+This function removes the colvars set by setColvars(). By default, it removes all of the collective variables in the list. It does not remove them from the collective variables list.
+
+\end{fulllineitems}
+
+\index{drawVel() (lammpsWalker.lammpsWalker method)}
+
+\begin{fulllineitems}
+\phantomsection\label{walker_api/walker_api.doc:lammpsWalker.lammpsWalker.drawVel}\pysiglinewithargsret{\bfcode{drawVel}}{\emph{distType='gaussian'}, \emph{temperature=310.0}, \emph{seed=None}}{}
+This function redraws the velocities from a maxwell-boltzmann dist.
+
+\end{fulllineitems}
+
+\index{equilibrate() (lammpsWalker.lammpsWalker method)}
+
+\begin{fulllineitems}
+\phantomsection\label{walker_api/walker_api.doc:lammpsWalker.lammpsWalker.equilibrate}\pysiglinewithargsret{\bfcode{equilibrate}}{\emph{center}, \emph{restraint}, \emph{numSteps}}{}
+This function prepares a LAMMPS image to be at the specified target position given by the vector `center' passed and an arguments.
+
+\end{fulllineitems}
+
+\index{getColvars() (lammpsWalker.lammpsWalker method)}
+
+\begin{fulllineitems}
+\phantomsection\label{walker_api/walker_api.doc:lammpsWalker.lammpsWalker.getColvars}\pysiglinewithargsret{\bfcode{getColvars}}{}{}
+This function returns the current position of the LAMMPS simulation in 
+colvars space.
+
+\end{fulllineitems}
+
+\index{getConfig() (lammpsWalker.lammpsWalker method)}
+
+\begin{fulllineitems}
+\phantomsection\label{walker_api/walker_api.doc:lammpsWalker.lammpsWalker.getConfig}\pysiglinewithargsret{\bfcode{getConfig}}{}{}
+This function returns the current position of the LAMMPS simulation.
+
+\end{fulllineitems}
+
+\index{getVel() (lammpsWalker.lammpsWalker method)}
+
+\begin{fulllineitems}
+\phantomsection\label{walker_api/walker_api.doc:lammpsWalker.lammpsWalker.getVel}\pysiglinewithargsret{\bfcode{getVel}}{}{}
+This function returns the current velocities from the LAMMPS simulation.
+
+\end{fulllineitems}
+
+\index{minimize() (lammpsWalker.lammpsWalker method)}
+
+\begin{fulllineitems}
+\phantomsection\label{walker_api/walker_api.doc:lammpsWalker.lammpsWalker.minimize}\pysiglinewithargsret{\bfcode{minimize}}{\emph{args=None}}{}
+This function runs a minimization routine with the specified type.
+
+\end{fulllineitems}
+
+\index{propagate() (lammpsWalker.lammpsWalker method)}
+
+\begin{fulllineitems}
+\phantomsection\label{walker_api/walker_api.doc:lammpsWalker.lammpsWalker.propagate}\pysiglinewithargsret{\bfcode{propagate}}{\emph{numSteps}, \emph{pre='no'}, \emph{post='no'}}{}
+This function issues a run command to the underlying dynamics to propagate
+the dynamics a given number of steps.
+
+\end{fulllineitems}
+
+\index{removeOutput() (lammpsWalker.lammpsWalker method)}
+
+\begin{fulllineitems}
+\phantomsection\label{walker_api/walker_api.doc:lammpsWalker.lammpsWalker.removeOutput}\pysiglinewithargsret{\bfcode{removeOutput}}{}{}
+This routine removes the ouput pipes for information to be written to disk from the underlying dynamics engine. Right now this simply clears all existing output.
+
+\end{fulllineitems}
+
+\index{reverseVel() (lammpsWalker.lammpsWalker method)}
+
+\begin{fulllineitems}
+\phantomsection\label{walker_api/walker_api.doc:lammpsWalker.lammpsWalker.reverseVel}\pysiglinewithargsret{\bfcode{reverseVel}}{}{}
+This function reverses the velocities of a given LAMMPS simulation
+
+\end{fulllineitems}
+
+\index{setConfig() (lammpsWalker.lammpsWalker method)}
+
+\begin{fulllineitems}
+\phantomsection\label{walker_api/walker_api.doc:lammpsWalker.lammpsWalker.setConfig}\pysiglinewithargsret{\bfcode{setConfig}}{\emph{config}}{}
+This routine sets the internal configuration.
+
+\end{fulllineitems}
+
+\index{setDynamics() (lammpsWalker.lammpsWalker method)}
+
+\begin{fulllineitems}
+\phantomsection\label{walker_api/walker_api.doc:lammpsWalker.lammpsWalker.setDynamics}\pysiglinewithargsret{\bfcode{setDynamics}}{\emph{dynamics\_instance}}{}
+This routine sets the dynamics for the walker.
+
+\end{fulllineitems}
+
+\index{setOutput() (lammpsWalker.lammpsWalker method)}
+
+\begin{fulllineitems}
+\phantomsection\label{walker_api/walker_api.doc:lammpsWalker.lammpsWalker.setOutput}\pysiglinewithargsret{\bfcode{setOutput}}{\emph{name}, \emph{outputType}, \emph{filename}, \emph{nSteps}}{}
+This routine sets up a mechanism for writing system information to file directly from the dynamics engine. This is equivalent to output constructed
+
+\end{fulllineitems}
+
+\index{setTemperature() (lammpsWalker.lammpsWalker method)}
+
+\begin{fulllineitems}
+\phantomsection\label{walker_api/walker_api.doc:lammpsWalker.lammpsWalker.setTemperature}\pysiglinewithargsret{\bfcode{setTemperature}}{\emph{temp}}{}
+This function sets the temperature of the walker object.
+
+\end{fulllineitems}
+
+\index{setTimestep() (lammpsWalker.lammpsWalker method)}
+
+\begin{fulllineitems}
+\phantomsection\label{walker_api/walker_api.doc:lammpsWalker.lammpsWalker.setTimestep}\pysiglinewithargsret{\bfcode{setTimestep}}{\emph{timestep}}{}
+This routine sets the dynamics time step.
+
+\end{fulllineitems}
+
+\index{setVel() (lammpsWalker.lammpsWalker method)}
+
+\begin{fulllineitems}
+\phantomsection\label{walker_api/walker_api.doc:lammpsWalker.lammpsWalker.setVel}\pysiglinewithargsret{\bfcode{setVel}}{\emph{vel}}{}
+This function sets the velocity to the lammps simulation.
+
+\end{fulllineitems}
+
+
+\end{fulllineitems}
+
+
+
+\section{OpenMM Walker Module}
+\label{walker_api/walker_api.doc:openmm-walker-module}
+We plan to implement an OpenMM walker API module in a future release.
+
+
+\chapter{Applications}
+\label{applications/applications.doc:applications}\label{applications/applications.doc::doc}
+
+\section{Nonequilibrium Umbrella Sampling}
+\label{applications/applications.doc:nonequilibrium-umbrella-sampling}
+
+\subsection{Partition Module}
+\label{applications/applications.doc:module-partition}\label{applications/applications.doc:partition-module}\index{partition (module)}
+This module contains the definition of the partition object. The partition object represents the definition of a 
+spatial decomposition defined in umbrella samping / stratification algorithms.
+
+The basic features of this partition and how one uses this data structure to perform umbrella sampling type calculations
+is described as follows.
+\index{partition (class in partition)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:partition.partition}\pysiglinewithargsret{\strong{class }\code{partition.}\bfcode{partition}}{\emph{scratchdir=None}, \emph{parallel=False}}{}
+This class defines a set of windows that partition the sampling space.
+This class will contain an array of basisFunction objects.
+\index{accumulateObservables() (partition.partition method)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:partition.partition.accumulateObservables}\pysiglinewithargsret{\bfcode{accumulateObservables}}{\emph{wlkr}, \emph{sample}, \emph{colvars}, \emph{indx}}{}
+This routine loops through the observables list and updates the samples in the corresponding windows.
+
+\end{fulllineitems}
+
+\index{addObservable() (partition.partition method)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:partition.partition.addObservable}\pysiglinewithargsret{\bfcode{addObservable}}{\emph{A}, \emph{rank\_index=None}}{}
+This routine adds an observable and initializes local copies of the observables in the basis windows.
+
+\end{fulllineitems}
+
+\index{build\_keylist\_to\_index\_map() (partition.partition method)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:partition.partition.build_keylist_to_index_map}\pysiglinewithargsret{\bfcode{build\_keylist\_to\_index\_map}}{\emph{keylist}}{}
+This routine takes the input keylist and constructs internal dictionaries that convert between indicies of F
+and elements of the keylist.
+
+\end{fulllineitems}
+
+\index{build\_neighbor\_list() (partition.partition method)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:partition.partition.build_neighbor_list}\pysiglinewithargsret{\bfcode{build\_neighbor\_list}}{\emph{umbrellas}, \emph{s}, \emph{debug=False}}{}
+This routine constructs a neighborlist based on the radius of the basis 
+function.
+
+L is the vector specifying the periodic lengths in each dimension.
+
+\end{fulllineitems}
+
+\index{communicateMPI() (partition.partition method)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:partition.partition.communicateMPI}\pysiglinewithargsret{\bfcode{communicateMPI}}{\emph{rank}, \emph{comm}, \emph{sparseSolve=False}, \emph{finiteTime=False}, \emph{debug=False}}{}
+This routine performs a round of MPI communication to synchronize information across all ranks.
+
+Let's note here that there is a sequence of communication / computation that takes place in this section.
+Therefore it makes the most sense to interleave the two components here.
+
+It should be noted that this being a initial version of the parallel neus code, an optimization of the
+MPI communication could be implemented at a later date.
+
+\end{fulllineitems}
+
+\index{computeObservables() (partition.partition method)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:partition.partition.computeObservables}\pysiglinewithargsret{\bfcode{computeObservables}}{\emph{rank=None}}{}
+This routine populates the partition observables with data averaged from the windows.
+
+\end{fulllineitems}
+
+\index{computeZ() (partition.partition method)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:partition.partition.computeZ}\pysiglinewithargsret{\bfcode{computeZ}}{\emph{sparseSolve=True}, \emph{finiteTime=False}}{}
+Solves for z vector given current G,a via solving the following linear 
+system:
+\begin{quote}
+
+(I - G)\textasciicircum{}T z = a
+
+for a finite time process and
+
+zG = z
+
+for infinite time process.
+\end{quote}
+
+A = (np.identity(self.G.shape{[}0{]}) - self.G).transpose()
+
+self.z = np.linalg.solve(A, self.a)
+
+\end{fulllineitems}
+
+\index{get\_basis\_function\_values() (partition.partition method)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:partition.partition.get_basis_function_values}\pysiglinewithargsret{\bfcode{get\_basis\_function\_values}}{\emph{wlkr}, \emph{umbrella\_index=None}}{}
+This function takes a point in collective variable space and returns 
+an array of the value of the basis functions at that point.
+
+If no umbrella index is passed, then search the whole space
+
+\end{fulllineitems}
+
+\index{reinject() (partition.partition method)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:partition.partition.reinject}\pysiglinewithargsret{\bfcode{reinject}}{\emph{wlkr}, \emph{i}}{}
+This function initializes a simulation from the entry point list in the 
+current umbrella.
+
+\end{fulllineitems}
+
+\index{removeObservable() (partition.partition method)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:partition.partition.removeObservable}\pysiglinewithargsret{\bfcode{removeObservable}}{}{}
+This routine removes all observables from the list for the partition.
+
+\end{fulllineitems}
+
+\index{resetObservable() (partition.partition method)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:partition.partition.resetObservable}\pysiglinewithargsret{\bfcode{resetObservable}}{\emph{obs}}{}
+Set each element in the data of the passed observable to zero.
+
+\end{fulllineitems}
+
+\index{sample() (partition.partition method)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:partition.partition.sample}\pysiglinewithargsret{\bfcode{sample}}{\emph{wlkr}, \emph{umbrellaIndex}, \emph{numSteps}, \emph{stepLength}, \emph{walkerIndex}, \emph{corrLength=None}, \emph{debug=False}}{}
+This function takes a system lmp and propagates the dynamics to generate
+the required samples but storing and generating samples via NEUS algorithm.
+
+Specifically, this performs an umbrella sampling routine using NEUS reinjection procedure for reinitializing the walker.
+
+We should remove the need for the output to be specified internally here.
+
+\end{fulllineitems}
+
+\index{set\_umbrellas() (partition.partition method)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:partition.partition.set_umbrellas}\pysiglinewithargsret{\bfcode{set\_umbrellas}}{\emph{umbrellas}, \emph{neighborList=True}, \emph{s=None}}{}
+This routine replaces the current list of umbrellas with those provided
+and updates the matricies contained to match the new umbrella list. This 
+behavior is destructive to the old matricies.
+
+\end{fulllineitems}
+
+\index{updateF() (partition.partition method)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:partition.partition.updateF}\pysiglinewithargsret{\bfcode{updateF}}{\emph{row}, \emph{epsilon}}{}
+This routine update G according to:
+\begin{quote}
+
+G\_\{ij\}\textasciicircum{}\{k+1\} = (1 - epsilon\_\{k\}) * G\_\{ij\}\textasciicircum{}\{k\} + epsilon\_\{k\} * M\_\{ij\} / T\_\{i\}
+\end{quote}
+
+for a finite time problem.
+
+\end{fulllineitems}
+
+
+\end{fulllineitems}
+
+
+
+\subsection{Basis Function Module}
+\label{applications/applications.doc:module-basisFunctions}\label{applications/applications.doc:basis-function-module}\index{basisFunctions (module)}
+Created on Mon May  5 18:04:54 2014
+
+@author: jtempkin
+\index{Box (class in basisFunctions)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:basisFunctions.Box}\pysiglinewithargsret{\strong{class }\code{basisFunctions.}\bfcode{Box}}{\emph{center}, \emph{width}, \emph{periodicLength=None}, \emph{max\_entrypoints=250}}{}
+This class impements a rectangle in CV space.
+\index{indicator() (basisFunctions.Box method)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:basisFunctions.Box.indicator}\pysiglinewithargsret{\bfcode{indicator}}{\emph{coord}}{}
+Return the value of the indicator of the box at this point.  This will be 1.0 if coord is contained inside the box, and 0.0 if it is not.
+
+\end{fulllineitems}
+
+
+\end{fulllineitems}
+
+\index{Gaussian (class in basisFunctions)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:basisFunctions.Gaussian}\pysiglinewithargsret{\strong{class }\code{basisFunctions.}\bfcode{Gaussian}}{\emph{mu}, \emph{sig}, \emph{max\_entrypoints=250}}{}
+This class implements a Gaussian function.
+\index{indicator() (basisFunctions.Gaussian method)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:basisFunctions.Gaussian.indicator}\pysiglinewithargsret{\bfcode{indicator}}{\emph{coord}}{}
+Function that returns the value of the Gaussian at a point.
+
+\end{fulllineitems}
+
+
+\end{fulllineitems}
+
+\index{Pyramid (class in basisFunctions)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:basisFunctions.Pyramid}\pysiglinewithargsret{\strong{class }\code{basisFunctions.}\bfcode{Pyramid}}{\emph{center}, \emph{width}, \emph{ref\_center=None}, \emph{ref\_width=None}, \emph{time=None}, \emph{periodicLength=None}, \emph{max\_entrypoints=500}}{}~\begin{description}
+\item[{This class implements a pyramidal basis function. }] \leavevmode\begin{quote}
+\begin{description}
+\item[{center            The center of the box in the collective variable space.  }] \leavevmode
+This should ideally be a numpy/scipy array or list, but other iterables MIGHT work.
+
+\end{description}
+\end{quote}
+\begin{description}
+\item[{width              This is the width out from the center in each collective coordinate.}] \leavevmode
+The actual width of the box in each coordinate is twice this vector.
+
+\item[{periodicLength        The wrapping object takes a little explanation.  It is an optional array, }] \leavevmode
+where the i'th element corresponds to the i'th collective variable.  If the 
+collective variable wraps around, the corresponding element is the range 
+of the collective variable, e.g. 360 for an angle going from -180 to 180.  If the 
+collective varable does not wrap around, the corresponding element is 
+just 0.  If none of the collective variables 
+wrap, leaving wrapping as None is perfectly fine.
+
+\end{description}
+
+\end{description}
+\index{ref\_indicator() (basisFunctions.Pyramid method)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:basisFunctions.Pyramid.ref_indicator}\pysiglinewithargsret{\bfcode{ref\_indicator}}{\emph{coord}}{}
+Return the value of the indicator for the reference coordinates if appropriate.
+
+NOTE: Currently we will simply implement the reference discretization as non-overlapping boxes.
+
+\end{fulllineitems}
+
+\index{time\_indicator() (basisFunctions.Pyramid method)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:basisFunctions.Pyramid.time_indicator}\pysiglinewithargsret{\bfcode{time\_indicator}}{\emph{coord}}{}
+Return the value of the indicator function for the time coordinate.
+
+This will be implemented currently as non-overlapping discretization in time.
+
+\end{fulllineitems}
+
+
+\end{fulllineitems}
+
+\index{basisFunction (class in basisFunctions)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:basisFunctions.basisFunction}\pysiglinewithargsret{\strong{class }\code{basisFunctions.}\bfcode{basisFunction}}{\emph{center}, \emph{width}, \emph{ref\_center=None}, \emph{ref\_width=None}, \emph{time=None}, \emph{periodicLength=None}, \emph{max\_entrypoints=500}}{}
+It is important to note that the configurations associated with 
+sampling of this box are stored at this level of the class structure.
+
+At this level, the characteristics defining the basisFunction class is
+a set of configurations inherent to the class.
+\index{add\_entry\_point() (basisFunctions.basisFunction method)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:basisFunctions.basisFunction.add_entry_point}\pysiglinewithargsret{\bfcode{add\_entry\_point}}{\emph{ep}, \emph{key}}{}
+This routine adds a new entry point to the current list
+
+\end{fulllineitems}
+
+\index{add\_local\_obserbale() (basisFunctions.basisFunction method)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:basisFunctions.basisFunction.add_local_obserbale}\pysiglinewithargsret{\bfcode{add\_local\_obserbale}}{\emph{obs}}{}
+This routine adds a local observable to this window.
+
+\end{fulllineitems}
+
+\index{add\_new\_entry\_point() (basisFunctions.basisFunction method)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:basisFunctions.basisFunction.add_new_entry_point}\pysiglinewithargsret{\bfcode{add\_new\_entry\_point}}{\emph{ep}, \emph{key\_from}}{}
+This routine add an entry point to the list of proposed entry points.
+
+\end{fulllineitems}
+
+\index{empty\_new\_entry\_points() (basisFunctions.basisFunction method)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:basisFunctions.basisFunction.empty_new_entry_points}\pysiglinewithargsret{\bfcode{empty\_new\_entry\_points}}{}{}
+This routine empties the new entry points data structure locally.
+
+\end{fulllineitems}
+
+\index{flush\_data\_to\_file() (basisFunctions.basisFunction method)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:basisFunctions.basisFunction.flush_data_to_file}\pysiglinewithargsret{\bfcode{flush\_data\_to\_file}}{\emph{filename}}{}
+This function flushes the internal data buffers configs and samples to
+files.
+
+This function uses the HDF5 python implementation to store data to disk.
+It should be noted that it creates two groups in the top-level called 
+`colvars' and `timeSeries'. Because appending data is not as easy for 
+this file format, it stores each flush as a new dataset indexed in each
+group.
+
+\end{fulllineitems}
+
+\index{get\_entry\_point() (basisFunctions.basisFunction method)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:basisFunctions.basisFunction.get_entry_point}\pysiglinewithargsret{\bfcode{get\_entry\_point}}{}{}
+This routine returns an entry point from the buffers draw proportional to the entry fluxes.
+
+\end{fulllineitems}
+
+\index{get\_local\_observales() (basisFunctions.basisFunction method)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:basisFunctions.basisFunction.get_local_observales}\pysiglinewithargsret{\bfcode{get\_local\_observales}}{}{}
+This routine returns a list of the local observables.
+
+\end{fulllineitems}
+
+\index{initialize\_entry\_points() (basisFunctions.basisFunction method)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:basisFunctions.basisFunction.initialize_entry_points}\pysiglinewithargsret{\bfcode{initialize\_entry\_points}}{\emph{keylist=None}}{}
+This routine initializes the entry point data structure in the umbrella.
+
+The structure of the entry Point library is designed to be flexible as to how one wants to track entries from
+neightbors. There are two schemes that are supported now. The first option is a single set containing all
+entry points to this window (we're actually using the Python set structure). The second type is a dictionary
+of sets. This allows one to group contributions to the entry point list for this window by assigning a key to
+each neighbor and add/draw entry points from these separate sets by passing a key value to the respective add/draw
+operations.
+
+To construct the second type of structure you specify the key structure with a list of keys that define the
+categories from which one can group entry points.
+
+\end{fulllineitems}
+
+\index{remove\_local\_observales() (basisFunctions.basisFunction method)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:basisFunctions.basisFunction.remove_local_observales}\pysiglinewithargsret{\bfcode{remove\_local\_observales}}{}{}
+This routine removes all local observables contained by this window.
+
+\end{fulllineitems}
+
+\index{update\_entry\_points\_fluxes() (basisFunctions.basisFunction method)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:basisFunctions.basisFunction.update_entry_points_fluxes}\pysiglinewithargsret{\bfcode{update\_entry\_points\_fluxes}}{\emph{flux}, \emph{key\_map}}{}
+This routine updates the sizes of the discretization of the entry point flux lists based on the maximum size of the entry point buffer.
+
+The flush keyword moves all stored points to the active buffer regardless of the fluxes
+
+\end{fulllineitems}
+
+
+\end{fulllineitems}
+
+
+
+\subsection{Entry Point Module}
+\label{applications/applications.doc:entry-point-module}\label{applications/applications.doc:module-entryPoints}\index{entryPoints (module)}
+This module acts as a template for defining named tuples that store entry points.
+
+It provides a consistent entry point contruction as a named tuple.
+\index{entry\_point (class in entryPoints)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:entryPoints.entry_point}\pysiglinewithargsret{\strong{class }\code{entryPoints.}\bfcode{entry\_point}}{\emph{q}, \emph{p}, \emph{ref\_q}, \emph{ref\_p}, \emph{time}, \emph{cv}}{}
+class entryPoints(object):
+\begin{quote}
+
+This class acts as a wrapper for an entry point object. Should have at least the structures to contain a phase space point.
+
+def \_\_init\_\_(self, config, vel, time):
+\begin{quote}
+
+Constructs an object containing at least a point in phase space. Can be initialized to contain other information like a reference point as well but we leave this to be handled dynamically.
+
+self.config = config
+self.vel = vel
+self.time = time
+\end{quote}
+\end{quote}
+\index{cv (entryPoints.entry\_point attribute)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:entryPoints.entry_point.cv}\pysigline{\bfcode{cv}}
+Alias for field number 5
+
+\end{fulllineitems}
+
+\index{p (entryPoints.entry\_point attribute)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:entryPoints.entry_point.p}\pysigline{\bfcode{p}}
+Alias for field number 1
+
+\end{fulllineitems}
+
+\index{q (entryPoints.entry\_point attribute)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:entryPoints.entry_point.q}\pysigline{\bfcode{q}}
+Alias for field number 0
+
+\end{fulllineitems}
+
+\index{ref\_p (entryPoints.entry\_point attribute)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:entryPoints.entry_point.ref_p}\pysigline{\bfcode{ref\_p}}
+Alias for field number 3
+
+\end{fulllineitems}
+
+\index{ref\_q (entryPoints.entry\_point attribute)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:entryPoints.entry_point.ref_q}\pysigline{\bfcode{ref\_q}}
+Alias for field number 2
+
+\end{fulllineitems}
+
+\index{time (entryPoints.entry\_point attribute)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:entryPoints.entry_point.time}\pysigline{\bfcode{time}}
+Alias for field number 4
+
+\end{fulllineitems}
+
+
+\end{fulllineitems}
+
+
+
+\subsection{Observable Module}
+\label{applications/applications.doc:module-observables}\label{applications/applications.doc:observable-module}\index{observables (module)}
+This module contains a list of observable routines. These functions serve to calculation and record the value of observables in the course of a calculation.
+
+These routines are initialized as their own class and subsequently can be invoked during other calculations or called by other routines. We may consider updating these classes with a base class prototype similar to how the walker class was initialized.
+\index{P1 (class in observables)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:observables.P1}\pysiglinewithargsret{\strong{class }\code{observables.}\bfcode{P1}}{\emph{name}, \emph{s}, \emph{stepLength}, \emph{atomids}, \emph{data}, \emph{cellDim}}{}
+This routine returns the TCF of the end to end distance.
+
+\end{fulllineitems}
+
+\index{cv\_indicator\_correlation (class in observables)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:observables.cv_indicator_correlation}\pysiglinewithargsret{\strong{class }\code{observables.}\bfcode{cv\_indicator\_correlation}}{\emph{name}, \emph{s}, \emph{stepLength}, \emph{data}, \emph{cv\_index}, \emph{cv\_range}}{}
+This routine returns the value of an indicator function over a space in a given cv.
+
+\end{fulllineitems}
+
+\index{dihedral\_fluctuation\_correlation (class in observables)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:observables.dihedral_fluctuation_correlation}\pysiglinewithargsret{\strong{class }\code{observables.}\bfcode{dihedral\_fluctuation\_correlation}}{\emph{name}, \emph{s}, \emph{stepLength}, \emph{data}, \emph{cvindex}, \emph{mean}}{}
+This routine returns the TCF of a dihedral angle.
+
+\end{fulllineitems}
+
+\index{dihedral\_fluctuation\_correlation\_2 (class in observables)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:observables.dihedral_fluctuation_correlation_2}\pysiglinewithargsret{\strong{class }\code{observables.}\bfcode{dihedral\_fluctuation\_correlation\_2}}{\emph{name}, \emph{s}, \emph{stepLength}, \emph{data}, \emph{atomids}, \emph{mean}}{}
+This routine returns the TCF of a dihedral angle.
+
+\end{fulllineitems}
+
+\index{dist\_fluctuation\_correlation (class in observables)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:observables.dist_fluctuation_correlation}\pysiglinewithargsret{\strong{class }\code{observables.}\bfcode{dist\_fluctuation\_correlation}}{\emph{name}, \emph{s}, \emph{stepLength}, \emph{atomids}, \emph{data}, \emph{cellDim}, \emph{mean}}{}
+This routine returns the TCF of the end to end distance.
+
+\end{fulllineitems}
+
+\index{electric\_field (class in observables)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:observables.electric_field}\pysiglinewithargsret{\strong{class }\code{observables.}\bfcode{electric\_field}}{\emph{name}, \emph{s}, \emph{stepLength}, \emph{atomids}, \emph{data}, \emph{cellDim}, \emph{atom\_exclusions}, \emph{ref\_atoms\_ids=None}}{}
+This class constructs an observable that reports on the time-correlation 
+of the electric field at a point in space.
+
+\end{fulllineitems}
+
+\index{pmf (class in observables)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:observables.pmf}\pysiglinewithargsret{\strong{class }\code{observables.}\bfcode{pmf}}{\emph{name}, \emph{data}, \emph{data\_width}}{}
+This class represents a PMF observable.
+
+\end{fulllineitems}
+
+
+
+\section{Steered Transition Path Sampling (Steps)}
+\label{applications/applications.doc:steered-transition-path-sampling-steps}
+
+\section{Replica Exchange}
+\label{applications/applications.doc:replica-exchange}
+
+\section{Profiling Applications}
+\label{applications/applications.doc:profiling-applications}
+
+\chapter{Testing}
+\label{test/testing.doc:testing}\label{test/testing.doc::doc}
+Here I will add a description of the unit testing of Walker API implementations and potentially the application testing.
 
 
 \renewcommand{\indexname}{Python Module Index}
 \begin{theindex}
 \def\bigletter#1{{\Large\sffamily#1}\nopagebreak\vspace{1mm}}
+\bigletter{b}
+\item {\texttt{basisFunctions}}, \pageref{applications/applications.doc:module-basisFunctions}
+\indexspace
+\bigletter{c}
+\item {\texttt{collectiveVariables}}, \pageref{walker_api/walker_api.doc:module-collectiveVariables}
+\indexspace
+\bigletter{d}
+\item {\texttt{dynamics}}, \pageref{walker_api/walker_api.doc:module-dynamics}
+\indexspace
+\bigletter{e}
+\item {\texttt{entryPoints}}, \pageref{applications/applications.doc:module-entryPoints}
+\indexspace
+\bigletter{l}
+\item {\texttt{lammpsWalker}}, \pageref{walker_api/walker_api.doc:module-lammpsWalker}
+\indexspace
+\bigletter{o}
+\item {\texttt{observables}}, \pageref{applications/applications.doc:module-observables}
+\item {\texttt{outputClass}}, \pageref{walker_api/walker_api.doc:module-outputClass}
+\indexspace
+\bigletter{p}
+\item {\texttt{partition}}, \pageref{applications/applications.doc:module-partition}
+\indexspace
 \bigletter{w}
-\item {\texttt{walker}}, \pageref{src/src.doc:module-walker}
+\item {\texttt{walker\_base}}, \pageref{walker_api/walker_api.doc:module-walker_base}
 \end{theindex}
 
 \renewcommand{\indexname}{Index}

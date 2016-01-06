@@ -1,0 +1,1076 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="846936b2-0076-4e99-bb40-49ca22566e82" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/langevinWalker.py" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/basisFunctions_neus.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/basisFunctions_neus_dipeptide.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/charmm_diala.psf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/data.diala" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/charmm_diala.psf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/data.diala" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/debug.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_0_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_100_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_101_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_102_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_103_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_104_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_105_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_106_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_107_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_108_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_109_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_10_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_110_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_111_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_112_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_113_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_114_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_115_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_116_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_117_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_118_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_119_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_11_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_120_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_121_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_122_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_123_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_124_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_125_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_126_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_127_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_128_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_129_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_12_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_130_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_131_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_132_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_133_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_134_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_135_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_136_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_137_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_138_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_139_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_13_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_140_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_141_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_142_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_143_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_14_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_15_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_16_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_17_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_18_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_19_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_1_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_20_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_21_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_22_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_23_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_24_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_25_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_26_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_27_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_28_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_29_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_2_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_30_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_31_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_32_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_33_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_34_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_35_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_36_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_37_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_38_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_39_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_3_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_40_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_41_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_42_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_43_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_44_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_45_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_46_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_47_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_48_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_49_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_4_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_50_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_51_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_52_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_53_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_54_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_55_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_56_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_57_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_58_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_59_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_5_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_60_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_61_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_62_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_63_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_64_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_65_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_66_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_67_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_68_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_69_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_6_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_70_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_71_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_72_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_73_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_74_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_75_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_76_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_77_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_78_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_79_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_7_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_80_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_81_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_82_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_83_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_84_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_85_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_86_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_87_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_88_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_89_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_8_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_90_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_91_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_92_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_93_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_94_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_95_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_96_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_97_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_98_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_99_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/in_9_w0.entryPoints.npy" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/entryPoints/log.lammps" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/input.diala" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/log.0" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/log.lammps" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/examples/neus_serial.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/input.diala" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/neus_serial.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/partition_deprecated.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/partition_mod.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/partition_neus.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/neus/partition_neus_dipeptide.py" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/neus/basisFunctions.py" afterPath="$PROJECT_DIR$/neus/basisFunctions.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/collectiveVariables.py" afterPath="$PROJECT_DIR$/src/collectiveVariables.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/dynamics.py" afterPath="$PROJECT_DIR$/src/dynamics.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/lammpsWalker.py" afterPath="$PROJECT_DIR$/src/lammpsWalker.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/neus/observables.py" afterPath="$PROJECT_DIR$/neus/observables.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/neus/partition.py" afterPath="$PROJECT_DIR$/neus/partition.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/umbrella_sampling/partition.py" afterPath="$PROJECT_DIR$/umbrella_sampling/partition.py" />
+    </list>
+    <ignored path="enhanced_sampling_toolkit.iws" />
+    <ignored path=".idea/workspace.xml" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
+  <component name="CreatePatchCommitExecutor">
+    <option name="PATCH_PATH" value="" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
+  <component name="FavoritesManager">
+    <favorites_list name="enhanced_sampling_toolkit" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf>
+      <file leaf-file-name="observables.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/neus/observables.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="214" column="44" selection-start-line="214" selection-start-column="44" selection-end-line="214" selection-end-column="44" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="entryPoints.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/neus/entryPoints.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="basisFunctions.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/neus/basisFunctions.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="96" column="29" selection-start-line="96" selection-start-column="29" selection-end-line="96" selection-end-column="29" />
+              <folding>
+                <element signature="e#654#672#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="diala.neus.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/../diala.neus.devel/diala.neus.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.4909091">
+              <caret line="411" column="69" selection-start-line="411" selection-start-column="69" selection-end-line="411" selection-end-column="69" />
+              <folding>
+                <element signature="e#267#285#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="run.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../diala.dual.devel/entryPoints/run.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="103" column="0" selection-start-line="103" selection-start-column="0" selection-end-line="103" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="partition.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/neus/partition.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="357" column="68" selection-start-line="357" selection-start-column="68" selection-end-line="357" selection-end-column="68" />
+              <folding>
+                <element signature="e#143#161#0" expanded="true" />
+                <element signature="e#2610#3503#0" expanded="false" />
+                <element signature="e#3545#3902#0" expanded="false" />
+                <element signature="e#3967#4919#0" expanded="false" />
+                <element signature="e#4971#6374#0" expanded="false" />
+                <element signature="e#7446#7609#0" expanded="false" />
+                <element signature="e#7660#8941#0" expanded="false" />
+                <element signature="e#9019#10951#0" expanded="false" />
+                <element signature="e#15425#16226#0" expanded="false" />
+                <element signature="e#16287#18088#0" expanded="false" />
+                <element signature="e#18142#18968#0" expanded="false" />
+                <element signature="e#19034#21963#0" expanded="false" />
+                <element signature="e#22064#27918#0" expanded="false" />
+                <element signature="e#27973#28537#0" expanded="false" />
+                <element signature="e#28621#30841#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/src/collectiveVariables.py" />
+        <option value="$PROJECT_DIR$/umbrella_sampling/partition.py" />
+        <option value="$PROJECT_DIR$/src/langevinWalker.py" />
+        <option value="$PROJECT_DIR$/../diala.neus.devel/entryPoints/run.py" />
+        <option value="$PROJECT_DIR$/neus/observables.py" />
+        <option value="$PROJECT_DIR$/neus/basisFunctions.py" />
+        <option value="$PROJECT_DIR$/src/dynamics.py" />
+        <option value="$PROJECT_DIR$/src/lammpsWalker.py" />
+        <option value="$PROJECT_DIR$/neus/partition.py" />
+        <option value="$PROJECT_DIR$/../diala.dual.devel/diala.dual.py" />
+        <option value="$PROJECT_DIR$/../diala.dual.devel/entryPoints/run.py" />
+        <option value="$PROJECT_DIR$/../diala.neus.devel/diala.neus.py" />
+      </list>
+    </option>
+  </component>
+  <component name="NamedScopeManager">
+    <order />
+  </component>
+  <component name="ProjectFrameBounds">
+    <option name="width" value="1440" />
+    <option name="height" value="900" />
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="false">
+    <OptionsSetting value="true" id="Add" />
+    <OptionsSetting value="true" id="Remove" />
+    <OptionsSetting value="true" id="Checkout" />
+    <OptionsSetting value="true" id="Update" />
+    <OptionsSetting value="true" id="Status" />
+    <OptionsSetting value="true" id="Edit" />
+    <ConfirmationsSetting value="0" id="Add" />
+    <ConfirmationsSetting value="0" id="Remove" />
+  </component>
+  <component name="ProjectView">
+    <navigator currentView="ProjectPane" proportions="" version="1">
+      <flattenPackages />
+      <showMembers />
+      <showModules />
+      <showLibraryContents />
+      <hideEmptyPackages />
+      <abbreviatePackageNames />
+      <autoscrollToSource />
+      <autoscrollFromSource />
+      <sortByType />
+    </navigator>
+    <panes>
+      <pane id="Scratches" />
+      <pane id="Scope" />
+      <pane id="ProjectPane">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="enhanced_sampling_toolkit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="enhanced_sampling_toolkit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="enhanced_sampling_toolkit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="enhanced_sampling_toolkit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="enhanced_sampling_toolkit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="enhanced_sampling_toolkit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="enhanced_sampling_toolkit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="neus" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../diala.dual.devel/diala.dual.py" />
+    <property name="FullScreen" value="true" />
+    <property name="settings.editor.selected.configurable" value="editor.preferences.appearance" />
+    <property name="settings.editor.splitter.proportion" value="0.2" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="PythonConfigurationType" factoryName="Python">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="enhanced_sampling_toolkit" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <method />
+    </configuration>
+    <configuration default="true" type="tests" factoryName="Attests">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="enhanced_sampling_toolkit" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="CLASS_NAME" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="FOLDER_NAME" value="" />
+      <option name="TEST_TYPE" value="TEST_SCRIPT" />
+      <option name="PATTERN" value="" />
+      <option name="USE_PATTERN" value="false" />
+      <method />
+    </configuration>
+    <configuration default="true" type="tests" factoryName="Doctests">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="enhanced_sampling_toolkit" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="CLASS_NAME" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="FOLDER_NAME" value="" />
+      <option name="TEST_TYPE" value="TEST_SCRIPT" />
+      <option name="PATTERN" value="" />
+      <option name="USE_PATTERN" value="false" />
+      <method />
+    </configuration>
+    <configuration default="true" type="tests" factoryName="Nosetests">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="enhanced_sampling_toolkit" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="CLASS_NAME" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="FOLDER_NAME" value="" />
+      <option name="TEST_TYPE" value="TEST_SCRIPT" />
+      <option name="PATTERN" value="" />
+      <option name="USE_PATTERN" value="false" />
+      <option name="PARAMS" value="" />
+      <option name="USE_PARAM" value="false" />
+      <method />
+    </configuration>
+    <configuration default="true" type="tests" factoryName="Unittests">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="enhanced_sampling_toolkit" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="CLASS_NAME" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="FOLDER_NAME" value="" />
+      <option name="TEST_TYPE" value="TEST_SCRIPT" />
+      <option name="PATTERN" value="" />
+      <option name="USE_PATTERN" value="false" />
+      <option name="PUREUNITTEST" value="true" />
+      <option name="PARAMS" value="" />
+      <option name="USE_PARAM" value="false" />
+      <method />
+    </configuration>
+    <configuration default="true" type="tests" factoryName="py.test">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="enhanced_sampling_toolkit" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="CLASS_NAME" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="FOLDER_NAME" value="" />
+      <option name="TEST_TYPE" value="TEST_SCRIPT" />
+      <option name="PATTERN" value="" />
+      <option name="USE_PATTERN" value="false" />
+      <option name="testToRun" value="" />
+      <option name="keywords" value="" />
+      <option name="params" value="" />
+      <option name="USE_PARAM" value="false" />
+      <option name="USE_KEYWORD" value="false" />
+      <method />
+    </configuration>
+  </component>
+  <component name="ShelveChangesManager" show_recycled="false" />
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="846936b2-0076-4e99-bb40-49ca22566e82" name="Default" comment="" />
+      <created>1439327634878</created>
+      <option name="number" value="Default" />
+      <updated>1439327634878</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="0" y="0" width="1440" height="900" extended-state="0" />
+    <editor active="true" />
+    <layout>
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+    </layout>
+  </component>
+  <component name="Vcs.Log.UiProperties">
+    <option name="RECENTLY_FILTERED_USER_GROUPS">
+      <collection />
+    </option>
+    <option name="RECENTLY_FILTERED_BRANCH_GROUPS">
+      <collection />
+    </option>
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager />
+    <watches-manager />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/neus/entryPoints.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/neus/basisFunctions.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="96" column="29" selection-start-line="96" selection-start-column="29" selection-end-line="96" selection-end-column="29" />
+          <folding>
+            <element signature="e#654#672#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../diala.dual.devel/diala.dual.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="226" column="31" selection-start-line="226" selection-start-column="31" selection-end-line="226" selection-end-column="31" />
+          <folding>
+            <element signature="e#578#1085#0" expanded="false" />
+            <element signature="e#1154#2680#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../diala.neus.devel/diala.neus.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="408" column="107" selection-start-line="408" selection-start-column="107" selection-end-line="408" selection-end-column="107" />
+          <folding>
+            <element signature="e#267#285#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../diala.dual.devel/entryPoints/run.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/neus/partition.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="199" column="25" selection-start-line="199" selection-start-column="25" selection-end-line="199" selection-end-column="25" />
+          <folding>
+            <element signature="e#143#161#0" expanded="true" />
+            <element signature="e#2610#3503#0" expanded="false" />
+            <element signature="e#3545#3902#0" expanded="false" />
+            <element signature="e#3967#4919#0" expanded="false" />
+            <element signature="e#4971#6374#0" expanded="false" />
+            <element signature="e#7446#7609#0" expanded="false" />
+            <element signature="e#7660#8941#0" expanded="false" />
+            <element signature="e#9019#10951#0" expanded="false" />
+            <element signature="e#15425#16226#0" expanded="false" />
+            <element signature="e#16287#18088#0" expanded="false" />
+            <element signature="e#18142#18968#0" expanded="false" />
+            <element signature="e#19034#21963#0" expanded="false" />
+            <element signature="e#22064#27918#0" expanded="false" />
+            <element signature="e#27973#28537#0" expanded="false" />
+            <element signature="e#28621#30841#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/neus/observables.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="214" column="44" selection-start-line="214" selection-start-column="44" selection-end-line="214" selection-end-column="44" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/neus/entryPoints.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/neus/basisFunctions.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="96" column="29" selection-start-line="96" selection-start-column="29" selection-end-line="96" selection-end-column="29" />
+          <folding>
+            <element signature="e#654#672#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../diala.dual.devel/diala.dual.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="39" column="0" selection-start-line="39" selection-start-column="0" selection-end-line="85" selection-end-column="12" />
+          <folding>
+            <element signature="e#578#1085#0" expanded="false" />
+            <element signature="e#1154#2680#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../diala.neus.devel/diala.neus.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#267#285#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../diala.dual.devel/entryPoints/run.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="122" column="72" selection-start-line="94" selection-start-column="8" selection-end-line="122" selection-end-column="72" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/neus/partition.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="199" column="25" selection-start-line="199" selection-start-column="25" selection-end-line="199" selection-end-column="25" />
+          <folding>
+            <element signature="e#143#161#0" expanded="true" />
+            <element signature="e#2610#3503#0" expanded="false" />
+            <element signature="e#3545#3902#0" expanded="false" />
+            <element signature="e#3967#4919#0" expanded="false" />
+            <element signature="e#4971#6374#0" expanded="false" />
+            <element signature="e#7446#7609#0" expanded="false" />
+            <element signature="e#7660#8941#0" expanded="false" />
+            <element signature="e#9019#10951#0" expanded="false" />
+            <element signature="e#15425#16226#0" expanded="false" />
+            <element signature="e#16287#18088#0" expanded="false" />
+            <element signature="e#18142#18968#0" expanded="false" />
+            <element signature="e#19034#21963#0" expanded="false" />
+            <element signature="e#22064#27918#0" expanded="false" />
+            <element signature="e#27973#28537#0" expanded="false" />
+            <element signature="e#28621#30841#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/walker_base.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/neus/observables.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/neus/entryPoints.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/neus/basisFunctions.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="106" column="33" selection-start-line="106" selection-start-column="33" selection-end-line="106" selection-end-column="33" />
+          <folding>
+            <element signature="e#654#672#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../diala.neus.devel/diala.neus.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="119" column="114" selection-start-line="119" selection-start-column="114" selection-end-line="119" selection-end-column="114" />
+          <folding>
+            <element signature="e#267#285#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../diala.neus.devel/entryPoints/run.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="102" column="0" selection-start-line="102" selection-start-column="0" selection-end-line="102" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/neus/partition.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="231" column="67" selection-start-line="231" selection-start-column="67" selection-end-line="231" selection-end-column="67" />
+          <folding>
+            <element signature="e#143#161#0" expanded="true" />
+            <element signature="e#2610#3503#0" expanded="false" />
+            <element signature="e#3545#3902#0" expanded="false" />
+            <element signature="e#3967#4919#0" expanded="false" />
+            <element signature="e#4971#6374#0" expanded="false" />
+            <element signature="e#7446#7609#0" expanded="false" />
+            <element signature="e#7660#8941#0" expanded="false" />
+            <element signature="e#9019#10951#0" expanded="false" />
+            <element signature="e#15425#16226#0" expanded="false" />
+            <element signature="e#16287#18088#0" expanded="false" />
+            <element signature="e#18142#18968#0" expanded="false" />
+            <element signature="e#19034#21963#0" expanded="false" />
+            <element signature="e#22064#27918#0" expanded="false" />
+            <element signature="e#27973#28537#0" expanded="false" />
+            <element signature="e#28621#30841#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/walker_base.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/neus/observables.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/neus/entryPoints.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/neus/basisFunctions.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="132" column="12" selection-start-line="132" selection-start-column="12" selection-end-line="132" selection-end-column="12" />
+          <folding>
+            <element signature="e#654#672#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/langevinWalker.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/neus/partition.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="227" column="47" selection-start-line="227" selection-start-column="47" selection-end-line="227" selection-end-column="47" />
+          <folding>
+            <element signature="e#143#161#0" expanded="true" />
+            <element signature="e#2610#3503#0" expanded="false" />
+            <element signature="e#3545#3902#0" expanded="false" />
+            <element signature="e#3967#4919#0" expanded="false" />
+            <element signature="e#4971#6374#0" expanded="false" />
+            <element signature="e#7446#7609#0" expanded="false" />
+            <element signature="e#7660#8941#0" expanded="false" />
+            <element signature="e#9019#10951#0" expanded="false" />
+            <element signature="e#15425#16226#0" expanded="false" />
+            <element signature="e#16287#18088#0" expanded="false" />
+            <element signature="e#18142#18968#0" expanded="false" />
+            <element signature="e#19034#21963#0" expanded="false" />
+            <element signature="e#22064#27918#0" expanded="false" />
+            <element signature="e#27973#28537#0" expanded="false" />
+            <element signature="e#28621#30841#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/neus/observables.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/neus/entryPoints.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/neus/basisFunctions.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#654#672#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/src.doc.rst">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="19" column="0" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/collectiveVariables.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.036363635">
+          <caret line="2" column="92" selection-start-line="2" selection-start-column="92" selection-end-line="2" selection-end-column="92" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-1.1090909">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/fileIO.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-2.3272727">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/umbrella_sampling/partition.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="5.0">
+          <caret line="337" column="4" selection-start-line="337" selection-start-column="4" selection-end-line="337" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/langevinWalker.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="5.927273">
+          <caret line="330" column="11" selection-start-line="330" selection-start-column="11" selection-end-line="330" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/neus/entryPoints.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../neus.diala/diala.neus.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/walker_base.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../diala.neus.devel/entryPoints/run.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="102" column="0" selection-start-line="102" selection-start-column="0" selection-end-line="102" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/neus/DEPRC/partition_deprecated.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-0.6181818">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/neus/DEPRC/partition_neus_dipeptide.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/neus/DEPRC/partition_neus.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-0.5090909">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Library/Caches/PyCharm40/python_stubs/-1470874971/__builtin__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.56363636">
+          <caret line="31" column="0" selection-start-line="31" selection-start-column="0" selection-end-line="31" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/dynamics.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.6363636">
+          <caret line="35" column="46" selection-start-line="35" selection-start-column="46" selection-end-line="35" selection-end-column="46" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/lammpsWalker.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.36363637">
+          <caret line="433" column="23" selection-start-line="433" selection-start-column="23" selection-end-line="433" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/neus/observables.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="214" column="44" selection-start-line="214" selection-start-column="44" selection-end-line="214" selection-end-column="44" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../diala.dual.devel/entryPoints/run.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="103" column="0" selection-start-line="103" selection-start-column="0" selection-end-line="103" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/neus/partition.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="357" column="68" selection-start-line="357" selection-start-column="68" selection-end-line="357" selection-end-column="68" />
+          <folding>
+            <element signature="e#143#161#0" expanded="true" />
+            <element signature="e#2610#3503#0" expanded="false" />
+            <element signature="e#3545#3902#0" expanded="false" />
+            <element signature="e#3967#4919#0" expanded="false" />
+            <element signature="e#4971#6374#0" expanded="false" />
+            <element signature="e#7446#7609#0" expanded="false" />
+            <element signature="e#7660#8941#0" expanded="false" />
+            <element signature="e#9019#10951#0" expanded="false" />
+            <element signature="e#15425#16226#0" expanded="false" />
+            <element signature="e#16287#18088#0" expanded="false" />
+            <element signature="e#18142#18968#0" expanded="false" />
+            <element signature="e#19034#21963#0" expanded="false" />
+            <element signature="e#22064#27918#0" expanded="false" />
+            <element signature="e#27973#28537#0" expanded="false" />
+            <element signature="e#28621#30841#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../diala.dual.devel/diala.dual.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.5272727">
+          <caret line="234" column="78" selection-start-line="234" selection-start-column="78" selection-end-line="234" selection-end-column="78" />
+          <folding>
+            <element signature="e#578#1085#0" expanded="false" />
+            <element signature="e#1154#2680#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/neus/basisFunctions.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="96" column="29" selection-start-line="96" selection-start-column="29" selection-end-line="96" selection-end-column="29" />
+          <folding>
+            <element signature="e#654#672#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../diala.neus.devel/diala.neus.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.4909091">
+          <caret line="411" column="69" selection-start-line="411" selection-start-column="69" selection-end-line="411" selection-end-column="69" />
+          <folding>
+            <element signature="e#267#285#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>

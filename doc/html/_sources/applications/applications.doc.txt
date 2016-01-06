@@ -1,0 +1,20 @@
+.. Documentation for applications folder. Will cover the 
+
+Applications
+=================
+
+Nonequilibrium Umbrella Sampling
+--------------------------------
+
+.. automodule:: ../neus/partition
+        :members: 
+      
+String Methods
+----------------
+
+
+Replica Exchange
+-----------------
+
+
+

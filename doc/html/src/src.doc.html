@@ -6,15 +6,15 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>LAMMPS Walker Module &mdash; Enhanced Sampling Toolkit 1.0 documentation</title>
+    <title>Walker API &mdash; Enhanced Sampling Toolkit 1.0a documentation</title>
     
-    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.0',
+        VERSION:     '1.0a',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,12 +23,13 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="Enhanced Sampling Toolkit 1.0 documentation" href="../index.html" />
-    <link rel="prev" title="Welcome to Enhanced Sampling Toolkit’s documentation!" href="../index.html" /> 
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Enhanced Sampling Toolkit 1.0a documentation" href="../index.html" />
+    <link rel="next" title="Applications" href="../applications/applications.doc.html" />
+    <link rel="prev" title="Introduction" href="../intro.doc.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -38,170 +39,162 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="../index.html" title="Welcome to Enhanced Sampling Toolkit’s documentation!"
+          <a href="../applications/applications.doc.html" title="Applications"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../intro.doc.html" title="Introduction"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Enhanced Sampling Toolkit 1.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Enhanced Sampling Toolkit 1.0a documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
-  <div class="section" id="module-lammpsWalker">
-<span id="lammps-walker-module"></span><h1>LAMMPS Walker Module<a class="headerlink" href="#module-lammpsWalker" title="Permalink to this headline">¶</a></h1>
-<p>This file implements the LAMMPS walker abstraction layer. The core of this idea is that</p>
+  <div class="section" id="walker-api">
+<h1>Walker API<a class="headerlink" href="#walker-api" title="Permalink to this headline">¶</a></h1>
+<p>The central design principle of the Walker API is to provide an
+abstracted interface between the &#8220;algorithm&#8221; level code and the
+code that integrates the dynamics of the model. This section describes the base API used to define the walker objects. The base class is declared internally using Python&#8217;s abstract base class module. The implementations of the bindings specific to the dynamics packages are registered to this base class definition through direct subclassing of the modules. A key feature of this decision is that it enforces the implementation of the dynamics bindings to implement each of the following methods in their class declarations. However, many of the methods can be overridden with empty methods if an implementation is incomplete or does not require all of the base class methods.</p>
+<div class="section" id="module-walker_base">
+<span id="the-core-walker-application-programming-interface-api"></span><h2>The Core Walker Application Programming Interface (API)<a class="headerlink" href="#module-walker_base" title="Permalink to this headline">¶</a></h2>
+<p>DEVELOPER NOTE: we may want to use abstract properties in the future.</p>
 <dl class="class">
-<dt id="lammpsWalker.lammpsWalker">
-<em class="property">class </em><tt class="descclassname">lammpsWalker.</tt><tt class="descname">lammpsWalker</tt><big>(</big><em>inputFilename</em>, <em>logFilename</em>, <em>index=0</em>, <em>debug=False</em><big>)</big><a class="reference internal" href="../_modules/lammpsWalker.html#lammpsWalker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lammpsWalker.lammpsWalker" title="Permalink to this definition">¶</a></dt>
-<dd><p>This class implements the enhanced sampling walker API for the bindings to the LAMMPS package. To check the math formatting, here is an example $e^{ipi} = -1$.</p>
-<p>Some usage issues to note:</p>
-<p>1) Collective variables (CVs) are defined to the walker by constructing a list of
-CVs internally in the walker.colvars object. These CVs list takes the following
-format:</p>
-<p>[&#8220;coordinateType&#8221;, atomids....]</p>
-<p>The coordinate type specifies which type of coordinate the CV is 
-(i.e. bond, angle, dihedral, etc.). The next items in the list are the atom 
-indecies involved in this specific instance of the CV.</p>
-<p>The walker will use this list to initialize them to the underlying LAMMPS objects.</p>
+<dt id="walker_base.walker">
+<em class="property">class </em><code class="descclassname">walker_base.</code><code class="descname">walker</code><a class="reference internal" href="../_modules/walker_base.html#walker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#walker_base.walker" title="Permalink to this definition">¶</a></dt>
+<dd><p>This object acts as an abstract base class that sets the core specification defining the Walker API. These routines</p>
 <dl class="method">
-<dt id="lammpsWalker.lammpsWalker.close">
-<tt class="descname">close</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/lammpsWalker.html#lammpsWalker.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lammpsWalker.lammpsWalker.close" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function closes the LAMMPS object.</p>
+<dt id="walker_base.walker.addColvars">
+<code class="descname">addColvars</code><span class="sig-paren">(</span><em>cv</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/walker_base.html#walker.addColvars"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#walker_base.walker.addColvars" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a new collective variable to the walker. Subsequent calls to routines that act on the defined collective variables will use the complete list of collective variables in the order they are added. To wipe this list of variables, see the destroyColvars() routine.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="lammpsWalker.lammpsWalker.command">
-<tt class="descname">command</tt><big>(</big><em>command</em><big>)</big><a class="reference internal" href="../_modules/lammpsWalker.html#lammpsWalker.command"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lammpsWalker.lammpsWalker.command" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function allows the user to issue a LAMMPS command directly to the
-LAMMPS object.</p>
+<dt id="walker_base.walker.close">
+<code class="descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/walker_base.html#walker.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#walker_base.walker.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Destroys the walker.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="lammpsWalker.lammpsWalker.destroyColvars">
-<tt class="descname">destroyColvars</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/lammpsWalker.html#lammpsWalker.destroyColvars"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lammpsWalker.lammpsWalker.destroyColvars" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function removes the colvars set by initColVars().</p>
+<dt id="walker_base.walker.destroyColvars">
+<code class="descname">destroyColvars</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/walker_base.html#walker.destroyColvars"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#walker_base.walker.destroyColvars" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes all collective variables from the walker.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="lammpsWalker.lammpsWalker.drawVel">
-<tt class="descname">drawVel</tt><big>(</big><em>distType='gaussian'</em>, <em>temperature=310.0</em><big>)</big><a class="reference internal" href="../_modules/lammpsWalker.html#lammpsWalker.drawVel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lammpsWalker.lammpsWalker.drawVel" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function redraws the velocities from a maxwell-boltzmann dist.</p>
+<dt id="walker_base.walker.drawVel">
+<code class="descname">drawVel</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/walker_base.html#walker.drawVel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#walker_base.walker.drawVel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws a new value of the velocities for the walker. Can redraw velocities according to a uniform or Gaussian distributions.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="lammpsWalker.lammpsWalker.equilibrate">
-<tt class="descname">equilibrate</tt><big>(</big><em>center</em>, <em>restraint</em>, <em>numSteps</em><big>)</big><a class="reference internal" href="../_modules/lammpsWalker.html#lammpsWalker.equilibrate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lammpsWalker.lammpsWalker.equilibrate" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function prepares a LAMMPS image to be at the specified target 
-position given by the vector &#8216;center&#8217; passed and an arguments.</p>
+<dt id="walker_base.walker.equilibrate">
+<code class="descname">equilibrate</code><span class="sig-paren">(</span><em>center</em>, <em>restraint</em>, <em>numSteps</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/walker_base.html#walker.equilibrate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#walker_base.walker.equilibrate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="walker_base.walker.getColvars">
+<code class="descname">getColvars</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/walker_base.html#walker.getColvars"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#walker_base.walker.getColvars" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function returns the location of the walker in the collective variable space. Values are returned as a one-dimensional numpy array</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="lammpsWalker.lammpsWalker.getColvars">
-<tt class="descname">getColvars</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/lammpsWalker.html#lammpsWalker.getColvars"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lammpsWalker.lammpsWalker.getColvars" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function returns the current position of the LAMMPS simulation in 
-colvars space.</p>
+<dt id="walker_base.walker.getConfig">
+<code class="descname">getConfig</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/walker_base.html#walker.getConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#walker_base.walker.getConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function should return the postition of the walker in configuration space as a one-dimensional numpy array. The coordinates are returned as [x1, y1, z1, x2, y2, z2, ...].</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="lammpsWalker.lammpsWalker.getConfig">
-<tt class="descname">getConfig</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/lammpsWalker.html#lammpsWalker.getConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lammpsWalker.lammpsWalker.getConfig" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function returns the current position of the LAMMPS simulation.</p>
+<dt id="walker_base.walker.getVel">
+<code class="descname">getVel</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/walker_base.html#walker.getVel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#walker_base.walker.getVel" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function returns the velocities of the system as a one-dimensional numpy array. The velocities are returned in a format that matches the getConfig() routine, specifically [v_x1, v_y1, v_z1, v_x2, v_y2, v_z2, ...].</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="lammpsWalker.lammpsWalker.getVel">
-<tt class="descname">getVel</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/lammpsWalker.html#lammpsWalker.getVel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lammpsWalker.lammpsWalker.getVel" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function returns the current velocities from the LAMMPS simulation.</p>
+<dt id="walker_base.walker.propagate">
+<code class="descname">propagate</code><span class="sig-paren">(</span><em>numsteps</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/walker_base.html#walker.propagate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#walker_base.walker.propagate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Integrates the dynamics of the model forward in time. Takes the numSteps argument specifying the number of time steps to take.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="lammpsWalker.lammpsWalker.minimize">
-<tt class="descname">minimize</tt><big>(</big><em>args=None</em><big>)</big><a class="reference internal" href="../_modules/lammpsWalker.html#lammpsWalker.minimize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lammpsWalker.lammpsWalker.minimize" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function runs a minimization routine with the specified type.</p>
+<dt id="walker_base.walker.removeOutput">
+<code class="descname">removeOutput</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/walker_base.html#walker.removeOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#walker_base.walker.removeOutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>This routine adds a source of output for the walker to write information to disk.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="lammpsWalker.lammpsWalker.propagate">
-<tt class="descname">propagate</tt><big>(</big><em>numSteps</em>, <em>pre='no'</em>, <em>post='no'</em><big>)</big><a class="reference internal" href="../_modules/lammpsWalker.html#lammpsWalker.propagate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lammpsWalker.lammpsWalker.propagate" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function issues a run command to the underlying dynamics to propagate
-the dynamics a given number of steps.</p>
+<dt id="walker_base.walker.reverseVel">
+<code class="descname">reverseVel</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/walker_base.html#walker.reverseVel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#walker_base.walker.reverseVel" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function reverses the velocity of the walker. The new velocities are given as</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="lammpsWalker.lammpsWalker.reverseVel">
-<tt class="descname">reverseVel</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/lammpsWalker.html#lammpsWalker.reverseVel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lammpsWalker.lammpsWalker.reverseVel" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function reverses the velocities of a given LAMMPS simulation</p>
+<dt id="walker_base.walker.setConfig">
+<code class="descname">setConfig</code><span class="sig-paren">(</span><em>configuration</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/walker_base.html#walker.setConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#walker_base.walker.setConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the configuration of the At minimum, it should take some sort of specification of the configuration.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="lammpsWalker.lammpsWalker.setColvars">
-<tt class="descname">setColvars</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/lammpsWalker.html#lammpsWalker.setColvars"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lammpsWalker.lammpsWalker.setColvars" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function initializes the collective variable for a LAMMPS simulation that is handed to this object.</p>
-<p>Currently supports the following cv&#8217;s:</p>
-<ul class="simple">
-<li>bond</li>
-<li>angle</li>
-<li>dihedral</li>
-<li>x, y or z position coordinates</li>
-<li>x, y or z velocity components</li>
-</ul>
-<p>These are parsed and sent to the underlying LAMMPS object directly using the LAMMPS syntax for these variable.</p>
-<p>The implementation first creates a labeled group in LAMMPS containing the atoms used in the CV. Then a compute is initialized using that group.</p>
+<dt id="walker_base.walker.setOutput">
+<code class="descname">setOutput</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/walker_base.html#walker.setOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#walker_base.walker.setOutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>This routine adds a source of output for the walker to write information to disk.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="lammpsWalker.lammpsWalker.setConfig">
-<tt class="descname">setConfig</tt><big>(</big><em>config</em><big>)</big><a class="reference internal" href="../_modules/lammpsWalker.html#lammpsWalker.setConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lammpsWalker.lammpsWalker.setConfig" title="Permalink to this definition">¶</a></dt>
-<dd><p>This routine sets the internal configuration.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="lammpsWalker.lammpsWalker.setDynamics">
-<tt class="descname">setDynamics</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/lammpsWalker.html#lammpsWalker.setDynamics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lammpsWalker.lammpsWalker.setDynamics" title="Permalink to this definition">¶</a></dt>
-<dd><p>This routine sets the dynamics for the walker.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="lammpsWalker.lammpsWalker.setTemperature">
-<tt class="descname">setTemperature</tt><big>(</big><em>temp</em><big>)</big><a class="reference internal" href="../_modules/lammpsWalker.html#lammpsWalker.setTemperature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lammpsWalker.lammpsWalker.setTemperature" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function sets the temperature of the walker object.</p>
-<p>NOTE THAT THIS DOES NOT ALTER THE DYNAMICS THERMOSTAT. LAMMPS REQUIRES
-RESETING THIS THERMOSTAT. WE WILL LOOK INTO HOW TO DO THIS.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="lammpsWalker.lammpsWalker.setTimestep">
-<tt class="descname">setTimestep</tt><big>(</big><em>timestep</em><big>)</big><a class="reference internal" href="../_modules/lammpsWalker.html#lammpsWalker.setTimestep"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lammpsWalker.lammpsWalker.setTimestep" title="Permalink to this definition">¶</a></dt>
-<dd><p>This routine sets the dynamics time step.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="lammpsWalker.lammpsWalker.setVel">
-<tt class="descname">setVel</tt><big>(</big><em>vel</em><big>)</big><a class="reference internal" href="../_modules/lammpsWalker.html#lammpsWalker.setVel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lammpsWalker.lammpsWalker.setVel" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function sets the velocity to the lammps simulation.</p>
+<dt id="walker_base.walker.setVel">
+<code class="descname">setVel</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/walker_base.html#walker.setVel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#walker_base.walker.setVel" title="Permalink to this definition">¶</a></dt>
+<dd><p>This routine sets the velocities of the system.</p>
 </dd></dl>
 
 </dd></dl>
 
+</div>
+<div class="section" id="lammps-walker-module">
+<h2>LAMMPS Walker Module<a class="headerlink" href="#lammps-walker-module" title="Permalink to this headline">¶</a></h2>
+<p>This module implements the Walker API for the LAMMPS MD engine. See walker_base.py for a specification of the API. For details concerning the usage of the LAMMPS MD package see the excellent documentation at the LAMMPS webpage:</p>
+<p><a class="reference external" href="http://lammps.sandia.gov/">http://lammps.sandia.gov/</a></p>
+<p>In particular, you may want to see how the Python wrapper to LAMMPS on which this implementation is based:</p>
+<p><a class="reference external" href="http://lammps.sandia.gov/doc/Section_python.html">http://lammps.sandia.gov/doc/Section_python.html</a></p>
+<p>Here we will outline basic usage guides for the walker API usage in LAMMPS.</p>
+</div>
+<div class="section" id="openmm-walker-module">
+<h2>OpenMM Walker Module<a class="headerlink" href="#openmm-walker-module" title="Permalink to this headline">¶</a></h2>
+<p>We plan to implement an OpenMM walker API module in a future release.</p>
+</div>
 </div>
 
 
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Walker API</a><ul>
+<li><a class="reference internal" href="#module-walker_base">The Core Walker Application Programming Interface (API)</a></li>
+<li><a class="reference internal" href="#lammps-walker-module">LAMMPS Walker Module</a></li>
+<li><a class="reference internal" href="#openmm-walker-module">OpenMM Walker Module</a></li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
-  <p class="topless"><a href="../index.html"
-                        title="previous chapter">Welcome to Enhanced Sampling Toolkit&#8217;s documentation!</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../_sources/src/src.doc.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <p class="topless"><a href="../intro.doc.html"
+                        title="previous chapter">Introduction</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../applications/applications.doc.html"
+                        title="next chapter">Applications</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/src/src.doc.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
       <input type="text" name="q" />
@@ -218,7 +211,7 @@ RESETING THIS THERMOSTAT. WE WILL LOOK INTO HOW TO DO THIS.</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -228,14 +221,17 @@ RESETING THIS THERMOSTAT. WE WILL LOOK INTO HOW TO DO THIS.</p>
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="../index.html" title="Welcome to Enhanced Sampling Toolkit’s documentation!"
+          <a href="../applications/applications.doc.html" title="Applications"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../intro.doc.html" title="Introduction"
              >previous</a> |</li>
-        <li><a href="../index.html">Enhanced Sampling Toolkit 1.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Enhanced Sampling Toolkit 1.0a documentation</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2015, Jeremy Tempkin.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2015, Jeremy O. B. Tempkin.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
     </div>
   </body>
 </html>

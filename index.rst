@@ -6,18 +6,11 @@
 Welcome to Enhanced Sampling Toolkit's documentation!
 =====================================================
 
-Contents:
-
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
    
-   src/src.doc
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+   intro.doc
+   walker_api/walker_api.doc
+   applications/applications.doc
+   test/testing.doc
 

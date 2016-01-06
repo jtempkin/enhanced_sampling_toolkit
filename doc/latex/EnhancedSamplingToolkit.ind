@@ -1,41 +1,151 @@
 \begin{theindex}
 \def\bigletter#1{{\Large\sffamily#1}\nopagebreak\vspace{1mm}}
 
+  \bigletter A
+  \item accumulateObservables() (partition.partition method), \hyperpage{9}
+  \item add\_entry\_point() (basisFunctions.basisFunction method), \hyperpage{11}
+  \item add\_local\_obserbale() (basisFunctions.basisFunction method), \hyperpage{11}
+  \item add\_new\_entry\_point() (basisFunctions.basisFunction method), \hyperpage{11}
+  \item addColvars() (lammpsWalker.lammpsWalker method), \hyperpage{5}
+  \item addColvars() (walker\_base.walker method), \hyperpage{3}
+  \item addObservable() (partition.partition method), \hyperpage{9}
+
+  \indexspace
+  \bigletter B
+  \item baoab (class in dynamics), \hyperpage{4}
+  \item basisFunction (class in basisFunctions), \hyperpage{11}
+  \item basisFunctions (module), \hyperpage{10}
+  \item Box (class in basisFunctions), \hyperpage{10}
+  \item build\_keylist\_to\_index\_map() (partition.partition method), \hyperpage{9}
+  \item build\_neighbor\_list() (partition.partition method), \hyperpage{9}
+
+  \indexspace
   \bigletter C
-  \item close() (walker.walker method), \hyperpage{3}
+  \item close() (lammpsWalker.lammpsWalker method), \hyperpage{5}
+  \item close() (walker\_base.walker method), \hyperpage{3}
+  \item collectiveVariables (module), \hyperpage{4}
+  \item command() (lammpsWalker.lammpsWalker method), \hyperpage{6}
+  \item communicateMPI() (partition.partition method), \hyperpage{9}
+  \item computeObservables() (partition.partition method), \hyperpage{9}
+  \item computeZ() (partition.partition method), \hyperpage{9}
+  \item cv (entryPoints.entry\_point attribute), \hyperpage{12}
+  \item cv\_indicator\_correlation (class in observables), \hyperpage{13}
 
   \indexspace
   \bigletter D
-  \item drawVel() (walker.velocityWalker method), \hyperpage{3}
+  \item destroyColvars() (lammpsWalker.lammpsWalker method), \hyperpage{6}
+  \item destroyColvars() (walker\_base.walker method), \hyperpage{3}
+  \item dihedral\_fluctuation\_correlation (class in observables), \hyperpage{13}
+  \item dihedral\_fluctuation\_correlation\_2 (class in observables), \hyperpage{13}
+  \item dist\_fluctuation\_correlation (class in observables), \hyperpage{13}
+  \item drawVel() (lammpsWalker.lammpsWalker method), \hyperpage{6}
+  \item drawVel() (walker\_base.walker method), \hyperpage{3}
+  \item dynamics (module), \hyperpage{4}
 
   \indexspace
   \bigletter E
-  \item equilibrate() (walker.walker method), \hyperpage{3}
+  \item electric\_field (class in observables), \hyperpage{13}
+  \item empty\_new\_entry\_points() (basisFunctions.basisFunction method), \hyperpage{11}
+  \item entry\_point (class in entryPoints), \hyperpage{12}
+  \item entryPoints (module), \hyperpage{12}
+  \item equilibrate() (lammpsWalker.lammpsWalker method), \hyperpage{6}
+  \item equilibrate() (walker\_base.walker method), \hyperpage{3}
+
+  \indexspace
+  \bigletter F
+  \item flush\_data\_to\_file() (basisFunctions.basisFunction method), \hyperpage{11}
 
   \indexspace
   \bigletter G
-  \item getColvars() (walker.walker method), \hyperpage{3}
-  \item getConfig() (walker.walker method), \hyperpage{3}
+  \item Gaussian (class in basisFunctions), \hyperpage{10}
+  \item get\_basis\_function\_values() (partition.partition method), \hyperpage{10}
+  \item get\_entry\_point() (basisFunctions.basisFunction method), \hyperpage{11}
+  \item get\_local\_observales() (basisFunctions.basisFunction method), \hyperpage{11}
+  \item getColvars() (lammpsWalker.lammpsWalker method), \hyperpage{6}
+  \item getColvars() (walker\_base.walker method), \hyperpage{3}
+  \item getConfig() (lammpsWalker.lammpsWalker method), \hyperpage{6}
+  \item getConfig() (walker\_base.walker method), \hyperpage{3}
+  \item getVel() (lammpsWalker.lammpsWalker method), \hyperpage{6}
+  \item getVel() (walker\_base.walker method), \hyperpage{3}
+
+  \indexspace
+  \bigletter I
+  \item indicator() (basisFunctions.Box method), \hyperpage{10}
+  \item indicator() (basisFunctions.Gaussian method), \hyperpage{10}
+  \item initialize\_entry\_points() (basisFunctions.basisFunction method), \hyperpage{11}
+
+  \indexspace
+  \bigletter L
+  \item lammpsWalker (class in lammpsWalker), \hyperpage{5}
+  \item lammpsWalker (module), \hyperpage{5}
+  \item langevin (class in dynamics), \hyperpage{4}
+
+  \indexspace
+  \bigletter M
+  \item minimize() (lammpsWalker.lammpsWalker method), \hyperpage{6}
+
+  \indexspace
+  \bigletter O
+  \item observables (module), \hyperpage{12}
+  \item outputClass (class in outputClass), \hyperpage{4}
+  \item outputClass (module), \hyperpage{4}
 
   \indexspace
   \bigletter P
-  \item propagate() (walker.walker method), \hyperpage{3}
+  \item p (entryPoints.entry\_point attribute), \hyperpage{12}
+  \item P1 (class in observables), \hyperpage{12}
+  \item partition (class in partition), \hyperpage{9}
+  \item partition (module), \hyperpage{9}
+  \item pmf (class in observables), \hyperpage{13}
+  \item propagate() (lammpsWalker.lammpsWalker method), \hyperpage{6}
+  \item propagate() (walker\_base.walker method), \hyperpage{4}
+  \item Pyramid (class in basisFunctions), \hyperpage{10}
+
+  \indexspace
+  \bigletter Q
+  \item q (entryPoints.entry\_point attribute), \hyperpage{12}
 
   \indexspace
   \bigletter R
-  \item reverseVel() (walker.velocityWalker method), \hyperpage{3}
+  \item ref\_indicator() (basisFunctions.Pyramid method), \hyperpage{11}
+  \item ref\_p (entryPoints.entry\_point attribute), \hyperpage{12}
+  \item ref\_q (entryPoints.entry\_point attribute), \hyperpage{12}
+  \item reinject() (partition.partition method), \hyperpage{10}
+  \item remove\_local\_observales() (basisFunctions.basisFunction method), \hyperpage{12}
+  \item removeObservable() (partition.partition method), \hyperpage{10}
+  \item removeOutput() (lammpsWalker.lammpsWalker method), \hyperpage{6}
+  \item removeOutput() (walker\_base.walker method), \hyperpage{4}
+  \item resetObservable() (partition.partition method), \hyperpage{10}
+  \item reverseVel() (lammpsWalker.lammpsWalker method), \hyperpage{6}
+  \item reverseVel() (walker\_base.walker method), \hyperpage{4}
 
   \indexspace
   \bigletter S
-  \item setConfig() (walker.walker method), \hyperpage{3}
+  \item sample() (partition.partition method), \hyperpage{10}
+  \item set\_umbrellas() (partition.partition method), \hyperpage{10}
+  \item setConfig() (lammpsWalker.lammpsWalker method), \hyperpage{6}
+  \item setConfig() (walker\_base.walker method), \hyperpage{4}
+  \item setDynamics() (lammpsWalker.lammpsWalker method), \hyperpage{6}
+  \item setOutput() (lammpsWalker.lammpsWalker method), \hyperpage{6}
+  \item setOutput() (walker\_base.walker method), \hyperpage{4}
+  \item setTemperature() (lammpsWalker.lammpsWalker method), \hyperpage{6}
+  \item setTimestep() (lammpsWalker.lammpsWalker method), \hyperpage{6}
+  \item setVel() (lammpsWalker.lammpsWalker method), \hyperpage{6}
+  \item setVel() (walker\_base.walker method), \hyperpage{4}
 
   \indexspace
-  \bigletter V
-  \item velocityWalker (class in walker), \hyperpage{3}
+  \bigletter T
+  \item time (entryPoints.entry\_point attribute), \hyperpage{12}
+  \item time\_indicator() (basisFunctions.Pyramid method), \hyperpage{11}
+
+  \indexspace
+  \bigletter U
+  \item update\_entry\_points\_fluxes() (basisFunctions.basisFunction method), \hyperpage{12}
+  \item updateF() (partition.partition method), \hyperpage{10}
 
   \indexspace
   \bigletter W
-  \item walker (class in walker), \hyperpage{3}
-  \item walker (module), \hyperpage{3}
+  \item walker (class in walker\_base), \hyperpage{3}
+  \item walker\_base (module), \hyperpage{3}
 
 \end{theindex}
