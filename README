@@ -23,15 +23,10 @@ System Prerequisits:
 
 Folders:
 
-src - The main source code for this project. This contains the core API of the toolkit in the *Walker.py files.
+walker_api - The main source code for this project. This contains the core API of the toolkit in the *Walker.py files.
 
-data - This folder contains data files that specify the construction of the molecular system you wish to simulate. These files are written using the LAMMPS format. See the LAMMPS documentation for more details. 
+doc - documentation for the project. This folder serves to hold the build targets for the Sphinx builds. 
 
-input - This folder contains input files that configure input settings. 
+applications - container for application modules built using the Walker API toolkit.
 
-profiling - A folder for storing profiling information generated from cProfile information.  
-
-neus - a NEUS implementation written in the Walker API. 
-
-repex - a simple replica exchange code implemented in the Walker API.
-
+test - unit testing for the toolkit. 
