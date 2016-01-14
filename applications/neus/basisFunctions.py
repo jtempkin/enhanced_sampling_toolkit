@@ -75,9 +75,6 @@ class basisFunction:
         # define a radius the usual way in this space
         self.radius = np.sqrt(np.sum(self.width**2))
 
-        # maximum number of entry points stored.
-        self.max_entrypoints = max_entrypoints
-
         # this parameter sets the last phase space point at each iteration such that 
         self.walker_restart = None
 
@@ -96,6 +93,11 @@ class basisFunction:
             self.wrapping = None
 
         self.active = False
+
+        # maximum number of entry points stored.
+        self.max_entrypoints = max_entrypoints
+
+        self.neighbor_prob = None
 
         return None
 
@@ -141,6 +143,57 @@ class basisFunction:
 
         return 0
 
+    def reinject(self, walker):
+        """
+        This function initializes a simulation from the entry point list in the 
+        current umbrella.
+        """
+        # let's get the current estimate of the flux
+        #prob = self.z * self.F[:,i]
+
+        # zero out flux from i to i
+        #prob[i] = 0.0
+
+        """
+        # now let's zero out any neighbors with potentially nonzero flux but no stored entry points
+        for indx in range(prob.size):
+            # lets get the key to this index
+            key = self.index_to_key[indx]
+            # check size of this neighbor specifically and zero out probability if zero
+            if self._umbrellas[i].getNumberOfEntryPoints(key=key) == 0:
+                prob[indx] = 0.0
+        """
+
+        # normalize probability
+        #assert prob.sum() > 0.0
+        #prob /= prob.sum()
+
+        # now choose neighbor proportional to prob 
+        #I = np.random.choice(np.arange(prob.size), p=prob)
+
+        # get the entry point from the umbrella window
+
+        #assert self._umbrellas[i].getNumberOfEntryPoints(key=self.index_to_key[I])
+
+        # we choose from the initial distribution with prob. stored in this window
+        if random.random() < self.initial_distribution_prob:
+            dist = self.initial_distribution
+            EP = random.sample(dist, 1)[0]
+
+        else:
+            EP = self.get_entry_point()
+
+        walker.setConfig(EP.q)
+        walker.setVel(EP.p)
+
+        # set the lag component of the walker state
+        walker.Y_s = (EP.ref_q, EP.ref_p)
+
+        walker.simulationTime = EP.time
+
+        return 0
+
+
     def get_entry_point(self):
         """
         This routine returns an entry point from the buffers draw proportional to the entry fluxes.
@@ -148,7 +201,10 @@ class basisFunction:
 
         assert hasattr(self, 'entryPoints'), 'Window has not initialized entry point library.'
     
-        choice = np.random.choice(self.flux[self.neighborList].size, p=self.flux[self.neighborList])
+        try:
+            choice = np.random.choice(self.flux[self.neighborList].size, p=self.flux[self.neighborList])
+        except ValueError:
+            print self.flux[self.neighborList]
 
         # assertion checking that the neighbor has entry points stored. 
         assert len(self.entryPoints[choice]) > 0, "Error in entry point fluxes. Attempted to draw from flux zero neighbor."
@@ -158,7 +214,7 @@ class basisFunction:
 
         return EP
 
-    def update_entry_points_fluxes(self, flux, key_map):
+    def update_entry_points_fluxes(self, flux):
         """
         This routine updates the sizes of the discretization of the entry point flux lists based on the maximum size of the entry point buffer.
 
@@ -169,31 +225,20 @@ class basisFunction:
         self.flux = flux
 
         for i in self.neighborList:
-            # if we don't find entries, set the flux to zero so we don't draw from this
-            if len(self.entryPoints[key_map[i]]) == 0: 
+            # if we don't find entries, set the flux to zero so we don't draw from this window
+            if len(self.entryPoints[i]) == 0: 
                 if self.flux[i] > 0.0: print "zeroing out", i
                 self.flux[i] = 0.0
 
 
-            size = int(self.max_entrypoints * flux[i])
-            if size == 0: 
-                continue
-            if size > self.max_entrypoints:
-                size = self.max_entrypoints
-
-            nentries = min(len(self.entryPoints[key_map[i]]), size)
-
-            #update_list = np.sample(self.entryPoints, nentries)
-            update_list = self.entryPoints[key_map[i]][0:nentries]
-
-            self.entryPointsList.update(update_list)
-
         # remove negative fluxes
-        self.flux[self.flux < 0.0] = 0.0
+        #self.flux[self.flux < 0.0] = 0.0
         
-        # normalize if needed
-        if self.flux.sum() > 0.0: 
+        # normalize if needed, since this will be treated as a probability 
+        if self.flux.sum() != 0.0: 
             self.flux /= self.flux.sum()
+            #print "flux:", self.flux.sum(), self.flux
+            #print "neighbor Flux:", self.flux[self.neighborList].sum(), self.flux[self.neighborList]
 
         return 0 
 
@@ -229,27 +274,30 @@ class basisFunction:
 
         return 0
 
-    def initialize_entry_points(self, keylist = None):
+    def initialize_entry_points(self, maxEntryPoints = 500, neighborList = None, size = None, keylist = None):
         """
         This routine initializes the entry point data structure in the umbrella.
 
-        The structure of the entry Point library is designed to be flexible as to how one wants to track entries from
-        neightbors. There are two schemes that are supported now. The first option is a single set containing all
-        entry points to this window (we're actually using the Python set structure). The second type is a dictionary
-        of sets. This allows one to group contributions to the entry point list for this window by assigning a key to
-        each neighbor and add/draw entry points from these separate sets by passing a key value to the respective add/draw
-        operations.
+        The entry point library contains two structures. The first structure is a library of accepted points which is used to draw from when get_entry_point() is called. The second is a buffer library in which new proposed points are stored. The first structure gets update from this second structure when the update_entry_points_fluxes() routine is called. 
 
-        To construct the second type of structure you specify the key structure with a list of keys that define the
-        categories from which one can group entry points.
+        The first structure acts like a double ended queue, in that it has a maximum lengh (set by the max_entrypoints attribute) and new entries are added in a FIFO manner. If max_entrypoints is set to None, this list grows to arbitrary length. 
+
+        This routine does not take max_entrypoints as an argument and sets the structure of these libraries to that size. This is destructive to 
         """
+
+        if hasattr(self, 'entryPoints'): print "WARNING: Calling initialize_entry_points() is destructive to current library."
 
         self.entryPoints = {}
 
         #if keylist is None: print "WARNING: no keys were initialized in the entry point structure in this window."
 
-        for neighbor in self.neighborList:
-            self.entryPoints[neighbor] = collections.deque(maxlen=self.max_entrypoints)
+        # if there is no neighborlist, add all windows 
+        if self.neighborList is None:
+            for neighbor in range(size):
+                self.entryPoints[neighbor] = collections.deque(maxlen=maxEntryPoints)
+        else:
+            for neighbor in self.neighborList:
+                self.entryPoints[neighbor] = collections.deque(maxlen=maxEntryPoints)
 
         self.keylist = keylist
 
@@ -257,6 +305,16 @@ class basisFunction:
         self.newEntryPoints = copy.deepcopy(self.entryPoints)
 
         return 0
+
+    def set_initial_distribution(self, initial_distribution, initial_distribution_prob):
+        """
+        This routine sets the initial distribution and support probability for this window. Used for reinjection routine.
+        """
+
+        self.initial_distribution = initial_distribution
+        self.initial_distribution_prob = initial_distribution_prob
+
+        return 0 
 
     def add_local_obserbale(self, obs):
         """

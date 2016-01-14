@@ -125,6 +125,12 @@ class partition:
 
         return len(self._umbrellas)
 
+    def win_index(self, win):
+        """
+        Returns the index of teh given window in the partition.
+        """
+        return self._umbrellas.index(win)
+
     def set_umbrellas(self, umbrellas, neighborList=True,  s=None):
         """
         This routine replaces the current list of umbrellas with those provided
@@ -178,7 +184,7 @@ class partition:
 
         return 0 
         
-    def updateF(self, row, epsilon):
+    def update_F(self, row, epsilon):
         """
         This routine update G according to:
             
@@ -219,7 +225,7 @@ class partition:
 
         return 0
 
-    def addObservable(self, A, rank_index=None):
+    def add_observable(self, A, rank_index=None):
         """
         This routine adds an observable and initializes local copies of the observables in the basis windows.
         """
@@ -239,7 +245,7 @@ class partition:
 
         return 0
 
-    def removeObservable(self):
+    def remove_observable(self):
         """
         This routine removes all observables from the list for the partition. 
         """
@@ -253,7 +259,7 @@ class partition:
         return 0 
         
 
-    def computeObservables(self, rank=None):
+    def compute_observables(self, rank=None):
         """
         This routine populates the partition observables with data averaged from the windows.
         """
@@ -276,7 +282,7 @@ class partition:
 
         return 0
 
-    def computeZ(self, sparseSolve=True, finiteTime=False):
+    def compute_z(self, sparseSolve=True, finiteTime=False):
         """
         Solves for z vector given current G,a via solving the following linear 
         system:
@@ -389,7 +395,7 @@ class partition:
 
         return 0
 
-    def accumulateObservables(self, wlkr, sample, colvars, indx):
+    def accumulate_observables(self, wlkr, sample, colvars, indx):
         """
         This routine loops through the observables list and updates the samples in the corresponding windows.
         """
@@ -415,7 +421,7 @@ class partition:
 
         return 0
 
-    def resetObservable(self, obs):
+    def reset_observable(self, obs):
         """
         Set each element in the data of the passed observable to zero.
         """
@@ -425,7 +431,7 @@ class partition:
 
         return 0
         
-    def reinject(self, wlkr, i):
+    def reinject(self, wlkr, win):
         """
         This function initializes a simulation from the entry point list in the 
         current umbrella.
@@ -458,14 +464,13 @@ class partition:
         #assert self._umbrellas[i].getNumberOfEntryPoints(key=self.index_to_key[I])
 
         # we choose from the initial distribution with prob. stored in this window
-        if random.random() < self._umbrellas[i].initial_distribution_prob:
-            dist = self._umbrellas[i].entryPoints[i]
+        if random.random() < win.initial_distribution_prob:
+            dist = win.initial_distribution
             EP = random.sample(dist, 1)[0]
 
         else:
-            EP = self._umbrellas[i].getEntryPoint(i)
+            EP = win.get_entry_point()
 
-        # you should pass this argument as a ctypes array for now
         wlkr.setConfig(EP.config)
         wlkr.setVel(EP.vel)
 
@@ -772,12 +777,12 @@ class partition:
     
         for row in range(self.F.shape[0]):
             if self.M[row].sum() > 0.0:
-                self.updateF(row, self.epsilon)
+                self.update_F(row, 0.9) #self.epsilon)
 
 
         #if rank == 0: print self.z
 
-        self.computeZ(sparseSolve=sparseSolve, finiteTime=finiteTime)
+        self.compute_z(sparseSolve=sparseSolve, finiteTime=finiteTime)
 
         #if rank == 0: print self.z
 
@@ -786,7 +791,7 @@ class partition:
         """
         Step 3) estimation of observables on each rank
         """
-        self.computeObservables()
+        self.compute_observables()
 
         """
         Step 4) all reduction of averaged observables to each processor
