@@ -25,15 +25,52 @@
   13 = max # of 1-4 neighbors
   16 = max # of special neighbors
 2 atoms in group cv1
+WARNING: No fixes defined, atoms won't move (../verlet.cpp:55)
+PPPM initialization ...
+  G vector (1/distance) = 0.186875
+  grid = 9 9 9
+  stencil order = 5
+  estimated absolute RMS force accuracy = 0.0146118
+  estimated relative force accuracy = 4.40031e-05
+  using double precision FFTs
+  3d grid and FFT values/proc = 2744 729
+Neighbor list info ...
+  1 neighbor list requests
+  update every 1 steps, delay 5 steps, check yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 12
+  ghost atom cutoff = 12
+  binsize = 6 -> bins = 7 7 7
+Memory usage per processor = 12.4384 Mbytes
+---------------- Step        0 ----- CPU =      0.0000 (sec) ----------------
+TotEng   =        22.6676 KinEng   =        19.4051 Temp     =       310.0000 
+PotEng   =         3.2625 E_bond   =         0.9766 E_angle  =         2.4122 
+E_dihed  =        12.2802 E_impro  =         0.8927 E_vdwl   =         0.7549 
+E_coul   =        51.3159 E_long   =       -65.3699 Press    =        26.4035 
+Loop time of 9.53674e-07 on 1 procs for 0 steps with 22 atoms
+
+104.9% CPU use with 1 MPI tasks x no OpenMP threads
 3 atoms in group cv2
+WARNING: No fixes defined, atoms won't move (../verlet.cpp:55)
+PPPM initialization ...
+  G vector (1/distance) = 0.186875
+  grid = 9 9 9
+  stencil order = 5
+  estimated absolute RMS force accuracy = 0.0146118
+  estimated relative force accuracy = 4.40031e-05
+  using double precision FFTs
+  3d grid and FFT values/proc = 2744 729
+Memory usage per processor = 12.5147 Mbytes
+---------------- Step        0 ----- CPU =      0.0000 (sec) ----------------
+TotEng   =        22.6676 KinEng   =        19.4051 Temp     =       310.0000 
+PotEng   =         3.2625 E_bond   =         0.9766 E_angle  =         2.4122 
+E_dihed  =        12.2802 E_impro  =         0.8927 E_vdwl   =         0.7549 
+E_coul   =        51.3159 E_long   =       -65.3699 Press    =        26.4035 
+Loop time of 9.53674e-07 on 1 procs for 0 steps with 22 atoms
+
+104.9% CPU use with 1 MPI tasks x no OpenMP threads
 4 atoms in group cv3
-1 atoms in group cv4
-1 atoms in group cv5
-1 atoms in group cv6
-1 atoms in group cv7
-1 atoms in group cv8
-1 atoms in group cv9
-WARNING: No fixes defined, atoms won't move (verlet.cpp:55)
+WARNING: No fixes defined, atoms won't move (../verlet.cpp:55)
 PPPM initialization ...
   G vector (1/distance) = 0.186875
   grid = 9 9 9
@@ -48,4 +85,138 @@ TotEng   =        22.6676 KinEng   =        19.4051 Temp     =       310.0000
 PotEng   =         3.2625 E_bond   =         0.9766 E_angle  =         2.4122 
 E_dihed  =        12.2802 E_impro  =         0.8927 E_vdwl   =         0.7549 
 E_coul   =        51.3159 E_long   =       -65.3699 Press    =        26.4035 
-Loop time of 1.19209e-06 on 1 procs for 0 steps with 22 atoms
+Loop time of 9.53674e-07 on 1 procs for 0 steps with 22 atoms
+
+0.0% CPU use with 1 MPI tasks x no OpenMP threads
+1 atoms in group cv4
+WARNING: No fixes defined, atoms won't move (../verlet.cpp:55)
+PPPM initialization ...
+  G vector (1/distance) = 0.186875
+  grid = 9 9 9
+  stencil order = 5
+  estimated absolute RMS force accuracy = 0.0146118
+  estimated relative force accuracy = 4.40031e-05
+  using double precision FFTs
+  3d grid and FFT values/proc = 2744 729
+Memory usage per processor = 12.591 Mbytes
+---------------- Step        0 ----- CPU =      0.0000 (sec) ----------------
+TotEng   =        22.6676 KinEng   =        19.4051 Temp     =       310.0000 
+PotEng   =         3.2625 E_bond   =         0.9766 E_angle  =         2.4122 
+E_dihed  =        12.2802 E_impro  =         0.8927 E_vdwl   =         0.7549 
+E_coul   =        51.3159 E_long   =       -65.3699 Press    =        26.4035 
+Loop time of 0 on 1 procs for 0 steps with 22 atoms
+
+0.0% CPU use with 1 MPI tasks x no OpenMP threads
+1 atoms in group cv5
+WARNING: No fixes defined, atoms won't move (../verlet.cpp:55)
+PPPM initialization ...
+  G vector (1/distance) = 0.186875
+  grid = 9 9 9
+  stencil order = 5
+  estimated absolute RMS force accuracy = 0.0146118
+  estimated relative force accuracy = 4.40031e-05
+  using double precision FFTs
+  3d grid and FFT values/proc = 2744 729
+Memory usage per processor = 12.716 Mbytes
+---------------- Step        0 ----- CPU =      0.0000 (sec) ----------------
+TotEng   =        22.6676 KinEng   =        19.4051 Temp     =       310.0000 
+PotEng   =         3.2625 E_bond   =         0.9766 E_angle  =         2.4122 
+E_dihed  =        12.2802 E_impro  =         0.8927 E_vdwl   =         0.7549 
+E_coul   =        51.3159 E_long   =       -65.3699 Press    =        26.4035 
+Loop time of 0 on 1 procs for 0 steps with 22 atoms
+
+0.0% CPU use with 1 MPI tasks x no OpenMP threads
+1 atoms in group cv6
+WARNING: No fixes defined, atoms won't move (../verlet.cpp:55)
+PPPM initialization ...
+  G vector (1/distance) = 0.186875
+  grid = 9 9 9
+  stencil order = 5
+  estimated absolute RMS force accuracy = 0.0146118
+  estimated relative force accuracy = 4.40031e-05
+  using double precision FFTs
+  3d grid and FFT values/proc = 2744 729
+Memory usage per processor = 12.841 Mbytes
+---------------- Step        0 ----- CPU =      0.0000 (sec) ----------------
+TotEng   =        22.6676 KinEng   =        19.4051 Temp     =       310.0000 
+PotEng   =         3.2625 E_bond   =         0.9766 E_angle  =         2.4122 
+E_dihed  =        12.2802 E_impro  =         0.8927 E_vdwl   =         0.7549 
+E_coul   =        51.3159 E_long   =       -65.3699 Press    =        26.4035 
+Loop time of 9.53674e-07 on 1 procs for 0 steps with 22 atoms
+
+0.0% CPU use with 1 MPI tasks x no OpenMP threads
+1 atoms in group cv7
+WARNING: No fixes defined, atoms won't move (../verlet.cpp:55)
+PPPM initialization ...
+  G vector (1/distance) = 0.186875
+  grid = 9 9 9
+  stencil order = 5
+  estimated absolute RMS force accuracy = 0.0146118
+  estimated relative force accuracy = 4.40031e-05
+  using double precision FFTs
+  3d grid and FFT values/proc = 2744 729
+Memory usage per processor = 12.966 Mbytes
+---------------- Step        0 ----- CPU =      0.0000 (sec) ----------------
+TotEng   =        22.6676 KinEng   =        19.4051 Temp     =       310.0000 
+PotEng   =         3.2625 E_bond   =         0.9766 E_angle  =         2.4122 
+E_dihed  =        12.2802 E_impro  =         0.8927 E_vdwl   =         0.7549 
+E_coul   =        51.3159 E_long   =       -65.3699 Press    =        26.4035 
+Loop time of 0 on 1 procs for 0 steps with 22 atoms
+
+0.0% CPU use with 1 MPI tasks x no OpenMP threads
+1 atoms in group cv8
+WARNING: No fixes defined, atoms won't move (../verlet.cpp:55)
+PPPM initialization ...
+  G vector (1/distance) = 0.186875
+  grid = 9 9 9
+  stencil order = 5
+  estimated absolute RMS force accuracy = 0.0146118
+  estimated relative force accuracy = 4.40031e-05
+  using double precision FFTs
+  3d grid and FFT values/proc = 2744 729
+Memory usage per processor = 13.091 Mbytes
+---------------- Step        0 ----- CPU =      0.0000 (sec) ----------------
+TotEng   =        22.6676 KinEng   =        19.4051 Temp     =       310.0000 
+PotEng   =         3.2625 E_bond   =         0.9766 E_angle  =         2.4122 
+E_dihed  =        12.2802 E_impro  =         0.8927 E_vdwl   =         0.7549 
+E_coul   =        51.3159 E_long   =       -65.3699 Press    =        26.4035 
+Loop time of 0 on 1 procs for 0 steps with 22 atoms
+
+0.0% CPU use with 1 MPI tasks x no OpenMP threads
+1 atoms in group cv9
+WARNING: No fixes defined, atoms won't move (../verlet.cpp:55)
+PPPM initialization ...
+  G vector (1/distance) = 0.186875
+  grid = 9 9 9
+  stencil order = 5
+  estimated absolute RMS force accuracy = 0.0146118
+  estimated relative force accuracy = 4.40031e-05
+  using double precision FFTs
+  3d grid and FFT values/proc = 2744 729
+Memory usage per processor = 13.216 Mbytes
+---------------- Step        0 ----- CPU =      0.0000 (sec) ----------------
+TotEng   =        22.6676 KinEng   =        19.4051 Temp     =       310.0000 
+PotEng   =         3.2625 E_bond   =         0.9766 E_angle  =         2.4122 
+E_dihed  =        12.2802 E_impro  =         0.8927 E_vdwl   =         0.7549 
+E_coul   =        51.3159 E_long   =       -65.3699 Press    =        26.4035 
+Loop time of 9.53674e-07 on 1 procs for 0 steps with 22 atoms
+
+0.0% CPU use with 1 MPI tasks x no OpenMP threads
+WARNING: No fixes defined, atoms won't move (../verlet.cpp:55)
+PPPM initialization ...
+  G vector (1/distance) = 0.186875
+  grid = 9 9 9
+  stencil order = 5
+  estimated absolute RMS force accuracy = 0.0146118
+  estimated relative force accuracy = 4.40031e-05
+  using double precision FFTs
+  3d grid and FFT values/proc = 2744 729
+Memory usage per processor = 13.341 Mbytes
+---------------- Step        0 ----- CPU =      0.0000 (sec) ----------------
+TotEng   =        22.6676 KinEng   =        19.4051 Temp     =       310.0000 
+PotEng   =         3.2625 E_bond   =         0.9766 E_angle  =         2.4122 
+E_dihed  =        12.2802 E_impro  =         0.8927 E_vdwl   =         0.7549 
+E_coul   =        51.3159 E_long   =       -65.3699 Press    =        26.4035 
+Loop time of 9.53674e-07 on 1 procs for 0 steps with 22 atoms
+
+104.9% CPU use with 1 MPI tasks x no OpenMP threads

@@ -1,0 +1,761 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>basisFunctions &mdash; Enhanced Sampling Toolkit 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Enhanced Sampling Toolkit 0.1a documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Enhanced Sampling Toolkit 0.1a documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for basisFunctions</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Mon May  5 18:04:54 2014</span>
+<span class="sd">author: Jeremy Tempkin</span>
+
+<span class="sd">This module contains the class definition of the basis function object. This construction is the</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy</span> <span class="kn">as</span> <span class="nn">sp</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">from</span> <span class="nn">entryPoints</span> <span class="kn">import</span> <span class="n">entry_point</span>
+
+
+<div class="viewcode-block" id="basisFunction"><a class="viewcode-back" href="../applications/applications.doc.html#basisFunctions.basisFunction">[docs]</a><span class="k">class</span> <span class="nc">basisFunction</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    It is important to note that the configurations associated with</span>
+<span class="sd">    sampling of this box are stored at this level of the class structure.</span>
+
+<span class="sd">    At this level, the characteristics defining the basisFunction class is</span>
+<span class="sd">    a set of configurations inherent to the class.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">ref_center</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">ref_width</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">periodicLength</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">max_entrypoints</span> <span class="o">=</span> <span class="mi">500</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Construct an instance of the basis function.</span>
+
+<span class="sd">        Input -</span>
+<span class="sd">            center</span>
+<span class="sd">            width</span>
+<span class="sd">            ref_center=None</span>
+<span class="sd">            ref_width=None</span>
+<span class="sd">            time=None</span>
+<span class="sd">            periodicLength=None</span>
+<span class="sd">            max_entrypoints = 500</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># define the parameters passed.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">center</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">center</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">width</span><span class="p">)</span>
+
+        <span class="c1"># add the reference centers and widths if needed</span>
+        <span class="k">if</span> <span class="n">ref_center</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ref_center</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">ref_center</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ref_center</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="k">if</span> <span class="n">ref_width</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ref_width</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">ref_width</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ref_width</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="c1"># if we get passed a time boundary, let&#39;s save the start and end points</span>
+        <span class="k">if</span> <span class="n">time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">time_start</span> <span class="o">=</span> <span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">time_end</span> <span class="o">=</span> <span class="n">time</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">time_start</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">time_end</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="c1"># record the dimension of the space</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dimension</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">)</span>
+
+        <span class="c1"># define a radius the usual way in this space</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+
+        <span class="c1"># this parameter sets the last phase space point at each iteration such that</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">walker_restart</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">local_observables</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+        <span class="c1"># this sets the initial distribution at time zero. Used for finite time calculations where a</span>
+        <span class="c1"># time zero injection distribution might be used.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initial_distribution_prob</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">neighborList</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="c1"># We check if the box wraps around a periodic variable</span>
+        <span class="k">if</span> <span class="n">periodicLength</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wrapping</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">periodicLength</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wrapping</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">active</span> <span class="o">=</span> <span class="bp">False</span>
+
+        <span class="c1"># maximum number of entry points stored.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_entrypoints</span> <span class="o">=</span> <span class="n">max_entrypoints</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">neighbor_prob</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="k">return</span> <span class="bp">None</span>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the number of entry points stored in the umbrella window.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">entryPoints</span><span class="p">:</span>
+            <span class="n">count</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entryPoints</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">count</span>
+
+<div class="viewcode-block" id="basisFunction.flush_data_to_file"><a class="viewcode-back" href="../applications/applications.doc.html#basisFunctions.basisFunction.flush_data_to_file">[docs]</a>    <span class="k">def</span> <span class="nf">flush_data_to_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Write the basis function data to an HDF5 file.</span>
+
+<span class="sd">        This function flushes the internal data buffers configs and samples to</span>
+<span class="sd">        files.</span>
+
+<span class="sd">        This function uses the HDF5 python implementation to store data to disk.</span>
+<span class="sd">        It should be noted that it creates two groups in the top-level called</span>
+<span class="sd">        &#39;colvars&#39; and &#39;timeSeries&#39;. Because appending data is not as easy for</span>
+<span class="sd">        this file format, it stores each flush as a new dataset indexed in each</span>
+<span class="sd">        group.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">samples</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s2">&quot;Tried to flush an empty samples buffer.&quot;</span>
+            <span class="k">return</span> <span class="mi">0</span>
+
+        <span class="c1"># get the last sample in the list</span>
+        <span class="n">lastSample</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">samples</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;.colvars&quot;</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f_handle</span><span class="p">:</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">f_handle</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">samples</span><span class="p">)</span>
+
+        <span class="c1"># delete current reference to the list</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">samples</span>
+
+        <span class="c1">#now replace the data structure with the endpoint</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">samples</span> <span class="o">=</span> <span class="p">[</span><span class="n">lastSample</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="basisFunction.reinject"><a class="viewcode-back" href="../applications/applications.doc.html#basisFunctions.basisFunction.reinject">[docs]</a>    <span class="k">def</span> <span class="nf">reinject</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">walker</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return an instance to a phase point drawn from the entry point library. Draw a point from the library proportional to the flux</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># let&#39;s get the current estimate of the flux</span>
+        <span class="c1">#prob = self.z * self.F[:,i]</span>
+
+        <span class="c1"># zero out flux from i to i</span>
+        <span class="c1">#prob[i] = 0.0</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        # now let&#39;s zero out any neighbors with potentially nonzero flux but no stored entry points</span>
+<span class="sd">        for indx in range(prob.size):</span>
+<span class="sd">            # lets get the key to this index</span>
+<span class="sd">            key = self.index_to_key[indx]</span>
+<span class="sd">            # check size of this neighbor specifically and zero out probability if zero</span>
+<span class="sd">            if self._umbrellas[i].getNumberOfEntryPoints(key=key) == 0:</span>
+<span class="sd">                prob[indx] = 0.0</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># normalize probability</span>
+        <span class="c1">#assert prob.sum() &gt; 0.0</span>
+        <span class="c1">#prob /= prob.sum()</span>
+
+        <span class="c1"># now choose neighbor proportional to prob</span>
+        <span class="c1">#I = np.random.choice(np.arange(prob.size), p=prob)</span>
+
+        <span class="c1"># get the entry point from the umbrella window</span>
+
+        <span class="c1">#assert self._umbrellas[i].getNumberOfEntryPoints(key=self.index_to_key[I])</span>
+
+        <span class="c1"># we choose from the initial distribution with prob. stored in this window</span>
+        <span class="k">if</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial_distribution_prob</span><span class="p">:</span>
+            <span class="c1">#print &quot;drawing from initial distribution&quot;</span>
+            <span class="n">dist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial_distribution</span>
+            <span class="c1">#p = self.initial_distribution_p</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            z = self.initial_distribution_p</span>
+<span class="sd">            sampled = False</span>
+<span class="sd">            while (not sampled):</span>
+<span class="sd">                _x = 2.0 * np.random.random() - 1.0</span>
+
+<span class="sd">                if np.random.random() &lt;= np.exp(-walker.V(_x, 0.0)) / z:</span>
+<span class="sd">                    EP =</span>
+<span class="sd">                    sampled = True</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">EP</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="c1">#EP_i = np.random.choice(len(dist), p=p)</span>
+            <span class="c1">#EP = entry_point(np.array([dist[EP_i]]), np.array([0.0]), np.array([0.0]), np.array([0.0]), 0.0, np.array([0.0]))</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            _x = -0.5</span>
+<span class="sd">            for i in range(1000):</span>
+<span class="sd">                _x += - (10.0 * (_x**2 - 1) * 2.0 * _x + 6 * (0.0 - 0.5) + 20.0 * (_x-(2.0*0.0-1))) * 0.001 + np.sqrt(2.0 * 0.001) * np.random.normal()</span>
+
+<span class="sd">            EP = entry_point(np.array([_x]), np.array([0.0]), np.array([0.0]), np.array([0.0]), 0.0, np.array([0.0]))</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">EP</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_entry_point</span><span class="p">()</span>
+
+        <span class="n">walker</span><span class="o">.</span><span class="n">setConfig</span><span class="p">(</span><span class="n">EP</span><span class="o">.</span><span class="n">q</span><span class="p">)</span>
+        <span class="n">walker</span><span class="o">.</span><span class="n">setVel</span><span class="p">(</span><span class="n">EP</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+
+        <span class="c1"># set the lag component of the walker state</span>
+        <span class="n">walker</span><span class="o">.</span><span class="n">Y_s</span> <span class="o">=</span> <span class="p">(</span><span class="n">EP</span><span class="o">.</span><span class="n">ref_q</span><span class="p">,</span> <span class="n">EP</span><span class="o">.</span><span class="n">ref_p</span><span class="p">)</span>
+
+        <span class="n">walker</span><span class="o">.</span><span class="n">simulationTime</span> <span class="o">=</span> <span class="n">EP</span><span class="o">.</span><span class="n">time</span>
+
+        <span class="n">walker</span><span class="o">.</span><span class="n">_w</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">EP</span><span class="o">.</span><span class="n">cv</span><span class="p">))</span>
+        <span class="n">walker</span><span class="o">.</span><span class="n">_l</span> <span class="o">=</span> <span class="n">walker</span><span class="o">.</span><span class="n">_dl</span> <span class="o">*</span> <span class="p">(</span><span class="n">walker</span><span class="o">.</span><span class="n">simulationTime</span><span class="p">)</span><span class="o">/</span> <span class="n">walker</span><span class="o">.</span><span class="n">_dt</span>
+
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+
+<div class="viewcode-block" id="basisFunction.get_entry_point"><a class="viewcode-back" href="../applications/applications.doc.html#basisFunctions.basisFunction.get_entry_point">[docs]</a>    <span class="k">def</span> <span class="nf">get_entry_point</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return an entry point from the buffers drawn with probability proportional to the entry fluxes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">assert</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;entryPoints&#39;</span><span class="p">),</span> <span class="s1">&#39;Window has not initialized entry point library.&#39;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">choice</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">neighborList</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">neighborList</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">neighborList</span><span class="p">]</span>
+
+        <span class="c1"># assertion checking that the neighbor has entry points stored.</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entryPoints</span><span class="p">[</span><span class="n">choice</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Error in entry point fluxes. Attempted to draw from flux zero neighbor.&quot;</span>
+
+        <span class="c1"># draw the point uniformly from that buffer</span>
+        <span class="n">EP</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entryPoints</span><span class="p">[</span><span class="n">choice</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">EP</span></div>
+
+<div class="viewcode-block" id="basisFunction.update_entry_points_fluxes"><a class="viewcode-back" href="../applications/applications.doc.html#basisFunctions.basisFunction.update_entry_points_fluxes">[docs]</a>    <span class="k">def</span> <span class="nf">update_entry_points_fluxes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flux</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update the sizes of the discretization of the entry point flux lists based on the maximum size of the entry point buffer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># set the flux</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">flux</span> <span class="o">=</span> <span class="n">flux</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">neighborList</span><span class="p">:</span>
+            <span class="c1"># if we don&#39;t find entries, set the flux to zero so we don&#39;t draw from this window</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entryPoints</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">:</span> <span class="k">print</span> <span class="s2">&quot;zeroing out&quot;</span><span class="p">,</span> <span class="n">i</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+
+        <span class="c1"># remove negative fluxes</span>
+        <span class="c1">#self.flux[self.flux &lt; 0.0] = 0.0</span>
+
+        <span class="c1"># normalize if needed, since this will be treated as a probability</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">flux</span> <span class="o">/=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+            <span class="c1">#print &quot;flux:&quot;, self.flux.sum(), self.flux</span>
+            <span class="c1">#print &quot;neighbor Flux:&quot;, self.flux[self.neighborList].sum(), self.flux[self.neighborList]</span>
+
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="basisFunction.add_entry_point"><a class="viewcode-back" href="../applications/applications.doc.html#basisFunctions.basisFunction.add_entry_point">[docs]</a>    <span class="k">def</span> <span class="nf">add_entry_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ep</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a new entry point to the current list of active entry points.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;entryPoints&#39;</span><span class="p">):</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Window has not initialized entry point library.&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;key was not provided to add entry point.&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">entryPoints</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ep</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="basisFunction.add_new_entry_point"><a class="viewcode-back" href="../applications/applications.doc.html#basisFunctions.basisFunction.add_new_entry_point">[docs]</a>    <span class="k">def</span> <span class="nf">add_new_entry_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ep</span><span class="p">,</span> <span class="n">key_from</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add an entry point to the list of proposed entry points.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;newEntryPoints&#39;</span><span class="p">):</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Window has not initialized new entry point library.&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">newEntryPoints</span><span class="p">[</span><span class="n">key_from</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ep</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="basisFunction.empty_new_entry_points"><a class="viewcode-back" href="../applications/applications.doc.html#basisFunctions.basisFunction.empty_new_entry_points">[docs]</a>    <span class="k">def</span> <span class="nf">empty_new_entry_points</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Empty the new entry points data list.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">newEntryPoints</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">newEntryPoints</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="basisFunction.initialize_entry_points"><a class="viewcode-back" href="../applications/applications.doc.html#basisFunctions.basisFunction.initialize_entry_points">[docs]</a>    <span class="k">def</span> <span class="nf">initialize_entry_points</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">maxEntryPoints</span> <span class="o">=</span> <span class="mi">500</span><span class="p">,</span> <span class="n">neighborList</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">keylist</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the entry point data structure in the umbrella.</span>
+
+<span class="sd">        The entry point library contains two structures. The first structure is a library of accepted points which is used to draw from when get_entry_point() is called. The second is a buffer library in which new proposed points are stored. The first structure gets update from this second structure when the update_entry_points_fluxes() routine is called.</span>
+
+<span class="sd">        The first structure acts like a double ended queue, in that it has a maximum lengh (set by the max_entrypoints attribute) and new entries are added in a FIFO manner. If max_entrypoints is set to None, this list grows to arbitrary length.</span>
+
+<span class="sd">        This routine does not take max_entrypoints as an argument and sets the structure of these libraries to that size. This is destructive to</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;entryPoints&#39;</span><span class="p">):</span> <span class="k">print</span> <span class="s2">&quot;WARNING: Calling initialize_entry_points() is destructive to current library.&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">entryPoints</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1">#if keylist is None: print &quot;WARNING: no keys were initialized in the entry point structure in this window.&quot;</span>
+
+        <span class="c1"># if there is no neighborlist, add all windows</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">neighborList</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">neighbor</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">entryPoints</span><span class="p">[</span><span class="n">neighbor</span><span class="p">]</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">deque</span><span class="p">(</span><span class="n">maxlen</span><span class="o">=</span><span class="n">maxEntryPoints</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">neighbor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">neighborList</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">entryPoints</span><span class="p">[</span><span class="n">neighbor</span><span class="p">]</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">deque</span><span class="p">(</span><span class="n">maxlen</span><span class="o">=</span><span class="n">maxEntryPoints</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">keylist</span> <span class="o">=</span> <span class="n">keylist</span>
+
+        <span class="c1"># now we need to create a deep copy called newEntryPoints</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">newEntryPoints</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entryPoints</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="basisFunction.set_initial_distribution"><a class="viewcode-back" href="../applications/applications.doc.html#basisFunctions.basisFunction.set_initial_distribution">[docs]</a>    <span class="k">def</span> <span class="nf">set_initial_distribution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_distribution</span><span class="p">,</span> <span class="n">initial_distribution_prob</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the initial distribution and support probability for this window.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">initial_distribution</span> <span class="o">=</span> <span class="n">initial_distribution</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initial_distribution_prob</span> <span class="o">=</span> <span class="n">initial_distribution_prob</span>
+
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="basisFunction.add_local_obserbale"><a class="viewcode-back" href="../applications/applications.doc.html#basisFunctions.basisFunction.add_local_obserbale">[docs]</a>    <span class="k">def</span> <span class="nf">add_local_obserbale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a local observable to this window.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">local_observables</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">obs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="basisFunction.remove_local_observales"><a class="viewcode-back" href="../applications/applications.doc.html#basisFunctions.basisFunction.remove_local_observales">[docs]</a>    <span class="k">def</span> <span class="nf">remove_local_observales</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remove all local observables contained by this window.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">local_observables</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="basisFunction.get_local_observales"><a class="viewcode-back" href="../applications/applications.doc.html#basisFunctions.basisFunction.get_local_observales">[docs]</a>    <span class="k">def</span> <span class="nf">get_local_observales</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a list of the local observables.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_observables</span></div></div>
+
+
+<div class="viewcode-block" id="Box"><a class="viewcode-back" href="../applications/applications.doc.html#basisFunctions.Box">[docs]</a><span class="k">class</span> <span class="nc">Box</span><span class="p">(</span><span class="n">basisFunction</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class impements a rectangle in CV space.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">periodicLength</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">max_entrypoints</span> <span class="o">=</span> <span class="mi">250</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the box object.</span>
+
+<span class="sd">        This takes as input:</span>
+<span class="sd">            center            The center of the box in the collective variable space.</span>
+<span class="sd">                                This should ideally be a numpy/scipy array or list, but other iterables MIGHT work.</span>
+<span class="sd">            width              This is the width out from the center in each collective coordinate.</span>
+<span class="sd">                                The actual width of the box in each coordinate is twice this vector.</span>
+<span class="sd">            periodicLength        The wrapping object takes a little explanation.  It is an optional array,</span>
+<span class="sd">                                where the i&#39;th element corresponds to the i&#39;th collective variable.  If the</span>
+<span class="sd">                                collective variable wraps around, the corresponding element is the range</span>
+<span class="sd">                                of the collective variable, e.g. 360 for an angle going from -180 to 180.  If the</span>
+<span class="sd">                                collective varable does not wrap around, the corresponding element is</span>
+<span class="sd">                                just 0.  If none of the collective variables</span>
+<span class="sd">                                wrap, leaving wrapping as None is perfectly fine.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># construct data structures for the basis function.</span>
+        <span class="c1"># center and width</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">center</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">center</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">width</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dimension</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">center</span><span class="p">)</span>
+
+        <span class="c1"># set the radius to use for computing neighbors.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span> <span class="o">*</span> <span class="mf">2.0</span>
+        <span class="c1">#self.radius = np.linalg.norm(self.width)**2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">neighborList</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_entrypoints</span> <span class="o">=</span> <span class="n">max_entrypoints</span>
+
+
+        <span class="c1"># for storing CV&#39;s and configs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">samples</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">numSamples</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">configs</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># if the cv is periodic, build a wrapping array</span>
+        <span class="k">if</span> <span class="n">periodicLength</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wrapping</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">periodicLength</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># set to the default value of None if not periodic</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wrapping</span> <span class="o">=</span> <span class="n">periodicLength</span>
+
+        <span class="c1">#print &quot;Box created at&quot;, center, &quot;with widths&quot;, width</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coord</span><span class="p">,</span> <span class="n">umb</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the value of the basis function at this coordinate.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># get sum of box indicators.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">indicator</span><span class="p">(</span><span class="n">coord</span><span class="p">)</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">0.0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">norm</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">neighborList</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">neighborList</span><span class="p">)):</span>
+                    <span class="n">norm</span> <span class="o">+=</span> <span class="n">umb</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">neighborList</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span><span class="o">.</span><span class="n">indicator</span><span class="p">(</span><span class="n">coord</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">umb</span><span class="p">)):</span>
+                    <span class="n">norm</span> <span class="o">+=</span> <span class="n">umb</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">indicator</span><span class="p">(</span><span class="n">coord</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">norm</span>
+
+<div class="viewcode-block" id="Box.indicator"><a class="viewcode-back" href="../applications/applications.doc.html#basisFunctions.Box.indicator">[docs]</a>    <span class="k">def</span> <span class="nf">indicator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coord</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the value of the indicator of the box at this point.</span>
+
+<span class="sd">        This will be 1.0 if coord is contained inside the box, and 0.0 if it is not.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># create a distance vector</span>
+        <span class="n">distancevec</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">coord</span><span class="p">)</span> <span class="o">-</span> <span class="n">sp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">)</span>
+        <span class="c1"># if any collective variable is periodic, construct dr, the adjuct for minimum image convetion for the periodic cv&#39;s</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">wrapping</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="c1"># build dr</span>
+            <span class="n">dr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">distancevec</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+            <span class="c1"># add values to dr if the CV wraps</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wrapping</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">wrapping</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
+                    <span class="c1"># This is an old trick from MD codes to find the minimum distance between two points.</span>
+                    <span class="n">dr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wrapping</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">rint</span><span class="p">(</span><span class="n">distancevec</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">wrapping</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="c1"># add min image vector</span>
+            <span class="n">distancevec</span> <span class="o">-=</span> <span class="n">dr</span>
+           <span class="c1"># print distancevec</span>
+
+        <span class="c1"># We return 1.0 if all the distances are smaller than the width of the box from the center, 0.0 otherwise.</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">distancevec</span><span class="p">)))</span></div></div>
+
+
+<div class="viewcode-block" id="Gaussian"><a class="viewcode-back" href="../applications/applications.doc.html#basisFunctions.Gaussian">[docs]</a><span class="k">class</span> <span class="nc">Gaussian</span><span class="p">(</span><span class="n">basisFunction</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class implements a Gaussian function.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Define repr special method to support identification of the basis function.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">id</span> <span class="o">=</span> <span class="s2">&quot;basisFunctions.Gaussian(&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+
+        <span class="k">return</span> <span class="nb">id</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="n">max_entrypoints</span> <span class="o">=</span> <span class="mi">250</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes a Gaussian at a point with a given width in each dimension.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># the center of the gaussian</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">center</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">mu</span><span class="p">)</span>
+        <span class="c1"># defines the stdev in each dimension</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sig</span><span class="p">)</span>
+        <span class="c1"># a list for samples of CV space</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">samples</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># configurations buffer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">configs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># stores the dimension of the CV space.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dimension</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="o">.</span><span class="n">size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_entrypoints</span> <span class="o">=</span> <span class="n">max_entrypoints</span>
+
+        <span class="c1">#print &quot;Gaussian created at &quot;, mu, &quot; with stdev &quot;, sig</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coord</span><span class="p">,</span> <span class="n">umb</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the value of the basis function at this coordinate.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># get sum of box indicators.</span>
+        <span class="n">norm</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">umb</span><span class="p">)):</span>
+            <span class="n">norm</span> <span class="o">+=</span> <span class="n">umb</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">indicator</span><span class="p">(</span><span class="n">coord</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">indicator</span><span class="p">(</span><span class="n">coord</span><span class="p">)</span> <span class="o">/</span> <span class="n">norm</span>
+
+<div class="viewcode-block" id="Gaussian.indicator"><a class="viewcode-back" href="../applications/applications.doc.html#basisFunctions.Gaussian.indicator">[docs]</a>    <span class="k">def</span> <span class="nf">indicator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coord</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Function that returns the value of the Gaussian at a point.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># first enforce nearest image convention</span>
+        <span class="n">dist</span> <span class="o">=</span> <span class="p">(</span><span class="n">coord</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">)</span><span class="o">-</span><span class="mf">360.0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">rint</span><span class="p">((</span><span class="n">coord</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">)</span><span class="o">/</span><span class="mf">360.0</span><span class="p">)</span>
+        <span class="c1"># compute the exponentials</span>
+        <span class="n">vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span> <span class="p">(</span><span class="mf">2.0</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+        <span class="c1"># return the product</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Pyramid"><a class="viewcode-back" href="../applications/applications.doc.html#basisFunctions.Pyramid">[docs]</a><span class="k">class</span> <span class="nc">Pyramid</span><span class="p">(</span><span class="n">basisFunction</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class implements a pyramidal basis function.</span>
+<span class="sd">                center            The center of the box in the collective variable space.</span>
+<span class="sd">                                This should ideally be a numpy/scipy array or list, but other iterables MIGHT work.</span>
+<span class="sd">            width              This is the width out from the center in each collective coordinate.</span>
+<span class="sd">                                The actual width of the box in each coordinate is twice this vector.</span>
+<span class="sd">            periodicLength        The wrapping object takes a little explanation.  It is an optional array,</span>
+<span class="sd">                                where the i&#39;th element corresponds to the i&#39;th collective variable.  If the</span>
+<span class="sd">                                collective variable wraps around, the corresponding element is the range</span>
+<span class="sd">                                of the collective variable, e.g. 360 for an angle going from -180 to 180.  If the</span>
+<span class="sd">                                collective varable does not wrap around, the corresponding element is</span>
+<span class="sd">                                just 0.  If none of the collective variables</span>
+<span class="sd">                                wrap, leaving wrapping as None is perfectly fine.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Definition of repr special method to support identification of the basis function.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">id</span> <span class="o">=</span> <span class="s2">&quot;basisFunctions.Pyramid(&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+
+        <span class="k">return</span> <span class="nb">id</span>
+
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">ref_center</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">ref_width</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">periodicLength</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">max_entrypoints</span> <span class="o">=</span> <span class="mi">500</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the pyramid at a center, given a width in each dimension.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># call parent constructor</span>
+        <span class="n">basisFunction</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">ref_center</span><span class="o">=</span><span class="n">ref_center</span><span class="p">,</span> <span class="n">ref_width</span><span class="o">=</span><span class="n">ref_width</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">,</span> <span class="n">periodicLength</span><span class="o">=</span><span class="n">periodicLength</span><span class="p">,</span> <span class="n">max_entrypoints</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+
+        <span class="c1"># We calculate the slope of the pyramid.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">slopes</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span>
+
+        <span class="k">return</span> <span class="bp">None</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wlkr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the value of the basis function at this coordinate.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">coord</span> <span class="o">=</span> <span class="n">wlkr</span><span class="o">.</span><span class="n">getColvars</span><span class="p">()</span>
+        <span class="n">ref_coord</span> <span class="o">=</span> <span class="n">wlkr</span><span class="o">.</span><span class="n">ref_cv</span>
+        <span class="n">time</span> <span class="o">=</span> <span class="n">wlkr</span><span class="o">.</span><span class="n">simulationTime</span>
+
+        <span class="c1"># create a distance vector</span>
+        <span class="n">distancevec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">coord</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">)</span>
+
+        <span class="c1"># if any collective variable is periodic, construct dr, the adjuct for minimum image convention for the periodic cv&#39;s</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">wrapping</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+
+            <span class="c1"># build dr</span>
+            <span class="n">dr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">distancevec</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+            <span class="c1"># add values to dr if the CV wraps</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wrapping</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">wrapping</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
+                    <span class="c1"># This is an old trick from MD codes to find the minimum distance between two points.</span>
+                    <span class="n">dr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wrapping</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">rint</span><span class="p">(</span><span class="n">distancevec</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">wrapping</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="c1"># add min image vector</span>
+            <span class="n">distancevec</span> <span class="o">-=</span> <span class="n">dr</span>
+
+        <span class="c1"># We calculate the value of</span>
+        <span class="n">psiparts</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">slopes</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">distancevec</span><span class="p">)</span>
+
+        <span class="n">val</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">psiparts</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ref_center</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">val</span> <span class="o">*=</span><span class="bp">self</span><span class="o">.</span><span class="n">ref_indicator</span><span class="p">(</span><span class="n">ref_coord</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">val</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_indicator</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+
+
+        <span class="c1"># We remove negative entries and return the minimum value.</span>
+        <span class="k">return</span> <span class="n">val</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        # adjust for the current</span>
+<span class="sd">        coord = coord[0:self.dimension]</span>
+<span class="sd">        ref_coord = coord[0:self.dimension]</span>
+
+<span class="sd">        time = wlkr.simulationTime</span>
+
+<span class="sd">        # get sum of box indicators for</span>
+<span class="sd">        if self.indicator(coord) == 0.0:</span>
+<span class="sd">            return 0.0</span>
+
+<span class="sd">        elif len(self.neighborList) &gt; 0:</span>
+<span class="sd">            norm = 0.0</span>
+<span class="sd">            for i in self.neighborList:</span>
+<span class="sd">                norm += umb[i].indicator(coord)</span>
+
+<span class="sd">        else:</span>
+<span class="sd">            norm = 0.0</span>
+<span class="sd">            for win in umb:</span>
+<span class="sd">                norm += win.indicator(coord)</span>
+
+<span class="sd">        assert norm != 0.0</span>
+
+<span class="sd">        if self.ref_center is not None:</span>
+<span class="sd">            norm *= self.refIndicator(ref_coord)</span>
+<span class="sd">        if self.time_start is not None:</span>
+<span class="sd">            norm *= self.timeIndicator(time)</span>
+
+<span class="sd">        if norm &gt; 0.0:</span>
+<span class="sd">            return self.indicator(coord) / norm</span>
+<span class="sd">        else:</span>
+<span class="sd">            return 0.0</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+
+    <span class="k">def</span> <span class="nf">__bool__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns True if the window is active and False if it is inactive.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">active</span>
+
+
+<div class="viewcode-block" id="Pyramid.ref_indicator"><a class="viewcode-back" href="../applications/applications.doc.html#basisFunctions.Pyramid.ref_indicator">[docs]</a>    <span class="k">def</span> <span class="nf">ref_indicator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coord</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the value of the indicator for the reference coordinates if appropriate.</span>
+
+<span class="sd">        NOTE: Currently we will simply implement the reference discretization as non-overlapping boxes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># create a distance vector</span>
+        <span class="n">distancevec</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">coord</span><span class="p">)</span> <span class="o">-</span> <span class="n">sp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ref_center</span><span class="p">)</span>
+
+        <span class="c1"># if any collective variable is periodic, construct dr, the adjuct for minimum image convetion for the periodic cv&#39;s</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">wrapping</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+
+            <span class="c1"># build dr</span>
+            <span class="n">dr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">distancevec</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+            <span class="c1"># add values to dr if the CV wraps</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wrapping</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">wrapping</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
+                    <span class="c1"># This is an old trick from MD codes to find the minimum distance between two points.</span>
+                    <span class="n">dr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wrapping</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">rint</span><span class="p">(</span><span class="n">distancevec</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">wrapping</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+            <span class="c1"># add min image vector</span>
+            <span class="n">distancevec</span> <span class="o">-=</span> <span class="n">dr</span>
+
+        <span class="c1"># We return 1.0 if all the distances are smaller than the width of the box from the center, 0.0 otherwise.</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ref_width</span> <span class="o">&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">distancevec</span><span class="p">)))</span></div>
+
+
+<div class="viewcode-block" id="Pyramid.time_indicator"><a class="viewcode-back" href="../applications/applications.doc.html#basisFunctions.Pyramid.time_indicator">[docs]</a>    <span class="k">def</span> <span class="nf">time_indicator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coord</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the value of the indicator function for the time coordinate.</span>
+
+<span class="sd">        This will be implemented currently as non-overlapping discretization in time.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_start</span> <span class="o">&lt;=</span> <span class="n">coord</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_end</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">1.0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">0.0</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Enhanced Sampling Toolkit 0.1a documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2015, Jeremy O. B. Tempkin.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
+    </div>
+  </body>
+</html>

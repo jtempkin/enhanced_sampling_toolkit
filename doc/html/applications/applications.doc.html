@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Applications &mdash; Enhanced Sampling Toolkit 1.0a documentation</title>
+    <title>Applications &mdash; Enhanced Sampling Toolkit 0.1a documentation</title>
     
     <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.0a',
+        VERSION:     '0.1a',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,9 +24,9 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="Enhanced Sampling Toolkit 1.0a documentation" href="../index.html" />
+    <link rel="top" title="Enhanced Sampling Toolkit 0.1a documentation" href="../index.html" />
     <link rel="next" title="Testing" href="../test/testing.doc.html" />
-    <link rel="prev" title="Walker API" href="../src/src.doc.html" /> 
+    <link rel="prev" title="Walker API" href="../walker_api/walker_api.doc.html" /> 
   </head>
   <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
@@ -42,9 +42,9 @@
           <a href="../test/testing.doc.html" title="Testing"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="../src/src.doc.html" title="Walker API"
+          <a href="../walker_api/walker_api.doc.html" title="Walker API"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Enhanced Sampling Toolkit 1.0a documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Enhanced Sampling Toolkit 0.1a documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -57,12 +57,207 @@
 <h1>Applications<a class="headerlink" href="#applications" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="nonequilibrium-umbrella-sampling">
 <h2>Nonequilibrium Umbrella Sampling<a class="headerlink" href="#nonequilibrium-umbrella-sampling" title="Permalink to this headline">¶</a></h2>
+<p>The Nonequilibrium Umbrella Sampling (NEUS) application module provides a flexible set of tools built on top of the Walker API that implements the found in <strong>Tempkin et at, in prep</strong>.</p>
+<p>More detailed examples of the specific implementations of the use of the can be found in the examples subdirectory.</p>
+<div class="section" id="partition-module">
+<h3>Partition Module<a class="headerlink" href="#partition-module" title="Permalink to this headline">¶</a></h3>
+<p>The partition module provides a simple structure for handling and manipulating a list of windows. The partition module is effectively a callable Python list. As such, it supports.</p>
+<p>To initialize a partition object:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">est.neus</span> <span class="k">import</span> <span class="n">partition</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sys</span> <span class="o">=</span> <span class="n">partition</span><span class="o">.</span><span class="n">partition</span><span class="p">()</span>
+</pre></div>
 </div>
-<div class="section" id="string-methods">
-<h2>String Methods<a class="headerlink" href="#string-methods" title="Permalink to this headline">¶</a></h2>
+<p>One can add elements to the partition one by one:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="go">&gt;&gt;&gt;</span>
+</pre></div>
 </div>
-<div class="section" id="replica-exchange">
-<h2>Replica Exchange<a class="headerlink" href="#replica-exchange" title="Permalink to this headline">¶</a></h2>
+<p>Or hand partition a list at initialization:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">est.neus</span> <span class="k">import</span> <span class="n">Box</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">windows</span> <span class="o">=</span> <span class="p">[</span><span class="n">Box</span><span class="o">.</span><span class="n">box</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sys</span> <span class="o">=</span> <span class="n">partition</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="n">windows</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">sys</span>
+</pre></div>
+</div>
+<p>Note that partition requires the elements it contains to be callable items. Partition will enforce this behavior:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;not callable&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>See below for a more detailed specification.</p>
+<span class="target" id="module-partition"></span><dl class="class">
+<dt id="partition.partition">
+<em class="property">class </em><code class="descclassname">partition.</code><code class="descname">partition</code><span class="sig-paren">(</span><em>umbrellas=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/partition.html#partition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#partition.partition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Note that the call behavior of the partition object. For example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">indicators</span> <span class="o">=</span> <span class="n">sys</span><span class="p">(</span><span class="n">wlkr</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">indicators</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="partition.partition.append">
+<code class="descname">append</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/partition.html#partition.append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#partition.partition.append" title="Permalink to this definition">¶</a></dt>
+<dd><p>Append a new value to the end of the partition</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="partition.partition.index">
+<code class="descname">index</code><span class="sig-paren">(</span><em>item</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/partition.html#partition.index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#partition.partition.index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the first index in which item appears in partition.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="window-module">
+<h3>Window Module<a class="headerlink" href="#window-module" title="Permalink to this headline">¶</a></h3>
+<p>The window object defines a single spatiotemporal restriction of the discretization defined by the NEUS J(t) process. An instance of the window object corresponds to a single value of the J. The object defines a data structure for storing the entry point flux lists defined by ~pi. It also defintes the routines require for constructing the flux lists and returning physically weighted elements.</p>
+<p>To import and initialize a window object:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">est.neus</span> <span class="k">import</span> <span class="n">Window</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">win</span> <span class="o">=</span> <span class="n">Window</span><span class="o">.</span><span class="n">window</span><span class="p">(</span><span class="n">center</span><span class="o">=</span><span class="p">[],</span> <span class="n">width</span><span class="o">=</span><span class="p">[])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="s2">&quot;Hello&quot;</span>
+</pre></div>
+</div>
+<p>To</p>
+<span class="target" id="module-window"></span><p>An implementation of the window object in the NEUS toolkit.</p>
+<dl class="class">
+<dt id="window.window">
+<em class="property">class </em><code class="descclassname">window.</code><code class="descname">window</code><span class="sig-paren">(</span><em>center</em>, <em>width</em>, <em>ref_center=None</em>, <em>ref_width=None</em>, <em>time=None</em>, <em>periodic_length=None</em>, <em>max_list_size=100</em>, <em>initial_conditions=[]</em>, <em>initial_conditions_probability=0.0</em>, <em>a=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/window.html#window"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#window.window" title="Permalink to this definition">¶</a></dt>
+<dd><p>The window object defines a single piece of the discretization defined by the NEUS J(t) process. An instance of the window object corresponds to a single value of the J. The object defines a data structure for storing the entry point flux lists defined by ~pi. It also defines a routine for returning an entry point based on the defined fluxes.</p>
+<p>This object contains the following items:</p>
+<ul class="simple">
+<li>data structure for containing flux lists</li>
+<li>data structure for the initial conditions distribution at J(0)</li>
+<li>a list of physical fluxes used to draw entry points proportionally</li>
+<li>routines for reinjection</li>
+<li>routines for updating fluxes</li>
+<li>routines for updating entry point lists</li>
+</ul>
+<dl class="method">
+<dt id="window.window.add_entry_point">
+<code class="descname">add_entry_point</code><span class="sig-paren">(</span><em>ep</em>, <em>key</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/window.html#window.add_entry_point"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#window.window.add_entry_point" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a new entry point to the specified flux list. If key is not already know, create a new set with label &#8220;key&#8221; and add it to the dictionary.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="window.window.clear_flux_list">
+<code class="descname">clear_flux_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/window.html#window.clear_flux_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#window.window.clear_flux_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clear the flux list of all entries.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="window.window.get_entry_point">
+<code class="descname">get_entry_point</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/window.html#window.get_entry_point"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#window.window.get_entry_point" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an entry point from the store flux lists proportional to the entry point fluxes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="window.window.get_flux_lists">
+<code class="descname">get_flux_lists</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/window.html#window.get_flux_lists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#window.window.get_flux_lists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the dictionary of the flux lists.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="window.window.get_initial_conditions">
+<code class="descname">get_initial_conditions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/window.html#window.get_initial_conditions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#window.window.get_initial_conditions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the distribution of initial conditions.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="window.window.reinject">
+<code class="descname">reinject</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/window.html#window.reinject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#window.window.reinject" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an entry point drawn proportional to the neighbor fluxes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="window.window.set_initial_conditions">
+<code class="descname">set_initial_conditions</code><span class="sig-paren">(</span><em>distribution</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/window.html#window.set_initial_conditions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#window.window.set_initial_conditions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the distribution of initial conditions to this window. This corresponds the distribution of the process at J(0). Distribution is expected to be an iterable of entry point objects.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="window.window.set_initial_conditions_probability">
+<code class="descname">set_initial_conditions_probability</code><span class="sig-paren">(</span><em>p</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/window.html#window.set_initial_conditions_probability"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#window.window.set_initial_conditions_probability" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the probability for drawing from the initial conditions.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="window.window.update_fluxes">
+<code class="descname">update_fluxes</code><span class="sig-paren">(</span><em>fluxes</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/window.html#window.update_fluxes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#window.window.update_fluxes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set neighbor fluxes as numpy array.</p>
+</dd></dl>
+
+</dd></dl>
+
+<p>The Pyramid module implements a support function for the Window class of the form:</p>
+<p><strong>equation</strong>.</p>
+<span class="target" id="module-pyramid"></span><p>Class definition for Pyramid shaped window. Inherets from Window.</p>
+<dl class="class">
+<dt id="pyramid.Pyramid">
+<em class="property">class </em><code class="descclassname">pyramid.</code><code class="descname">Pyramid</code><span class="sig-paren">(</span><em>center</em>, <em>width</em>, <em>ref_center=None</em>, <em>ref_width=None</em>, <em>time=None</em>, <em>periodic_length=None</em>, <em>max_list_size=100</em>, <em>initial_conditions=[]</em>, <em>initial_conditions_probability=0.0</em>, <em>a=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyramid.html#Pyramid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyramid.Pyramid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class definition of Pyramid which inherits from window. Implements the pyramid shaped basis function.</p>
+<dl class="method">
+<dt id="pyramid.Pyramid.ref_indicator">
+<code class="descname">ref_indicator</code><span class="sig-paren">(</span><em>coord</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyramid.html#Pyramid.ref_indicator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyramid.Pyramid.ref_indicator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the value of the indicator for the reference.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyramid.Pyramid.time_indicator">
+<code class="descname">time_indicator</code><span class="sig-paren">(</span><em>coord</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyramid.html#Pyramid.time_indicator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyramid.Pyramid.time_indicator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the value of the indicator function for the time coordinate.</p>
+</dd></dl>
+
+</dd></dl>
+
+<p>The Box module implements a support function for the Window class of the form:</p>
+<p><strong>Box indicator function</strong>.</p>
+</div>
+<div class="section" id="module-entryPoints">
+<span id="entry-point-module"></span><h3>Entry Point Module<a class="headerlink" href="#module-entryPoints" title="Permalink to this headline">¶</a></h3>
+<p>This module acts as a template for defining named tuples that store entry points.</p>
+<p>It provides a consistent entry point contruction as a named tuple.</p>
+<p>It&#8217;s provided as an independent file so that analysis and manipulation of these objects can be possible.</p>
+<dl class="class">
+<dt id="entryPoints.entry_point">
+<em class="property">class </em><code class="descclassname">entryPoints.</code><code class="descname">entry_point</code><span class="sig-paren">(</span><em>q</em>, <em>p</em>, <em>ref_q</em>, <em>ref_p</em>, <em>time</em>, <em>cv</em><span class="sig-paren">)</span><a class="headerlink" href="#entryPoints.entry_point" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="entryPoints.entry_point.cv">
+<code class="descname">cv</code><a class="headerlink" href="#entryPoints.entry_point.cv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 5</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entryPoints.entry_point.p">
+<code class="descname">p</code><a class="headerlink" href="#entryPoints.entry_point.p" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entryPoints.entry_point.q">
+<code class="descname">q</code><a class="headerlink" href="#entryPoints.entry_point.q" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entryPoints.entry_point.ref_p">
+<code class="descname">ref_p</code><a class="headerlink" href="#entryPoints.entry_point.ref_p" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 3</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entryPoints.entry_point.ref_q">
+<code class="descname">ref_q</code><a class="headerlink" href="#entryPoints.entry_point.ref_q" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entryPoints.entry_point.time">
+<code class="descname">time</code><a class="headerlink" href="#entryPoints.entry_point.time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 4</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 </div>
 </div>
 
@@ -75,15 +270,18 @@
   <h3><a href="../index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Applications</a><ul>
-<li><a class="reference internal" href="#nonequilibrium-umbrella-sampling">Nonequilibrium Umbrella Sampling</a></li>
-<li><a class="reference internal" href="#string-methods">String Methods</a></li>
-<li><a class="reference internal" href="#replica-exchange">Replica Exchange</a></li>
+<li><a class="reference internal" href="#nonequilibrium-umbrella-sampling">Nonequilibrium Umbrella Sampling</a><ul>
+<li><a class="reference internal" href="#partition-module">Partition Module</a></li>
+<li><a class="reference internal" href="#window-module">Window Module</a></li>
+<li><a class="reference internal" href="#module-entryPoints">Entry Point Module</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="../src/src.doc.html"
+  <p class="topless"><a href="../walker_api/walker_api.doc.html"
                         title="previous chapter">Walker API</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="../test/testing.doc.html"
@@ -103,9 +301,6 @@
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -125,14 +320,14 @@
           <a href="../test/testing.doc.html" title="Testing"
              >next</a> |</li>
         <li class="right" >
-          <a href="../src/src.doc.html" title="Walker API"
+          <a href="../walker_api/walker_api.doc.html" title="Walker API"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Enhanced Sampling Toolkit 1.0a documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Enhanced Sampling Toolkit 0.1a documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jeremy O. B. Tempkin.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
     </div>
   </body>
 </html>

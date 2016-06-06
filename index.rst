@@ -8,9 +8,8 @@ Welcome to Enhanced Sampling Toolkit's documentation!
 
 .. toctree::
    :maxdepth: 4
-   
+
    intro.doc
    walker_api/walker_api.doc
    applications/applications.doc
    test/testing.doc
-

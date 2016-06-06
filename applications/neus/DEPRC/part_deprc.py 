@@ -1,0 +1,358 @@
+"""
+A module to temporarily store deprecated routines from the partition module
+"""
+
+
+def communicateMPI(self, rank, comm, sparseSolve=False, finiteTime=False, debug=False):
+    """
+    This routine performs a round of MPI communication to synchronize information across all ranks.
+
+    Let's note here that there is a sequence of communication / computation that takes place in this section.
+    Therefore it makes the most sense to interleave the two components here.
+
+    It should be noted that this being a initial version of the parallel neus code, an optimization of the
+    MPI communication could be implemented at a later date.
+    """
+
+    """
+    Step 1) Communication of M as an all reduce
+    """
+
+    # first we need to communicate the M matricies in which we've accumulated transition statistics
+
+    # now reduce the M matrix at root, first making a send buffer,
+    self.Mbuff = copy.deepcopy(self.M)
+    comm.Allreduce([self.Mbuff, MPI.DOUBLE], [self.M, MPI.DOUBLE], op=MPI.SUM)
+
+    comm.Barrier()
+
+    #if rank == 0: print rank, "after", self.active_windows.sum()
+
+    """
+    Step 2) solution of the eigenvalue problem at each rank
+    """
+    # at rank, update F and compute z
+
+    for row in range(self.F.shape[0]):
+        if self.M[row].sum() > 0.0:
+            self.update_F(row, 0.9) #self.epsilon)
+
+
+    #if rank == 0: print self.z
+
+    self.compute_z(sparseSolve=sparseSolve, finiteTime=finiteTime)
+
+    #if rank == 0: print self.z
+
+
+
+    """
+    Step 3) estimation of observables on each rank
+    """
+    self.compute_observables()
+
+    """
+    Step 4) all reduction of averaged observables to each processor
+    """
+
+    for obs in self.observables:
+        self.lbuff = copy.deepcopy(obs.data)
+        comm.Allreduce([self.lbuff, MPI.DOUBLE], [obs.data, MPI.DOUBLE], op=MPI.SUM)
+
+        self.lbuff = copy.deepcopy(obs.weights)
+        comm.Allreduce([self.lbuff, MPI.DOUBLE], [obs.weights, MPI.DOUBLE], op=MPI.SUM)
+
+        # normalize by the weights for nonzero weights only
+        obs.data[obs.weights.astype(bool)] /= obs.weights[obs.weights.astype(bool)]
+
+    if debug: print self.observables[0].data, rank
+
+
+    return 0
+
+
+def sample(self, wlkr, umbrellaIndex, numSteps, stepLength, walkerIndex, corrLength=None, debug=False):
+    """
+    This function takes a system lmp and propagates the dynamics to generate
+    the required samples but storing and generating samples via NEUS algorithm.
+
+    Specifically, this performs an umbrella sampling routine using NEUS reinjection procedure for reinitializing the walker.
+
+    We should remove the need for the output to be specified internally here.
+
+    """
+    # count the number of transitions made in this sampling routine if debug.
+    if debug: ntransitions = 0
+
+    assert hasattr(self, 'scratchdir'), "Scratch directory was not specified for this partition object."
+
+    # assign an input filename for this walker.
+    if debug:
+        inputFilename = self.scratchdir + "/" + str(umbrellaIndex) + "_w" + str(walkerIndex)
+    else:
+        inputFilename = None
+
+    # get the sample from the initial state of the walker in CV space
+    self._umbrellas[umbrellaIndex].samples.append(wlkr.getColvars())
+
+    # reset the local observables arrays for this round of sampling
+    for obs in self._umbrellas[umbrellaIndex].local_observables:
+        self.resetObservable(obs)
+
+    # now we proceed with the sampling routine
+    for i in range(0, numSteps, stepLength):
+
+        # propagate the dynamics
+        wlkr.propagate(stepLength)
+
+        # update the record of the simulation time for the walker object.
+        wlkr.simulationTime += stepLength
+
+        # if this is a finite time version, we should kill the walker if it hits the boundary
+        if 30.0 < wlkr.getColvars()[0] < 90.0:
+            #print "hit target", self._umbrellas[umbrellaIndex].center, wlkr.simulationTime, self.z[umbrellaIndex]
+            self.reinject(wlkr, umbrellaIndex)
+
+            self._umbrellas[umbrellaIndex].nhits += 1.0
+
+            # now update the statistics for hitting vs stopping.
+
+            continue
+
+        # now we check to see if we've passed the autocorrelation length
+        # if we do, we reset the Y ( [t / s] * s) value to the current point
+        if corrLength is not None:
+            if (wlkr.simulationTime % corrLength) == 0.0:
+                #wlkr.Y_s = (wlkr.getConfig(), wlkr.getVel(), wlkr.getColvars())
+                #wlkr.simulationTime = 0.0
+                #print "stopping time hit"
+
+                self._umbrellas[umbrellaIndex].nstops += 1.0
+
+                # if we hit the stopping time, reset the walker
+                self.reinject(wlkr, umbrellaIndex)
+                continue
+
+        # get the new sample position
+        new_sample = wlkr.getColvars()
+        self._umbrellas[umbrellaIndex].samples.append(new_sample)
+
+        # check for a transition out of this index
+        if self._umbrellas[umbrellaIndex](wlkr, self._umbrellas) == 0.0:
+            if debug: ntransitions += 1
+            # choose the new j with probability {psi_0, ..., psi_N}
+
+            indicators = self.get_basis_function_values(wlkr)
+
+            # record a transition to the matrix
+            self.M[umbrellaIndex,:] += indicators
+
+            # now we select a window to which to append this new entry point,use numpy to choose window index
+            ep_targets = np.arange(indicators.size)[indicators.astype(bool)]
+
+            # create a new entry point and append the entry point to the new window
+            newEP = entryPoints.entryPoints(wlkr.getConfig(), wlkr.getVel(), wlkr.simulationTime)
+            newEP.Y_s = wlkr.Y_s
+
+            for indx in ep_targets:
+                #if not self.active_windows[indx]: print "added entry point", indx
+                self._umbrellas[indx].addNewEntryPoint(newEP, umbrellaIndex)
+
+            # drop the last point from the samples
+            self._umbrellas[umbrellaIndex].samples.pop()
+
+            # reinject the walker into the current window
+            self.reinject(wlkr, umbrellaIndex)
+
+            # get the sample from the new starting point after reinjection
+            self._umbrellas[umbrellaIndex].samples.append(wlkr.getColvars())
+
+        # if we do not detect a transition and handle that, we should add a count to M_ii
+        else:
+            self.M[umbrellaIndex, umbrellaIndex] += 1.0
+
+        #print self.M[umbrellaIndex, :]
+
+        # let's accumulate a sample into the observables we are accumulating on this window
+        self.accumulateObservables(wlkr, wlkr.getColvars(), wlkr.colvars, umbrellaIndex)
+
+        # now check to see if the data buffer has become too large and flush buffer to file
+        #if len(self._umbrellas[umbrellaIndex].samples) > 1000000: self._umbrellas[umbrellaIndex].flushDataToFile(inputFilename)
+
+    # flush the last data to file after sampling has finished
+    self._umbrellas[umbrellaIndex].flushDataToFile(inputFilename)
+
+    # record the number of samples taken here
+    self.nsamples_M[umbrellaIndex] = numSteps / stepLength
+
+    # now we compute the estimate of the flux from thsi iteration
+    #self.M[umbrellaIndex,umbrellaIndex] = numSteps - self.M[umbrellaIndex, :].sum()
+
+    self.M[umbrellaIndex, :] /= self.nsamples_M[umbrellaIndex]
+
+    # here we will store the current position of the walker in an entry point structure
+    newEP = entryPoints.entryPoints(wlkr.getConfig(), wlkr.getVel(), wlkr.simulationTime)
+    newEP.Y_s = wlkr.Y_s
+    self._umbrellas[umbrellaIndex].walker_restart = newEP
+
+    if debug: print "row" ,umbrellaIndex, "of M:", self.M[umbrellaIndex,:]
+
+    if debug: print "Recorded",ntransitions,"transitions"
+
+    return 0
+
+
+def update_F(self, row, epsilon):
+    """
+    This routine update G according to:
+
+        G_{ij}^{k+1} = (1 - \epsilon_{k}) * G_{ij}^{k} + \epsilon_{k} * M_{ij} / T_{i}
+
+    for a finite time problem.
+    """
+
+
+    temp_M = self.M[row]
+    """
+    # update elements
+    temp_M[:] = self.M[row,:] / self.nsamples_M[row]
+    temp_M[row] = 1 - temp_M.sum()
+    """
+
+    # update an total average
+    self.F[row] = (self.k[row] * self.F[row] + temp_M) / (self.k[row] + 1)
+
+    # keep a list of the most recent F
+    """
+    if len(self.F_list[row]) >= epsilon:
+        self.F_list[row].pop(0)
+
+    self.F_list[row].append(temp_M)
+    self.F[row].fill(0.0)
+    for m in self.F_list[row]:
+        self.F[row] += m
+
+    self.F[row] /= len(self.F_list[row])
+    """
+
+    # the one with the decay parameter
+    #self.F[row] = ((1-epsilon) * self.F[row] + epsilon * temp_M)
+
+    if self.k[row] / (self.k[row] + 1) < epsilon:
+        self.k[row] += 1
+
+    return 0
+
+    
+def compute_z(self, sparseSolve=True, finiteTime=False):
+    """
+    Solves for z vector given current G,a via solving the following linear
+    system:
+
+        (I - G)^T z = a
+
+    for a finite time process and
+
+        zG = z
+
+    for infinite time process.
+
+    A = (np.identity(self.G.shape[0]) - self.G).transpose()
+
+    self.z = np.linalg.solve(A, self.a)
+
+    """
+    # let's compute a z only for the list of active windows
+    temp_F = self.F[self.active_windows, :][:, self.active_windows]
+
+    if finiteTime:
+
+        """
+        Construct G_bar as
+
+        G_bar = [[ G     1-G1
+
+                    a     0   ]]
+
+        Then solve the eigenvalue problem choosing "pivot" off maximum z excluding the final row.
+
+        We'll choose a max_z
+
+        and solve the equation z_bar^T = z_bar^t G_bar
+
+        using the following strategy:
+        """
+
+        G_bar = np.zeros((self.F.shape[0]+1, self.F.shape[0]+1))
+
+        G_bar[:-1, :-1] = self.F
+        G_bar[-1, :-1] = self.a
+        G_bar[:-1, -1] = np.ones(self.a.shape) - np.dot(self.F, np.ones(self.a.shape))
+
+        #evals, evec = LA.eig(G_bar, left=True, right=False)
+        #sort = np.argsort(evals)
+
+        #temp_z = evec[:,sort[-1]] / np.sum(evec[:,sort[-1]])
+
+        #self.z = temp_z[:-1].real
+
+        #return 0
+
+        # get the maximum z value
+        max_z = np.argmax(self.z)
+
+        # slice out the row corresponding to maximum z
+        temp_F = np.delete(np.delete(G_bar, max_z, 0), max_z, 1)
+
+        # now construct A and run through solver.
+        A = (np.identity(temp_F.shape[0]) - temp_F).transpose()
+        temp_z = np.linalg.solve(A, np.delete(G_bar[max_z], max_z).transpose())
+
+        z_bar = np.zeros(self.z.size+1)
+
+        z_bar[max_z] = 1.0
+
+        z_bar[0:max_z] = temp_z[0:max_z]
+        z_bar[max_z+1:] = temp_z[max_z:]
+
+        # now we renormalize the z_bar so that the last entry is one and take the rest
+        z_bar /= z_bar[-1]
+
+        # set remainig weights and return
+        self.z = z_bar[:-1]
+
+        #self.z /= self.z.sum()
+
+        return 0
+
+
+    if sparseSolve:
+        # compute via numpy interface to LAPACK the eigenvectors v and eigenvalues w
+        # here will first convert F to sparse format before solving.
+        # The linalg routine returns this as the first (i.e. largest) eigenvalue.
+
+        F_sparse = sparse.coo_matrix(temp_F)
+        evals, evec = LA_sparse.eigs(F_sparse.transpose())
+        #evals, evec = LA.eig(self.F, left=True, right=False)
+        sort = np.argsort(evals)
+        # normalize if needed.
+
+        self.z[self.active_windows] = evec[:,sort[-1]] / np.sum(evec[:,sort[-1]])
+        self.z[np.logical_not(self.active_windows)] = 0.0
+
+    else:
+
+        # here we will do a different eigenvalue solution procedure to solve for the weights
+
+        evals, evec = LA.eig(self.F, left=True, right=False)
+        sort = np.argsort(evals)
+        # normalize if needed.
+
+        #self.z[self.active_windows] = evec[:,sort[-1]] / np.sum(evec[:,sort[-1]])
+        #self.z[np.logical_not(self.active_windows)] = 0.0
+
+        self.z = evec[:,sort[-1]] / np.sum(evec[:,sort[-1]])
+
+
+
+    return 0

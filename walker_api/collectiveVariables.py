@@ -4,13 +4,11 @@ A container class for collective variable definitions. We provide here a contain
 """
 
 class collectiveVariables(object):
-    def __init__(self, name, cvType, atomIDs): 
+    def __init__(self, name, cvType, atomIDs):
         """
-        Here we declare a name, type and list of atomID's as the parameters. These are all required parameters. 
+        Here we declare a name, type and list of atomID's as the parameters. These are all required parameters.
         """
         self.name = name
         self.type = cvType
         self.atomIDs = atomIDs
-        
-    
         

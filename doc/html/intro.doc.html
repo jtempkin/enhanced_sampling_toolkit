@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Introduction &mdash; Enhanced Sampling Toolkit 1.0a documentation</title>
+    <title>Introduction &mdash; Enhanced Sampling Toolkit 0.1a documentation</title>
     
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.0a',
+        VERSION:     '0.1a',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,8 +24,8 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="Enhanced Sampling Toolkit 1.0a documentation" href="index.html" />
-    <link rel="next" title="Walker API" href="src/src.doc.html" />
+    <link rel="top" title="Enhanced Sampling Toolkit 0.1a documentation" href="index.html" />
+    <link rel="next" title="Walker API" href="walker_api/walker_api.doc.html" />
     <link rel="prev" title="Welcome to Enhanced Sampling Toolkit’s documentation!" href="index.html" /> 
   </head>
   <body role="document">
@@ -39,12 +39,12 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="src/src.doc.html" title="Walker API"
+          <a href="walker_api/walker_api.doc.html" title="Walker API"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="index.html" title="Welcome to Enhanced Sampling Toolkit’s documentation!"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Enhanced Sampling Toolkit 1.0a documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Enhanced Sampling Toolkit 0.1a documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -56,12 +56,12 @@
   <div class="section" id="introduction">
 <h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
 <p>The objective of the Enhanced Sampling Toolkit is to provide a programming toolkit that facilitates rapid prototyping and development of enhanced sampling algorithms for use in molecular dynamics applications.</p>
-<p>The toolkit is implemented in 100% Python and is targeted for development in the Python language. One reason for this decision is that Python is a popular language in the broader scientific community and has a wide support base in terms of scienfitic code. However, more importantly, a strength of the language lies in the speed at which ideas can be implemented into working code. Since rapid prototyping of new algorithms is the core priority of the toolkit, Python seems a natural choice in language. However, if the need arises in a future date, ports to other languages may be considered and integrated into the package.</p>
+<p>The toolkit is implemented in 100% Python and is targeted for development in the Python language. One reason for this decision is that Python is a popular language in the broader scientific community and has a wide support base for developing scientific codes. However, more importantly, a strength of the language lies in the speed at which ideas can be implemented into working code. Since rapid and flexible prototyping of new algorithms is the core priority of the toolkit, Python seems a natural choice in language. However, if the need arises in a future date, ports to other languages may be considered and integrated into the package.</p>
 <p>In many places of the toolkit some care has been made to adhere to the powerful Python object design principles inherent in the Python data model. We find this to be a powerful feature of the Python language since it facilitates clean, &#8220;Pythonic&#8221; use of the toolkit in our applications. We are continually working to improve this aspect of the toolkit as the project develops.</p>
-<p>In the basic sense, the toolkit serves to wrap commonly used MD codes and in the process abstract the interactions between algorithm level code and the MD engine. This abstractions provides useful extensibilty in the sense that algorthm codes that are implemented in the Walker API can be reused and swapped between MD models and even entire MD codes. Furthermore, the expensive integration steps are executed in faster compiled codes and avoids some of the inefficiencies introduced in the choice of Python.</p>
-<p>In addition to rapid algorthm prototyping, we&#8217;ve found in it&#8217;s development that the toolkit is effective in HPC environments as well. Because the underlying dynamics are executed in commonly used MD codes, the toolkit has access to the HPC features that have been optimized in these codes and can therefore leverage MPI parallelism concurrently at the algorithm level and the MD level as well as support for accelerators such as GPU&#8217;s or Intel MIC cards.</p>
+<p>In the basic sense, the toolkit serves to wrap commonly used MD codes and in the process abstract the interactions between algorithm level code and the MD engine. This abstractions provides useful extensibilty in the sense that algorithm codes that are implemented in the Walker API can be reused and swapped between MD models and even entire MD codes. Furthermore, the expensive integration steps are executed in faster compiled codes and avoids some of the inefficiencies introduced in the choice of Python.</p>
+<p>In addition to rapid algorithm prototyping, we&#8217;ve found in it&#8217;s development that the toolkit is effective in HPC environments as well. Because the underlying dynamics are executed in commonly used MD codes, the toolkit has access to the HPC features that have been optimized in these codes and can therefore leverage MPI parallelism concurrently at the algorithm level and the MD level as well as support for accelerators such as GPU&#8217;s or Intel MIC cards.</p>
 <p>The structure of the toolkit comprises of two parts. At the core, we provide a specification we call the Walker API. The core API serves to define a set of interactions between algorithm level code and the underlying MD engine. This specification also defines the features developers need to implement for a new dynamics engine to leverage the full features of the toolkit.</p>
-<p>On top of this core API, we&#8217;ve implemented several common enhanced sampling algorithms. These tools are built as importable Python modules which can be used to develop new variants of these</p>
+<p>On top of this core API, we&#8217;ve implemented several common enhanced sampling algorithms.</p>
 </div>
 
 
@@ -74,7 +74,7 @@
   <p class="topless"><a href="index.html"
                         title="previous chapter">Welcome to Enhanced Sampling Toolkit&#8217;s documentation!</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="src/src.doc.html"
+  <p class="topless"><a href="walker_api/walker_api.doc.html"
                         title="next chapter">Walker API</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
@@ -91,9 +91,6 @@
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -110,17 +107,17 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="src/src.doc.html" title="Walker API"
+          <a href="walker_api/walker_api.doc.html" title="Walker API"
              >next</a> |</li>
         <li class="right" >
           <a href="index.html" title="Welcome to Enhanced Sampling Toolkit’s documentation!"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Enhanced Sampling Toolkit 1.0a documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Enhanced Sampling Toolkit 0.1a documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jeremy O. B. Tempkin.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
     </div>
   </body>
 </html>

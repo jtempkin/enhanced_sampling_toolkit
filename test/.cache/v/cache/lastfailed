@@ -1,0 +1,4 @@
+{
+  "test_basisFunction.py::test_initialization": true, 
+  "test_lammpsWalker.py::test_getColvars": true
+}

@@ -6,15 +6,15 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>lammpsWalker &mdash; Enhanced Sampling Toolkit 1.0 documentation</title>
+    <title>lammpsWalker &mdash; Enhanced Sampling Toolkit 0.1a documentation</title>
     
-    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.0',
+        VERSION:     '0.1a',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,12 +23,12 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="Enhanced Sampling Toolkit 1.0 documentation" href="../index.html" />
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Enhanced Sampling Toolkit 0.1a documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -37,490 +37,583 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Enhanced Sampling Toolkit 1.0 documentation</a> &raquo;</li>
-          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Enhanced Sampling Toolkit 0.1a documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <h1>Source code for lammpsWalker</h1><div class="highlight"><pre>
-<span class="c"># -*- coding: utf-8 -*-</span>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">This file implements the LAMMPS walker abstraction layer. The core of this idea is that </span>
+<span class="sd">This module implements the Walker API for the LAMMPS MD engine. See walker_base.py for a specification of the API. For details concerning the usage of the LAMMPS MD package see the excellent documentation at the LAMMPS webpage:</span>
+
+<span class="sd">http://lammps.sandia.gov/</span>
+
+<span class="sd">In particular, you may want to see how the Python wrapper to LAMMPS on which this implementation is based:</span>
+
+<span class="sd">http://lammps.sandia.gov/doc/Section_python.html</span>
+
+<span class="sd">Here we will outline basic usage guides for the walker API usage in LAMMPS. To begin using the lammpsWalker module</span>
+
+<span class="sd">* highlight here an example code which shows how to use the LAMMPS walker module.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">random</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">walker</span>
+<span class="c1">#import sys</span>
+<span class="kn">from</span> <span class="nn">walker_base</span> <span class="kn">import</span> <span class="n">walker</span>
+<span class="kn">import</span> <span class="nn">collectiveVariables</span>
+<span class="kn">import</span> <span class="nn">outputClass</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">ctypes</span>
-<span class="kn">from</span> <span class="nn">lammps</span> <span class="kn">import</span> <span class="n">lammps</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="c1">#from lammps import lammps</span>
 
 
-<div class="viewcode-block" id="lammpsWalker"><a class="viewcode-back" href="../src/src.doc.html#lammpsWalker.lammpsWalker">[docs]</a><span class="k">class</span> <span class="nc">lammpsWalker</span><span class="p">(</span><span class="n">walker</span><span class="o">.</span><span class="n">velocityWalker</span><span class="p">):</span>
+<div class="viewcode-block" id="lammpsWalker"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#lammpsWalker.lammpsWalker">[docs]</a><span class="k">class</span> <span class="nc">lammpsWalker</span><span class="p">(</span><span class="n">walker</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This class implements the enhanced sampling walker API for the bindings to the LAMMPS package. To check the math formatting, here is an example $e^{i\pi} = -1$. </span>
-<span class="sd">    </span>
+<span class="sd">    This class implements the enhanced sampling walker API for the bindings to the LAMMPS package.</span>
+
 <span class="sd">    Some usage issues to note:</span>
-<span class="sd">    </span>
+
 <span class="sd">    1) Collective variables (CVs) are defined to the walker by constructing a list of</span>
 <span class="sd">    CVs internally in the walker.colvars object. These CVs list takes the following</span>
 <span class="sd">    format:</span>
 
-<span class="sd">    </span>
+
 <span class="sd">    [&quot;coordinateType&quot;, atomids....]</span>
-<span class="sd">    </span>
-<span class="sd">    The coordinate type specifies which type of coordinate the CV is </span>
-<span class="sd">    (i.e. bond, angle, dihedral, etc.). The next items in the list are the atom </span>
+
+<span class="sd">    The coordinate type specifies which type of coordinate the CV is</span>
+<span class="sd">    (i.e. bond, angle, dihedral, etc.). The next items in the list are the atom</span>
 <span class="sd">    indecies involved in this specific instance of the CV.</span>
-<span class="sd">    </span>
-<span class="sd">    The walker will use this list to initialize them to the underlying LAMMPS objects. </span>
+
+<span class="sd">    The walker will use this list to initialize them to the underlying LAMMPS objects.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputFilename</span><span class="p">,</span> <span class="n">logFilename</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initializes a walker object. Takes the following input:</span>
-<span class="sd">        </span>
-<span class="sd">        * a filename that builds the model from a LAMMPS script.</span>
-<span class="sd">        * a filename to pipe standard LAMMPS output into.</span>
-<span class="sd">        * an index for the walker. (default=0)</span>
-<span class="sd">        * debug flag to open writing verbose output. Importantly, this pipes LAMMPS output to standard output. (default=False)</span>
-<span class="sd">        </span>
+<span class="sd">        Initializes a walker object.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">        -----------------------</span>
+<span class="sd">        inputFilename -</span>
+<span class="sd">            A string with a system path to a LAMMPS input file. This file is</span>
+<span class="sd">            read and interpreted by LAMMPS&#39;s own interpreter so the syntax</span>
+<span class="sd">            should be readable by LAMMPS. If None is provided, the input file</span>
+<span class="sd">            is ignored.</span>
+
+<span class="sd">        LogFilename -</span>
+<span class="sd">            A string to pipe standard LAMMPS output into.</span>
+
+<span class="sd">        index (default: 0) -</span>
+<span class="sd">            A optional index which is appended to the log files and output</span>
+<span class="sd">            files to protect overwriting multiple copies</span>
+
+<span class="sd">        debug (default: False) -</span>
+<span class="sd">            A boolean flag for debugging purposes. If set to True, will direct</span>
+<span class="sd">            LAMMPS output to stdout instead of to logFilename.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c"># a filename for storing the data, note the appending of the index</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">inputFilename</span> <span class="o">+</span> <span class="s">&quot;.&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
-        
-        <span class="c"># start walker object from the passed lammps input file name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__initLAMMPS__</span><span class="p">(</span><span class="n">inputFilename</span><span class="o">=</span><span class="n">inputFilename</span><span class="p">,</span> <span class="n">logFilename</span><span class="o">=</span><span class="s">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">logFilename</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)]),</span> <span class="n">verbose</span> <span class="o">=</span> <span class="n">debug</span><span class="p">)</span>
-        
-        <span class="c"># a list of the relevant collective variables</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">colvars</span> <span class="o">=</span> <span class="p">[]</span>
-        
-        <span class="c"># a list of commands used to equilibrate the system </span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">equilCmds</span> <span class="o">=</span> <span class="p">[]</span>
-        
-        <span class="c"># by default, execute shake code. This flag lets the walker know</span>
-        <span class="c"># that shakeH will be used in the dynamics</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">shakeH</span> <span class="o">=</span> <span class="bp">True</span>
-        
-        <span class="c"># here is the list of dynamics properties the walker should know:</span>
-        
-        <span class="bp">self</span><span class="o">.</span><span class="n">temperature</span> <span class="o">=</span> <span class="mf">310.0</span>
-        
-    
-        <span class="c"># walker index         </span>
+        <span class="k">if</span> <span class="n">inputFilename</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="c1"># check to see if there is actually a filename at that location.</span>
+            <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">inputFilename</span><span class="p">),</span> <span class="s2">&quot;The input file for the LAMMPS walker could not be found.&quot;</span>
+
+        <span class="c1"># a filename for storing the data, note the appending of the index</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">inputFilename</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+
+        <span class="c1"># walker index</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">index</span>
 
-<div class="viewcode-block" id="lammpsWalker.close"><a class="viewcode-back" href="../src/src.doc.html#lammpsWalker.lammpsWalker.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">logFilename</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">logfile</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">logFilename</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logfile</span> <span class="o">=</span> <span class="bp">None</span>
+
+
+        <span class="c1"># start walker object from the passed lammps input file name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__initLAMMPS__</span><span class="p">(</span><span class="n">inputFilename</span> <span class="o">=</span> <span class="n">inputFilename</span><span class="p">,</span> <span class="n">logFilename</span> <span class="o">=</span> <span class="n">logfile</span><span class="p">,</span> <span class="n">verbose</span> <span class="o">=</span> <span class="n">debug</span><span class="p">)</span>
+
+        <span class="c1"># a list of the relevant collective variables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">colvars</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># we&#39;re constructing a list for collective output classes.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dynamics</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">Y_s</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getConfig</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">getVel</span><span class="p">())</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+        <span class="c1"># a list of commands used to equilibrate the system</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">equilCmds</span> <span class="o">=</span> <span class="p">[]</span>
+
+
+<div class="viewcode-block" id="lammpsWalker.close"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#lammpsWalker.lammpsWalker.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This function closes the LAMMPS object. </span>
+<span class="sd">        This function closes the LAMMPS object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-        <span class="k">return</span> <span class="mi">0</span> 
-        </div>
-    <span class="k">def</span> <span class="nf">__initLAMMPS__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputFilename</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">logFilename</span><span class="o">=</span><span class="s">&quot;log&quot;</span><span class="p">,</span> <span class="n">verbose</span> <span class="o">=</span> <span class="bp">False</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+    <span class="k">def</span> <span class="nf">__initLAMMPS__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputFilename</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">logFilename</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">verbose</span> <span class="o">=</span> <span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This function initializes a LAMMPS simulation given an input file. </span>
-<span class="sd">        </span>
-<span class="sd">        Takes the following arguments:</span>
-<span class="sd">        </span>
-<span class="sd">        * input file name</span>
-<span class="sd">        * </span>
-<span class="sd">        </span>
-<span class="sd">        </span>
+<span class="sd">        This function initializes a LAMMPS simulation given an input file.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">        -----------------------</span>
+
+
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c"># initialize the lammps object</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">lammps</span> <span class="kn">import</span> <span class="n">lammps</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s2">&quot;ERROR: The LAMMPS python interface could not be found. Check your PYTHONPATH and compiled LAMMPS directory to make sure it is compiled and importable.&quot;</span>
+
+
+        <span class="c1"># check to see we are handing an absolute pathname.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isabs</span><span class="p">(</span><span class="n">inputFilename</span><span class="p">):</span>
+            <span class="n">inputFilename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">inputFilename</span><span class="p">)</span>
+
+        <span class="c1"># we&#39;re going to assume here that the user is taking care of the fact that LAMMPS needs to know where to find things but we will issue a worning in case they aren&#39;t.</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">inputFilename</span><span class="p">)</span> <span class="o">!=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">():</span>
+            <span class="k">print</span> <span class="s2">&quot;WARNING: Getting lammps input file from directory other than current working directory. Be sure pathnames are correct in input files.&quot;</span>
+
+        <span class="c1"># initialize the lammps object</span>
         <span class="k">if</span> <span class="n">verbose</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span> <span class="o">=</span> <span class="n">lammps</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">=</span><span class="n">lammps</span><span class="p">()</span>
+            <span class="c1">#self.lmp = lammps(&quot;&quot;, [&quot;-c&quot;, &quot;on&quot;, &quot;-sf&quot;, &quot;cuda&quot;])</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;-sc&quot;</span><span class="p">,</span> <span class="s">&quot;none&quot;</span><span class="p">,</span> <span class="s">&quot;-echo&quot;</span><span class="p">,</span> <span class="s">&quot;log&quot;</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span> <span class="o">=</span> <span class="n">lammps</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
-        
-        <span class="c"># after the lammps object is created, initialize the lammps simulation. </span>
-        <span class="c"># specify general log file parameters</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&quot;echo none&quot;</span><span class="p">)</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;-sc&quot;</span><span class="p">,</span> <span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;-echo&quot;</span><span class="p">,</span> <span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;-log&quot;</span><span class="p">,</span> <span class="s2">&quot;none&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span> <span class="o">=</span> <span class="n">lammps</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
 
-        <span class="c"># if there is a specified filename, use it to set up the simulation.         </span>
+        <span class="c1"># after the lammps object is created, initialize the lammps simulation.</span>
+        <span class="c1"># specify general log file parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;echo none&quot;</span><span class="p">)</span>
+
+        <span class="c1"># write out log file if needed</span>
+        <span class="k">if</span> <span class="n">logFilename</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isabs</span><span class="p">(</span><span class="n">logFilename</span><span class="p">):</span>
+                <span class="n">logFilename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">logFilename</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;log &quot;</span> <span class="o">+</span> <span class="n">logFilename</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;log none&quot;</span><span class="p">)</span>
+
+
+        <span class="c1"># if there is a specified filename, use it to set up the simulation.</span>
         <span class="k">if</span> <span class="n">inputFilename</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&quot;log &quot;</span> <span class="o">+</span> <span class="n">logFilename</span><span class="p">)</span>
+            <span class="c1">#self.command(&quot;log &quot; + logFilename)</span>
+
             <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">file</span><span class="p">(</span><span class="n">inputFilename</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&quot;log &quot;</span> <span class="o">+</span> <span class="n">logFilename</span><span class="p">)</span>
-        
-        <span class="c">#self.__setupLAMMPS__(filename)</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span>    
+        <span class="c1">#self.__setupLAMMPS__(filename)</span>
 
-    <span class="k">def</span> <span class="nf">__setupLAMMPS__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span>
+
+<div class="viewcode-block" id="lammpsWalker.addColvars"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#lammpsWalker.lammpsWalker.addColvars">[docs]</a>    <span class="k">def</span> <span class="nf">addColvars</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">cvType</span><span class="p">,</span> <span class="n">atomIDs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        The input file sets up and initializes the LAMMPS system from a setup</span>
-<span class="sd">        file. The setup file should be a simple text file written in LAMMPS</span>
-<span class="sd">        input file syntax.</span>
-<span class="sd">        </span>
-<span class="sd">        **DEPRECATED TO DATE 4/6/15**.</span>
+<span class="sd">        Implements the addition of a collective variable to the list of collective variables held by this walker.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">        -----------------------</span>
+<span class="sd">        name -</span>
+<span class="sd">            A internal string used to reference this collective variable. Collective variable names must be unique.</span>
+
+<span class="sd">        cvType -</span>
+<span class="sd">            A string refering to the type of collective variable. Currently the following variables are supported:</span>
+<span class="sd">                * &#39;bond&#39;</span>
+<span class="sd">                * &#39;angle&#39;</span>
+<span class="sd">                * &#39;dihedral&#39;</span>
+<span class="sd">                * &#39;x&#39;, &#39;y&#39;, &#39;z&#39; positions</span>
+<span class="sd">                * &#39;x&#39;, &#39;y&#39;, &#39;z&#39; velocity components</span>
+
+<span class="sd">        atomIDs -</span>
+<span class="sd">            A list of the atom indecies involved in the collective variable. Should provide the right number of atom indecies for the collective variable:</span>
+<span class="sd">                * &#39;bond&#39; -&gt; 2</span>
+<span class="sd">                * &#39;angle&#39;-&gt; 3</span>
+<span class="sd">                * &#39;dihedral&#39; -&gt; 4</span>
+<span class="sd">                * position or velocity component -&gt; 1</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c"># specify general log file parameters</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&quot;echo none&quot;</span><span class="p">)</span>
+        <span class="c1"># make sure we know what the cv type is.</span>
+        <span class="n">__knownCVs__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;bond&#39;</span><span class="p">,</span> <span class="s1">&#39;angle&#39;</span><span class="p">,</span> <span class="s1">&#39;dihedral&#39;</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">,</span> <span class="s1">&#39;vx&#39;</span><span class="p">,</span> <span class="s1">&#39;vy&#39;</span><span class="p">,</span> <span class="s1">&#39;vz&#39;</span><span class="p">,</span> <span class="s1">&#39;fe&#39;</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="n">cvType</span> <span class="ow">in</span> <span class="n">__knownCVs__</span><span class="p">,</span> <span class="s2">&quot;cvType that was provided was not understood.&quot;</span>
 
-        <span class="c"># if there is a specified filename, use it to set up the simulation.         </span>
-        <span class="k">if</span> <span class="n">filename</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&quot;log &quot;</span> <span class="o">+</span> <span class="n">filename</span> <span class="o">+</span> <span class="s">&quot;.log&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">file</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&quot;log lammps.log&quot;</span><span class="p">)</span>
-        
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        # set default values for keywords:</span>
-<span class="sd">        self.dynaType = &#39;langevin&#39;</span>
-<span class="sd">        self.temperature = 310.0</span>
-<span class="sd">        self.outputTrajFreq = 1000                  </span>
-<span class="sd">        </span>
-<span class="sd">        with open(sysParams[&#39;datadir&#39;] + &quot;/&quot; + sysParams[&#39;setupFile&#39;], &quot;r&quot;) as ifile:</span>
-<span class="sd">            while True:</span>
-<span class="sd">                # get the next line</span>
-<span class="sd">                line = ifile.readline()</span>
-<span class="sd">                # check to see if the next line is the EOF, if so break the loop</span>
-<span class="sd">                if line == &#39;&#39;:</span>
-<span class="sd">                    break</span>
-<span class="sd">                # ignore emtpy lines</span>
-<span class="sd">                if not line.strip():</span>
-<span class="sd">                    continue</span>
-<span class="sd">                # ignore comments </span>
-<span class="sd">                if line.strip()[0] == &#39;#&#39;:</span>
-<span class="sd">                    continue</span>
-<span class="sd">                # if not skipped from above, parse the information </span>
-<span class="sd">                linesplit = line.split()</span>
-<span class="sd">                </span>
-<span class="sd">                # first parse for general parameter flags       </span>
-<span class="sd">                # if you hit the equilibration section, append the lines</span>
-<span class="sd">                if linesplit[0] == &#39;equilibrate&#39;:</span>
-<span class="sd">                    while &#39;}&#39; not in line:</span>
-<span class="sd">                        # get the following line</span>
-<span class="sd">                        line = ifile.readline()</span>
-<span class="sd">                        #check for comments</span>
-<span class="sd">                        if line.split()[0] == &quot;#&quot;:</span>
-<span class="sd">                            continue</span>
-<span class="sd">                        # get the next line and append it</span>
-<span class="sd">                        if line.strip().strip(&#39;}&#39;):</span>
-<span class="sd">                            self.equilCmds.append(line.strip().strip(&#39;}&#39;))</span>
-<span class="sd">                elif linesplit[0] == &#39;colvars&#39;:</span>
-<span class="sd">                    while &#39;}&#39; not in line:</span>
-<span class="sd">                        # get the following line</span>
-<span class="sd">                        line = ifile.readline()</span>
-<span class="sd">                        #check for comments</span>
-<span class="sd">                        if line.split()[0] == &quot;#&quot;:</span>
-<span class="sd">                            continue</span>
-<span class="sd">                        # get the next line and append it</span>
-<span class="sd">                        if line.strip().strip(&#39;}&#39;):</span>
-<span class="sd">                            self.colvars.append(line.strip().strip(&#39;}&#39;).split())</span>
-<span class="sd">                # parse for specific keywords</span>
-<span class="sd">                elif linesplit[0] == &#39;dynamics&#39;:</span>
-<span class="sd">                    self.dynaType = linesplit[1]</span>
-<span class="sd">                elif linesplit[0] == &#39;temperature&#39;:</span>
-<span class="sd">                    self.temperature = float(linesplit[1])</span>
-<span class="sd">                elif linesplit[0] == &#39;outputTrajFreq&#39;:</span>
-<span class="sd">                    self.outputTrajFreq = int(linesplit[1])</span>
-<span class="sd">                # note that if the read data command is found, read in the molecular data</span>
-<span class="sd">                # this ordering was done to fix errors in the sequence of commands read into LAMMPS</span>
-<span class="sd">                elif linesplit[0] == &#39;read_data&#39;:</span>
-<span class="sd">                    self.lmp.command(line)</span>
-<span class="sd">                elif linesplit[0] == &#39;shake&#39;:</span>
-<span class="sd">                    if linesplit[1] == &#39;off&#39;:</span>
-<span class="sd">                        self.shakeH = False</span>
-<span class="sd">                else: </span>
-<span class="sd">                    # if it is a general lammps command, execute</span>
-<span class="sd">                    self.lmp.command(line)</span>
-<span class="sd">        </span>
-<span class="sd">        # now set up dynamics fixes for the specified dynamics</span>
-<span class="sd">        if self.dynaType == &#39;langevin&#39;:</span>
-<span class="sd">            # langevin dynamics fixes</span>
-<span class="sd">            self.lmp.command(&quot;fix 1 all nve&quot;)</span>
-<span class="sd">            self.lmp.command(&quot;fix 2 all langevin &quot; + str(self.temperature) + &quot; &quot; + str(self.temperature) + &quot; 30.0 &quot; + str(random.randint(100000,999999)))</span>
-<span class="sd">            # initialize velocities</span>
-<span class="sd">            self.lmp.command(&quot;velocity all create &quot; + str(self.temperature) + &quot; &quot; + str(random.randint(100000,999999)) + &quot; dist gaussian&quot;)</span>
-<span class="sd">        else:</span>
-<span class="sd">            print &quot;Dynamics type not understood from&quot;, sysParams[&#39;setupFile&#39;]</span>
-<span class="sd">            sys.exit(0)</span>
-<span class="sd">        </span>
-<span class="sd">        # set colvars and computes</span>
-<span class="sd">        self.initColVars()</span>
-<span class="sd">        # write out the configurations to a file. </span>
-<span class="sd">        self.lmp.command(&quot;dump 3 all dcd &quot; + str(self.outputTrajFreq) + &quot; &quot; + filename + &quot;.dcd&quot;)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        
-        
-        
-        <span class="k">return</span> <span class="mi">0</span> 
-        
-<div class="viewcode-block" id="lammpsWalker.setColvars"><a class="viewcode-back" href="../src/src.doc.html#lammpsWalker.lammpsWalker.setColvars">[docs]</a>    <span class="k">def</span> <span class="nf">setColvars</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This function initializes the collective variable for a LAMMPS simulation that is handed to this object. </span>
-<span class="sd">        </span>
-<span class="sd">        Currently supports the following cv&#39;s:</span>
-<span class="sd">        </span>
-<span class="sd">        * bond</span>
-<span class="sd">        * angle</span>
-<span class="sd">        * dihedral</span>
-<span class="sd">        * x, y or z position coordinates</span>
-<span class="sd">        * x, y or z velocity components </span>
-<span class="sd">        </span>
-<span class="sd">        These are parsed and sent to the underlying LAMMPS object directly using the LAMMPS syntax for these variable. </span>
-<span class="sd">        </span>
-<span class="sd">        The implementation first creates a labeled group in LAMMPS containing the atoms used in the CV. Then a compute is initialized using that group. </span>
-<span class="sd">        &quot;&quot;&quot;</span>        
-        <span class="n">cv</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">colvars</span><span class="p">:</span>
-            <span class="n">cv</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">entry</span><span class="p">))</span>
-        
-        <span class="c"># initialize the groups and the computes associated with them</span>
-        <span class="k">for</span> <span class="n">index</span><span class="p">,</span><span class="n">entry</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cv</span><span class="p">):</span>  
-            <span class="k">if</span> <span class="n">entry</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;bond&#39;</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&quot;group &quot;</span> <span class="o">+</span> <span class="s">&quot;b&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; id &quot;</span> <span class="o">+</span> <span class="s">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&quot;compute &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; b&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; bond/local dist&quot;</span> <span class="p">)</span>
-            <span class="k">elif</span> <span class="n">entry</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;angle&#39;</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&quot;group &quot;</span> <span class="o">+</span> <span class="s">&quot;a&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; id &quot;</span> <span class="o">+</span> <span class="s">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&quot;compute &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; a&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; angle/local theta&quot;</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">entry</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;dihedral&#39;</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&quot;group &quot;</span> <span class="o">+</span> <span class="s">&quot;d&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; id &quot;</span> <span class="o">+</span> <span class="s">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&quot;compute &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; d&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; dihedral/local phi&quot;</span><span class="p">)</span>        
-            <span class="k">elif</span> <span class="n">entry</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;x&#39;</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&quot;group x&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; id &quot;</span> <span class="o">+</span> <span class="s">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&quot;compute &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; x&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; property/atom x&quot;</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">entry</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;y&#39;</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&quot;group y&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; id &quot;</span> <span class="o">+</span> <span class="s">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&quot;compute &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; y&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; property/atom y&quot;</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">entry</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;z&#39;</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&quot;group z&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; id &quot;</span> <span class="o">+</span> <span class="s">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&quot;compute &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; z&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; property/atom z&quot;</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">entry</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;vx&quot;</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&quot;group vx&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; id &quot;</span> <span class="o">+</span> <span class="s">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&quot;compute &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; vx&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; property/atom vx&quot;</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">entry</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;vy&quot;</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&quot;group vy&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; id &quot;</span> <span class="o">+</span> <span class="s">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&quot;compute &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; vy&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; property/atom vy&quot;</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">entry</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;vz&quot;</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&quot;group vz&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; id &quot;</span> <span class="o">+</span> <span class="s">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&quot;compute &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; vz&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; property/atom vz&quot;</span><span class="p">)</span>
-            
-        
-        <span class="k">return</span> <span class="mi">0</span>
-
-        </div>
-<div class="viewcode-block" id="lammpsWalker.destroyColvars"><a class="viewcode-back" href="../src/src.doc.html#lammpsWalker.lammpsWalker.destroyColvars">[docs]</a>    <span class="k">def</span> <span class="nf">destroyColvars</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This function removes the colvars set by initColVars().</span>
-<span class="sd">        &quot;&quot;&quot;</span>        
+        <span class="c1"># check to make sure the name is unique.</span>
         <span class="k">for</span> <span class="n">cv</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">colvars</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&quot;uncompute &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">colvars</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">cv</span><span class="p">)))</span>
-            
-        <span class="k">return</span> <span class="mi">0</span>    
-                </div>
-<div class="viewcode-block" id="lammpsWalker.equilibrate"><a class="viewcode-back" href="../src/src.doc.html#lammpsWalker.lammpsWalker.equilibrate">[docs]</a>    <span class="k">def</span> <span class="nf">equilibrate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">restraint</span><span class="p">,</span> <span class="n">numSteps</span><span class="p">):</span>
+            <span class="k">assert</span> <span class="n">cv</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="n">name</span><span class="p">,</span> <span class="s2">&quot;Collective variable names must be unique.&quot;</span>
+
+        <span class="c1"># now append the collective variable to the walker list. Initialize a collective variable object.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">colvars</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">collectiveVariables</span><span class="o">.</span><span class="n">collectiveVariables</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">cvType</span><span class="p">,</span> <span class="n">atomIDs</span><span class="p">))</span>
+
+        <span class="c1"># grab a handle to the new object</span>
+        <span class="n">cv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">colvars</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># first set the group for the colvar</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;group &quot;</span> <span class="o">+</span> <span class="n">cv</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot; id &quot;</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span><span class="n">cv</span><span class="o">.</span><span class="n">atomIDs</span><span class="p">)))</span>
+
+        <span class="c1"># now set the appropriate colvar as a compute to LAMMPS</span>
+        <span class="k">if</span> <span class="n">cv</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;bond&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;compute &quot;</span> <span class="o">+</span> <span class="n">cv</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">cv</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot; bond/local dist&quot;</span> <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">cv</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;angle&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;compute &quot;</span> <span class="o">+</span> <span class="n">cv</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">cv</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot; angle/local theta&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">cv</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;dihedral&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;compute &quot;</span> <span class="o">+</span> <span class="n">cv</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">cv</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot; dihedral/local phi&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">cv</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;x&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;compute &quot;</span> <span class="o">+</span> <span class="n">cv</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">cv</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot; property/atom x&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">cv</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;compute &quot;</span> <span class="o">+</span> <span class="n">cv</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">cv</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot; property/atom y&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">cv</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;z&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;compute &quot;</span> <span class="o">+</span> <span class="n">cv</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">cv</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot; property/atom z&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">cv</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;vx&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;compute &quot;</span> <span class="o">+</span> <span class="n">cv</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">cv</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot; property/atom vx&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">cv</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;vy&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;compute &quot;</span> <span class="o">+</span> <span class="n">cv</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">cv</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot; property/atom vy&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">cv</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;vz&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;compute &quot;</span> <span class="o">+</span> <span class="n">cv</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">cv</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot; property/atom vz&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">propagate</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">pre</span><span class="o">=</span><span class="s1">&#39;yes&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ref_cv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getColvars</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="lammpsWalker.destroyColvars"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#lammpsWalker.lammpsWalker.destroyColvars">[docs]</a>    <span class="k">def</span> <span class="nf">destroyColvars</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This function prepares a LAMMPS image to be at the specified target </span>
-<span class="sd">        position given by the vector &#39;center&#39; passed and an arguments. </span>
+<span class="sd">        This function removes the colvars set by setColvars(). By default, it removes all of the collective variables in the list. It does not remove them from the collective variables list.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c">#print &quot;Equilibrating walker.&quot;</span>
-        
-        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">center</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">restraint</span><span class="p">),</span> <span class="s">&quot;The dimension of the center array and the restraint array do not match.&quot;</span>
-        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">center</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">colvars</span><span class="p">),</span> <span class="s">&quot;The dimension of the center array and the number of collective variables do not match.&quot;</span>
-        
-        
-        <span class="c"># first enter the restraints based on computes data structure</span>
-        <span class="n">restCommand</span> <span class="o">=</span> <span class="s">&quot;fix REST all restrain &quot;</span>
-        
-        <span class="c"># here we apply the constraints based on the collective variable definition</span>
-        <span class="c"># check to make sure we have collective variables defined. </span>
+        <span class="k">for</span> <span class="n">cv</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">colvars</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;uncompute &quot;</span> <span class="o">+</span> <span class="n">cv</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">colvars</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">propagate</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">pre</span><span class="o">=</span><span class="s1">&#39;yes&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="lammpsWalker.equilibrate"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#lammpsWalker.lammpsWalker.equilibrate">[docs]</a>    <span class="k">def</span> <span class="nf">equilibrate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">restraint</span><span class="p">,</span> <span class="n">numSteps</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function prepares a LAMMPS image to be at the specified target position given by the vector &#39;center&#39; passed and an arguments.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">        -----------------------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#print &quot;Equilibrating walker.&quot;</span>
+
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">center</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">restraint</span><span class="p">),</span> <span class="s2">&quot;The dimension of the center array and the restraint array do not match.&quot;</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">center</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">colvars</span><span class="p">),</span> <span class="s2">&quot;The dimension of the center array and the number of collective variables do not match.&quot;</span>
+
+
+        <span class="c1"># first enter the restraints based on computes data structure</span>
+        <span class="n">restCommand</span> <span class="o">=</span> <span class="s2">&quot;fix REST all restrain &quot;</span>
+
+        <span class="c1"># here we apply the constraints based on the collective variable definition</span>
+        <span class="c1"># check to make sure we have collective variables defined.</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">colvars</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">print</span> <span class="s">&quot;There are no collective variables defined in walker &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
-            <span class="k">print</span> <span class="s">&quot;Aborting equilibration of walker &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
-            <span class="k">return</span> <span class="mi">0</span> 
-            
-        <span class="c"># let&#39;s get a string representation of the colvars, it&#39;s friendly</span>
-        <span class="n">cv</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">colvars</span><span class="p">:</span>
-            <span class="n">cv</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">entry</span><span class="p">))</span>
-            
-        <span class="c"># now loop through each </span>
-        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">entry</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cv</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">entry</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;dihedral&#39;</span><span class="p">:</span>
-                <span class="n">restCommand</span> <span class="o">+=</span> <span class="s">&quot; &quot;</span> <span class="o">+</span> <span class="s">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; &quot;</span> <span class="o">+</span> <span class="s">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">restraint</span><span class="p">[</span><span class="n">index</span><span class="p">]))</span> <span class="o">+</span> <span class="s">&quot; &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">center</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
-                <span class="c">#restCommand += &quot; &quot; + &quot; &quot;.join(entry) + &quot; &quot; + &quot; &quot;.join(map(str, restraint[index])) + &quot; &quot; + str(center[index] + 180.0)</span>
+            <span class="k">print</span> <span class="s2">&quot;There are no collective variables defined in walker &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+            <span class="k">print</span> <span class="s2">&quot;Aborting equilibration of walker &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mi">0</span>
+
+        <span class="c1"># let&#39;s get a string representation of the colvars, it&#39;s friendly</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        cv = []</span>
+<span class="sd">        for entry in self.colvars:</span>
+<span class="sd">            cv.append(map(str, entry))</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># now loop through each</span>
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">entry</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">colvars</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">entry</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;dihedral&#39;</span><span class="p">:</span>
+                <span class="c1">#restCommand += &quot; &quot; + entry.type + &quot; &quot; + &quot; &quot;.join(map(str, entry.atomIDs)) + &quot; &quot; + &quot; &quot;.join(map(str, restraint[index])) + &quot; &quot; + str(center[index])</span>
+                <span class="n">restCommand</span> <span class="o">+=</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">entry</span><span class="o">.</span><span class="n">type</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span><span class="n">entry</span><span class="o">.</span><span class="n">atomIDs</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">restraint</span><span class="p">[</span><span class="n">index</span><span class="p">]))</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">center</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">+</span> <span class="mf">180.0</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">restCommand</span> <span class="o">+=</span> <span class="s">&quot; &quot;</span> <span class="o">+</span> <span class="s">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; &quot;</span> <span class="o">+</span> <span class="s">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">restraint</span><span class="p">[</span><span class="n">index</span><span class="p">]))</span> <span class="o">+</span> <span class="s">&quot; &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">center</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
-        
-        <span class="c"># now issue restraint definition to the lammps object </span>
+                <span class="n">restCommand</span> <span class="o">+=</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">entry</span><span class="o">.</span><span class="n">type</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">entry</span><span class="o">.</span><span class="n">atomIDs</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">restraint</span><span class="p">[</span><span class="n">index</span><span class="p">]))</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">center</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
+
+        <span class="c1"># now issue restraint definition to the lammps object</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="n">restCommand</span><span class="p">)</span>
-        
-        <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&quot;fix_modify REST energy yes&quot;</span><span class="p">)</span>
-                    
-        <span class="c"># now run the equilibration dynamics     </span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&quot;run &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">numSteps</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; post no&quot;</span><span class="p">)</span>
-        
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;fix_modify REST energy yes&quot;</span><span class="p">)</span>
+
+        <span class="c1"># now run the equilibration dynamics</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;run &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">numSteps</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; post no&quot;</span><span class="p">)</span>
+
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        # apply SHAKE if used</span>
-<span class="sd">        if self.shakeH:    </span>
+<span class="sd">        if self.shakeH:</span>
 <span class="sd">            self.lmp.command(&quot;fix 10 all shake 0.0001 500 0 m 1.008&quot;)</span>
-<span class="sd">        &quot;&quot;&quot;</span> 
-        
-        <span class="c"># now remove constraints for subsequent dynamics         </span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&quot;unfix REST&quot;</span><span class="p">)</span>
-        
-        <span class="c"># this resets the dynamics environment after the equilibration run</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&quot;run 0 post no&quot;</span><span class="p">)</span>
-        
-        <span class="k">return</span> <span class="mi">0</span>
-        </div>
-<div class="viewcode-block" id="lammpsWalker.getConfig"><a class="viewcode-back" href="../src/src.doc.html#lammpsWalker.lammpsWalker.getConfig">[docs]</a>    <span class="k">def</span> <span class="nf">getConfig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># now remove constraints for subsequent dynamics</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;unfix REST&quot;</span><span class="p">)</span>
+
+        <span class="c1"># this resets the dynamics environment after the equilibration run</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;run 0 post no&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="lammpsWalker.getConfig"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#lammpsWalker.lammpsWalker.getConfig">[docs]</a>    <span class="k">def</span> <span class="nf">getConfig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This function returns the current position of the LAMMPS simulation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">gather_atoms</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
 
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">gather_atoms</span><span class="p">(</span><span class="s">&quot;x&quot;</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
-        </div>
-<div class="viewcode-block" id="lammpsWalker.getVel"><a class="viewcode-back" href="../src/src.doc.html#lammpsWalker.lammpsWalker.getVel">[docs]</a>    <span class="k">def</span> <span class="nf">getVel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">config</span></div>
+
+<div class="viewcode-block" id="lammpsWalker.getVel"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#lammpsWalker.lammpsWalker.getVel">[docs]</a>    <span class="k">def</span> <span class="nf">getVel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This function returns the current velocities from the LAMMPS simulation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">gather_atoms</span><span class="p">(</span><span class="s">&quot;v&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
-        </div>
-<div class="viewcode-block" id="lammpsWalker.setVel"><a class="viewcode-back" href="../src/src.doc.html#lammpsWalker.lammpsWalker.setVel">[docs]</a>    <span class="k">def</span> <span class="nf">setVel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vel</span><span class="p">):</span>
+        <span class="n">vel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">gather_atoms</span><span class="p">(</span><span class="s2">&quot;v&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">vel</span></div>
+
+<div class="viewcode-block" id="lammpsWalker.setVel"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#lammpsWalker.lammpsWalker.setVel">[docs]</a>    <span class="k">def</span> <span class="nf">setVel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vel</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This function sets the velocity to the lammps simulation. </span>
+<span class="sd">        This function sets the velocity to the lammps simulation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        
-        <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">scatter_atoms</span><span class="p">(</span><span class="s">&quot;v&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">vel</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data_as</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">POINTER</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_double</span><span class="p">)))</span>
-        
-        <span class="k">return</span> <span class="mi">0</span>
-</div>
-<div class="viewcode-block" id="lammpsWalker.getColvars"><a class="viewcode-back" href="../src/src.doc.html#lammpsWalker.lammpsWalker.getColvars">[docs]</a>    <span class="k">def</span> <span class="nf">getColvars</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">scatter_atoms</span><span class="p">(</span><span class="s2">&quot;v&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">vel</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data_as</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">POINTER</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_double</span><span class="p">)))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">propagate</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">pre</span><span class="o">=</span><span class="s1">&#39;yes&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="lammpsWalker.getColvars"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#lammpsWalker.lammpsWalker.getColvars">[docs]</a>    <span class="k">def</span> <span class="nf">getColvars</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This function returns the current position of the LAMMPS simulation in </span>
+<span class="sd">        This function returns the current position of the LAMMPS simulation in</span>
 <span class="sd">        colvars space.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c"># get an empty array with placeholders</span>
-        <span class="n">cvarray</span> <span class="o">=</span> <span class="p">[</span><span class="bp">None</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">colvars</span><span class="p">)</span>
-        
-        <span class="c"># now get cv&#39;s one by one from each compute defined</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">colvars</span><span class="p">)):</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">colvars</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;x&#39;</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">colvars</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;y&#39;</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">colvars</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;z&#39;</span><span class="p">:</span> 
-                <span class="n">cvarray</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">extract_compute</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="c">#*** We REALLY need assurance here that what we are getting here is in fact not a NULL POINTER.</span>
-                <span class="n">cvarray</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">extract_compute</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># get an empty array with placeholders</span>
+        <span class="n">cvarray</span> <span class="o">=</span> <span class="p">[]</span>
 
-        <span class="k">return</span> <span class="n">cvarray</span>
-    </div>
-<div class="viewcode-block" id="lammpsWalker.setConfig"><a class="viewcode-back" href="../src/src.doc.html#lammpsWalker.lammpsWalker.setConfig">[docs]</a>    <span class="k">def</span> <span class="nf">setConfig</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="c1"># now get cv&#39;s one by one from each compute defined</span>
+        <span class="k">for</span> <span class="n">cv</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">colvars</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">cv</span><span class="o">.</span><span class="n">type</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">,</span> <span class="s1">&#39;vx&#39;</span><span class="p">,</span> <span class="s1">&#39;vy&#39;</span><span class="p">,</span> <span class="s1">&#39;vz&#39;</span><span class="p">]:</span>
+                <span class="n">cvarray</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">extract_compute</span><span class="p">(</span><span class="n">cv</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="n">cv</span><span class="o">.</span><span class="n">type</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;fe&#39;</span><span class="p">]:</span>
+                <span class="n">cvarray</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">extract_compute</span><span class="p">(</span><span class="n">cv</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1">#*** We REALLY need assurance here that what we are getting here is in fact not a NULL POINTER.</span>
+                <span class="n">cvarray</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">extract_compute</span><span class="p">(</span><span class="n">cv</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">cvarray</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">colvars</span><span class="p">),</span> <span class="s2">&quot;Not all collective variables were added.&quot;</span>
+
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">cvarray</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="lammpsWalker.setConfig"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#lammpsWalker.lammpsWalker.setConfig">[docs]</a>    <span class="k">def</span> <span class="nf">setConfig</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This routine sets the internal configuration. </span>
-<span class="sd">        &quot;&quot;&quot;</span>                
-        <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">scatter_atoms</span><span class="p">(</span><span class="s">&quot;x&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data_as</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">POINTER</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_double</span><span class="p">)))</span>
-        
-        <span class="k">return</span> <span class="mi">0</span> 
-    </div>
-<div class="viewcode-block" id="lammpsWalker.drawVel"><a class="viewcode-back" href="../src/src.doc.html#lammpsWalker.lammpsWalker.drawVel">[docs]</a>    <span class="k">def</span> <span class="nf">drawVel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">distType</span> <span class="o">=</span> <span class="s">&#39;gaussian&#39;</span><span class="p">,</span> <span class="n">temperature</span> <span class="o">=</span> <span class="mf">310.0</span><span class="p">):</span>
+<span class="sd">        This routine sets the internal configuration.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">scatter_atoms</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data_as</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">POINTER</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_double</span><span class="p">)))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">propagate</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">pre</span><span class="o">=</span><span class="s1">&#39;yes&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="lammpsWalker.drawVel"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#lammpsWalker.lammpsWalker.drawVel">[docs]</a>    <span class="k">def</span> <span class="nf">drawVel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">distType</span> <span class="o">=</span> <span class="s1">&#39;gaussian&#39;</span><span class="p">,</span> <span class="n">temperature</span> <span class="o">=</span> <span class="mf">310.0</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This function redraws the velocities from a maxwell-boltzmann dist.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">distType</span> <span class="o">==</span> <span class="s">&#39;gaussian&#39;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&quot;velocity all create &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temperature</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">100000</span><span class="p">,</span><span class="mi">999999</span><span class="p">))</span> <span class="o">+</span> <span class="s">&quot; dist gaussian&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">seed</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">100000</span><span class="p">,</span><span class="mi">999999</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">distType</span> <span class="o">==</span> <span class="s1">&#39;gaussian&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;velocity all create &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temperature</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; dist gaussian&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">print</span> <span class="s">&quot;The drawVel routine was passed distType that was not understood.&quot;</span>
-            
-        <span class="k">return</span> <span class="mi">0</span>
-    </div>
-<div class="viewcode-block" id="lammpsWalker.reverseVel"><a class="viewcode-back" href="../src/src.doc.html#lammpsWalker.lammpsWalker.reverseVel">[docs]</a>    <span class="k">def</span> <span class="nf">reverseVel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; </span>
+            <span class="k">print</span> <span class="s2">&quot;The drawVel() routine was passed a distribution Type that was not understood.&quot;</span>
+
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="lammpsWalker.reverseVel"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#lammpsWalker.lammpsWalker.reverseVel">[docs]</a>    <span class="k">def</span> <span class="nf">reverseVel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This function reverses the velocities of a given LAMMPS simulation</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        
-        <span class="c"># set varibales for reversing velocities</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&quot;variable vx atom -vx&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&quot;variable vy atom -vy&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&quot;variable vz atom -vz&quot;</span><span class="p">)</span>
-        
-        <span class="c"># set new velocities</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&quot;velocity all set v_vx v_vy v_vz&quot;</span><span class="p">)</span>
-        
-        <span class="k">return</span> <span class="mi">0</span>     
-        </div>
-<div class="viewcode-block" id="lammpsWalker.propagate"><a class="viewcode-back" href="../src/src.doc.html#lammpsWalker.lammpsWalker.propagate">[docs]</a>    <span class="k">def</span> <span class="nf">propagate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">numSteps</span><span class="p">,</span> <span class="n">pre</span><span class="o">=</span><span class="s">&#39;no&#39;</span><span class="p">,</span> <span class="n">post</span><span class="o">=</span><span class="s">&#39;no&#39;</span><span class="p">):</span>
+
+        <span class="c1"># set varibales for reversing velocities</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;variable vx atom -vx&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;variable vy atom -vy&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;variable vz atom -vz&quot;</span><span class="p">)</span>
+
+        <span class="c1"># set new velocities</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;velocity all set v_vx v_vy v_vz&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">propagate</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">pre</span><span class="o">=</span><span class="s1">&#39;yes&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="lammpsWalker.propagate"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#lammpsWalker.lammpsWalker.propagate">[docs]</a>    <span class="k">def</span> <span class="nf">propagate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">numSteps</span><span class="p">,</span> <span class="n">pre</span><span class="o">=</span><span class="s1">&#39;no&#39;</span><span class="p">,</span> <span class="n">post</span><span class="o">=</span><span class="s1">&#39;no&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This function issues a run command to the underlying dynamics to propagate</span>
-<span class="sd">        the dynamics a given number of steps. </span>
+<span class="sd">        This function issues a run command to the underlying dynamics to propagate the dynamics a given number of steps.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        
-        <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&quot;run &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">numSteps</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; pre &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">pre</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; post &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">post</span><span class="p">))</span>
-        
-        <span class="k">return</span> <span class="mi">0</span> 
-    </div>
-<div class="viewcode-block" id="lammpsWalker.setDynamics"><a class="viewcode-back" href="../src/src.doc.html#lammpsWalker.lammpsWalker.setDynamics">[docs]</a>    <span class="k">def</span> <span class="nf">setDynamics</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;run &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">numSteps</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; pre &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">pre</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; post &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">post</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="lammpsWalker.setDynamics"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#lammpsWalker.lammpsWalker.setDynamics">[docs]</a>    <span class="k">def</span> <span class="nf">setDynamics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dynamics_instance</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This routine sets the dynamics for the walker. </span>
+<span class="sd">        This routine sets the dynamics for the walker.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        
-        <span class="k">return</span> <span class="mi">0</span>
-    </div>
-<div class="viewcode-block" id="lammpsWalker.command"><a class="viewcode-back" href="../src/src.doc.html#lammpsWalker.lammpsWalker.command">[docs]</a>    <span class="k">def</span> <span class="nf">command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">):</span>
+        <span class="n">__knownDynamics__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;langevin&#39;</span><span class="p">,</span> <span class="s1">&#39;baoab&#39;</span><span class="p">]</span>
+
+        <span class="k">assert</span> <span class="n">dynamics_instance</span><span class="o">.</span><span class="n">type</span> <span class="ow">in</span> <span class="n">__knownDynamics__</span><span class="p">,</span> <span class="s2">&quot;Dynamics instance type was not recognized.&quot;</span>
+
+        <span class="c1"># first we should check to see if there is already a dynamics defined.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dynamics</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="c1"># if there is a dynamics already present, remove it&#39;s fixes from LAMMPS</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">fixes</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;unfix &quot;</span> <span class="o">+</span> <span class="n">item</span><span class="p">)</span>
+
+        <span class="c1"># now replace with new dynamics instance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dynamics</span> <span class="o">=</span> <span class="n">dynamics_instance</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">fixes</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># and set the required fixes</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">type</span> <span class="ow">is</span> <span class="s1">&#39;langevin&#39;</span><span class="p">:</span>
+            <span class="c1"># send the fixes to the underlying lammps object</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;fix 1 all nve&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">seed</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;fix 2 all langevin &quot;</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">temperature</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">temperature</span><span class="p">)])</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">damping_coefficient</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">100000</span><span class="p">,</span> <span class="mi">999999</span><span class="p">)))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;fix 2 all langevin &quot;</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">temperature</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">temperature</span><span class="p">)])</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">damping_coefficient</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">seed</span><span class="p">))</span>
+
+            <span class="c1"># add the fixes to the internal list</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">fixes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">fixes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;2&quot;</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">type</span> <span class="ow">is</span> <span class="s1">&#39;baoab&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">seed</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;fix 1 all baoab &quot;</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">damping_coefficient</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">temperature</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">100000</span><span class="p">,</span> <span class="mi">999999</span><span class="p">))]))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;fix 1 all baoab &quot;</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">damping_coefficient</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">temperature</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">seed</span><span class="p">)]))</span>
+
+        <span class="c1"># set shake</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">shake</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;fix shk all shake 0.0001 20 0 m 1.0&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">fixes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;shk&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">linear_momentum</span> <span class="o">==</span> <span class="bp">False</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;fix mom all  momentum 1 linear 1 1 1&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">fixes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;mom&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">propagate</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">pre</span><span class="o">=</span><span class="s1">&#39;yes&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="lammpsWalker.command"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#lammpsWalker.lammpsWalker.command">[docs]</a>    <span class="k">def</span> <span class="nf">command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This function allows the user to issue a LAMMPS command directly to the</span>
 <span class="sd">        LAMMPS object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        
-        <span class="c"># issue the given command directly. </span>
+
+        <span class="c1"># issue the given command directly.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
-        
-        <span class="k">return</span> <span class="mi">0</span> 
-        </div>
-<div class="viewcode-block" id="lammpsWalker.minimize"><a class="viewcode-back" href="../src/src.doc.html#lammpsWalker.lammpsWalker.minimize">[docs]</a>    <span class="k">def</span> <span class="nf">minimize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="lammpsWalker.minimize"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#lammpsWalker.lammpsWalker.minimize">[docs]</a>    <span class="k">def</span> <span class="nf">minimize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This function runs a minimization routine with the specified type.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c"># use default settings</span>
+        <span class="c1"># use default settings</span>
         <span class="k">if</span> <span class="n">args</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&quot;minimize 1.0e-4 1.0e-6 100 1000&quot;</span><span class="p">)</span>
-        <span class="c"># else use the arguments provided. </span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;minimize 1.0e-4 1.0e-6 100 1000&quot;</span><span class="p">)</span>
+        <span class="c1"># else use the arguments provided.</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&quot;minimize &quot;</span> <span class="o">+</span> <span class="s">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
-        
-        <span class="k">return</span> <span class="mi">0</span> 
-        </div>
-<div class="viewcode-block" id="lammpsWalker.setTemperature"><a class="viewcode-back" href="../src/src.doc.html#lammpsWalker.lammpsWalker.setTemperature">[docs]</a>    <span class="k">def</span> <span class="nf">setTemperature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temp</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;minimize &quot;</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="lammpsWalker.setTemperature"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#lammpsWalker.lammpsWalker.setTemperature">[docs]</a>    <span class="k">def</span> <span class="nf">setTemperature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temp</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This function sets the temperature of the walker object.</span>
-<span class="sd">        </span>
-<span class="sd">        NOTE THAT THIS DOES NOT ALTER THE DYNAMICS THERMOSTAT. LAMMPS REQUIRES</span>
-<span class="sd">        RESETING THIS THERMOSTAT. WE WILL LOOK INTO HOW TO DO THIS. </span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">temperature</span> <span class="o">=</span> <span class="n">temp</span>
-        
-        <span class="k">return</span> <span class="mi">0</span>
-        </div>
-<div class="viewcode-block" id="lammpsWalker.setTimestep"><a class="viewcode-back" href="../src/src.doc.html#lammpsWalker.lammpsWalker.setTimestep">[docs]</a>    <span class="k">def</span> <span class="nf">setTimestep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timestep</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">temperature</span> <span class="o">=</span> <span class="n">temp</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">setDynamics</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dynamics</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="lammpsWalker.setTimestep"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#lammpsWalker.lammpsWalker.setTimestep">[docs]</a>    <span class="k">def</span> <span class="nf">setTimestep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timestep</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This routine sets the dynamics time step.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&quot;timestep &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">timestep</span><span class="p">))</span>
-        
-        <span class="k">return</span> <span class="mi">0</span>
-        
-        
-        
-    </div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;timestep &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">timestep</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="lammpsWalker.setOutput"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#lammpsWalker.lammpsWalker.setOutput">[docs]</a>    <span class="k">def</span> <span class="nf">setOutput</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">outputType</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">nSteps</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This routine sets up a mechanism for writing system information to file directly from the dynamics engine. This is equivalent to output constructed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># assert outputType in __knownOutput__, &quot;The output type specified was not recognized.&quot;</span>
+        <span class="n">__knownOutputTypes__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;dcd&#39;</span><span class="p">,</span> <span class="s1">&#39;xyz&#39;</span><span class="p">,</span> <span class="s1">&#39;custom&#39;</span><span class="p">,</span> <span class="s1">&#39;xyz/mpiio&#39;</span><span class="p">,</span> <span class="s2">&quot;atom&quot;</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="n">outputType</span> <span class="ow">in</span> <span class="n">__knownOutputTypes__</span><span class="p">,</span> <span class="s2">&quot;outputType that was provided was not understood.&quot;</span>
+
+        <span class="k">for</span> <span class="n">out</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">out</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="n">name</span><span class="p">,</span> <span class="s2">&quot;Output class names must be unique.&quot;</span>
+
+        <span class="c1"># now append the collective variable to the walker list.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">outputClass</span><span class="o">.</span><span class="n">outputClass</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">outputType</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">nSteps</span><span class="p">))</span>
+
+        <span class="n">dump</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">dump</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;custom&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;dump &quot;</span> <span class="o">+</span> <span class="n">dump</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot; all &quot;</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">dump</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">dump</span><span class="o">.</span><span class="n">nSteps</span><span class="p">),</span> <span class="n">dump</span><span class="o">.</span><span class="n">destination</span><span class="p">,</span> <span class="s2">&quot;x y z&quot;</span><span class="p">]))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;dump &quot;</span> <span class="o">+</span> <span class="n">dump</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot; all &quot;</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">dump</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">dump</span><span class="o">.</span><span class="n">nSteps</span><span class="p">),</span> <span class="n">dump</span><span class="o">.</span><span class="n">destination</span><span class="p">]))</span></div>
+
+
+<div class="viewcode-block" id="lammpsWalker.removeOutput"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#lammpsWalker.lammpsWalker.removeOutput">[docs]</a>    <span class="k">def</span> <span class="nf">removeOutput</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This routine removes the ouput pipes for information to be written to disk from the underlying dynamics engine. Right now this simply clears all existing output.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">out</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;undump &quot;</span> <span class="o">+</span> <span class="n">out</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="lammpsWalker.get_time"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#lammpsWalker.lammpsWalker.get_time">[docs]</a>    <span class="k">def</span> <span class="nf">get_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the time associated with the state of the walker.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span></div>
+
+<div class="viewcode-block" id="lammpsWalker.set_time"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#lammpsWalker.lammpsWalker.set_time">[docs]</a>    <span class="k">def</span> <span class="nf">set_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the time of the walker.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">t</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">lmp</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;reset_timestep &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">propagate</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">pre</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">None</span></div></div>
+
+<span class="n">walker</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">lammpsWalker</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s1">&#39;The lammpsWalker module is a subclass of walker:&#39;</span><span class="p">,</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">lammpsWalker</span><span class="p">,</span> <span class="n">walker</span><span class="p">)</span>
 </pre></div>
 
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
       <input type="text" name="q" />
@@ -528,16 +621,13 @@
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -546,13 +636,13 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Enhanced Sampling Toolkit 1.0 documentation</a> &raquo;</li>
-          <li><a href="index.html" >Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Enhanced Sampling Toolkit 0.1a documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2015, Jeremy Tempkin.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2015, Jeremy O. B. Tempkin.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
     </div>
   </body>
 </html>
