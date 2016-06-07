@@ -28,7 +28,7 @@
 
 
 \title{Enhanced Sampling Toolkit Documentation}
-\date{Jun 06, 2016}
+\date{Jun 07, 2016}
 \release{0.1a}
 \author{Jeremy O. B. Tempkin}
 \newcommand{\sphinxlogo}{}
@@ -603,25 +603,55 @@ We plan to implement an OpenMM walker API module in a future release.
 
 \section{Nonequilibrium Umbrella Sampling}
 \label{applications/applications.doc:nonequilibrium-umbrella-sampling}
+The Nonequilibrium Umbrella Sampling (NEUS) application module provides a flexible set of tools built on top of the Walker API that implements the found in \textbf{Tempkin et at, in prep}.
+
+More detailed examples of the specific implementations of the use of the can be found in the examples subdirectory.
+
 
 \subsection{Partition Module}
-\label{applications/applications.doc:module-partition}\label{applications/applications.doc:partition-module}\index{partition (module)}
-New module of the Partiton class.
-\index{partition (class in partition)}
+\label{applications/applications.doc:partition-module}
+The partition module provides a simple structure for handling and manipulating a list of windows. The partition module is effectively a callable Python list. As such, it supports.
 
-\begin{fulllineitems}
-\phantomsection\label{applications/applications.doc:partition.partition}\pysiglinewithargsret{\strong{class }\code{partition.}\bfcode{partition}}{\emph{umbrellas={[}{]}}}{}
-The partiton class is a general container for a list of objects that define how a space is discretized. It supports general features of list-like objects in Python but also provides some added functionality specific to the needs of.
-
-Specifically, the partition object is a specialized custom container object for a list of basis functions. What this means is that partition will support the normal operations that are inherent to Python lists but will add additional functionality specific to it's role in the NEUS such as it will also be a callable object.
+To initialize a partition object:
 
 \begin{Verbatim}[commandchars=\\\{\}]
 \PYG{g+gp}{\PYGZgt{}\PYGZgt{}\PYGZgt{} }\PYG{k+kn}{from} \PYG{n+nn}{est}\PYG{n+nn}{.}\PYG{n+nn}{neus} \PYG{k}{import} \PYG{n}{partition}
+\PYG{g+gp}{\PYGZgt{}\PYGZgt{}\PYGZgt{} }\PYG{k+kn}{import} \PYG{n+nn}{numpy} \PYG{k}{as} \PYG{n+nn}{np}
 \PYG{g+gp}{\PYGZgt{}\PYGZgt{}\PYGZgt{} }\PYG{n}{sys} \PYG{o}{=} \PYG{n}{partition}\PYG{o}{.}\PYG{n}{partition}\PYG{p}{(}\PYG{p}{)}
 \end{Verbatim}
 
-DEVELOPERS NOTE:
-It would be really nice for the partition object to support addition operation to merge two partitions by appending the list. It could also be really interesting if the partition could support a multiply function which would produce the product of two partitions, i.e. P1(N) * P2(M) could produce P3(NxM).
+One can add elements to the partition one by one:
+
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{g+go}{\PYGZgt{}\PYGZgt{}\PYGZgt{}}
+\end{Verbatim}
+
+Or hand partition a list at initialization:
+
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{g+gp}{\PYGZgt{}\PYGZgt{}\PYGZgt{} }\PYG{k+kn}{from} \PYG{n+nn}{est}\PYG{n+nn}{.}\PYG{n+nn}{neus} \PYG{k}{import} \PYG{n}{Box}
+\PYG{g+gp}{\PYGZgt{}\PYGZgt{}\PYGZgt{} }\PYG{n}{windows} \PYG{o}{=} \PYG{p}{[}\PYG{n}{Box}\PYG{o}{.}\PYG{n}{box}\PYG{p}{(}\PYG{n}{i}\PYG{p}{,}\PYG{n}{j}\PYG{p}{)} \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{l+m+mi}{5}\PYG{p}{)} \PYG{k}{for} \PYG{n}{j} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{l+m+mi}{10}\PYG{p}{)}\PYG{p}{]}
+\PYG{g+gp}{\PYGZgt{}\PYGZgt{}\PYGZgt{} }\PYG{n}{sys} \PYG{o}{=} \PYG{n}{partition}\PYG{o}{.}\PYG{n}{partition}\PYG{p}{(}\PYG{n}{windows}\PYG{p}{)}
+\PYG{g+gp}{\PYGZgt{}\PYGZgt{}\PYGZgt{} }\PYG{n+nb}{print} \PYG{n}{sys}
+\end{Verbatim}
+
+Note that partition requires the elements it contains to be callable items. Partition will enforce this behavior:
+
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{g+gp}{\PYGZgt{}\PYGZgt{}\PYGZgt{} }\PYG{n}{sys}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{not callable}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+\end{Verbatim}
+
+See below for a more detailed specification.
+\phantomsection\label{applications/applications.doc:module-partition}\index{partition (module)}\index{partition (class in partition)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:partition.partition}\pysiglinewithargsret{\strong{class }\code{partition.}\bfcode{partition}}{\emph{umbrellas={[}{]}}}{}
+Note that the call behavior of the partition object. For example:
+
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{g+gp}{\PYGZgt{}\PYGZgt{}\PYGZgt{} }\PYG{n}{indicators} \PYG{o}{=} \PYG{n}{sys}\PYG{p}{(}\PYG{n}{wlkr}\PYG{p}{)}
+\PYG{g+gp}{\PYGZgt{}\PYGZgt{}\PYGZgt{} }\PYG{n+nb}{print} \PYG{n}{indicators}
+\end{Verbatim}
 \index{append() (partition.partition method)}
 
 \begin{fulllineitems}
@@ -644,7 +674,19 @@ Return the first index in which item appears in partition.
 
 
 \subsection{Window Module}
-\label{applications/applications.doc:module-window}\label{applications/applications.doc:window-module}\index{window (module)}
+\label{applications/applications.doc:window-module}
+The window object defines a single spatiotemporal restriction of the discretization defined by the NEUS J(t) process. An instance of the window object corresponds to a single value of the J. The object defines a data structure for storing the entry point flux lists defined by \textasciitilde{}pi. It also defintes the routines require for constructing the flux lists and returning physically weighted elements.
+
+To import and initialize a window object:
+
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{g+gp}{\PYGZgt{}\PYGZgt{}\PYGZgt{} }\PYG{k+kn}{from} \PYG{n+nn}{est}\PYG{n+nn}{.}\PYG{n+nn}{neus} \PYG{k}{import} \PYG{n}{Window}
+\PYG{g+gp}{\PYGZgt{}\PYGZgt{}\PYGZgt{} }\PYG{n}{win} \PYG{o}{=} \PYG{n}{Window}\PYG{o}{.}\PYG{n}{window}\PYG{p}{(}\PYG{n}{center}\PYG{o}{=}\PYG{p}{[}\PYG{p}{]}\PYG{p}{,} \PYG{n}{width}\PYG{o}{=}\PYG{p}{[}\PYG{p}{]}\PYG{p}{)}
+\PYG{g+gp}{\PYGZgt{}\PYGZgt{}\PYGZgt{} }\PYG{n+nb}{print} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Hello}\PYG{l+s+s2}{\PYGZdq{}}
+\end{Verbatim}
+
+To
+\phantomsection\label{applications/applications.doc:module-window}\index{window (module)}
 An implementation of the window object in the NEUS toolkit.
 \index{window (class in window)}
 
@@ -749,6 +791,40 @@ Set neighbor fluxes as numpy array.
 \end{fulllineitems}
 
 
+The Pyramid module implements a support function for the Window class of the form:
+
+\textbf{equation}.
+\phantomsection\label{applications/applications.doc:module-pyramid}\index{pyramid (module)}
+Class definition for Pyramid shaped window. Inherets from Window.
+\index{Pyramid (class in pyramid)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:pyramid.Pyramid}\pysiglinewithargsret{\strong{class }\code{pyramid.}\bfcode{Pyramid}}{\emph{center}, \emph{width}, \emph{ref\_center=None}, \emph{ref\_width=None}, \emph{time=None}, \emph{periodic\_length=None}, \emph{max\_list\_size=100}, \emph{initial\_conditions={[}{]}}, \emph{initial\_conditions\_probability=0.0}, \emph{a=0.0}}{}
+Class definition of Pyramid which inherits from window. Implements the pyramid shaped basis function.
+\index{ref\_indicator() (pyramid.Pyramid method)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:pyramid.Pyramid.ref_indicator}\pysiglinewithargsret{\bfcode{ref\_indicator}}{\emph{coord}}{}
+Return the value of the indicator for the reference.
+
+\end{fulllineitems}
+
+\index{time\_indicator() (pyramid.Pyramid method)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:pyramid.Pyramid.time_indicator}\pysiglinewithargsret{\bfcode{time\_indicator}}{\emph{coord}}{}
+Return the value of the indicator function for the time coordinate.
+
+\end{fulllineitems}
+
+
+\end{fulllineitems}
+
+
+The Box module implements a support function for the Window class of the form:
+
+\textbf{Box indicator function}.
+
 
 \subsection{Entry Point Module}
 \label{applications/applications.doc:entry-point-module}\label{applications/applications.doc:module-entryPoints}\index{entryPoints (module)}
@@ -813,79 +889,6 @@ Alias for field number 4
 
 
 
-\subsection{Observable Module}
-\label{applications/applications.doc:module-observables}\label{applications/applications.doc:observable-module}\index{observables (module)}
-This module contains a list of observable routines. These functions serve to calculation and record the value of observables in the course of a calculation.
-
-These routines are initialized as their own class and subsequently can be invoked during other calculations or called by other routines. We may consider updating these classes with a base class prototype similar to how the walker class was initialized.
-\index{P1 (class in observables)}
-
-\begin{fulllineitems}
-\phantomsection\label{applications/applications.doc:observables.P1}\pysiglinewithargsret{\strong{class }\code{observables.}\bfcode{P1}}{\emph{name}, \emph{s}, \emph{stepLength}, \emph{atomids}, \emph{data}, \emph{cellDim}}{}
-This routine returns the TCF of the end to end distance.
-
-\end{fulllineitems}
-
-\index{cv\_indicator\_correlation (class in observables)}
-
-\begin{fulllineitems}
-\phantomsection\label{applications/applications.doc:observables.cv_indicator_correlation}\pysiglinewithargsret{\strong{class }\code{observables.}\bfcode{cv\_indicator\_correlation}}{\emph{name}, \emph{s}, \emph{stepLength}, \emph{data}, \emph{cv\_index}, \emph{cv\_range}}{}
-This routine returns the value of an indicator function over a space in a given cv.
-
-\end{fulllineitems}
-
-\index{dihedral\_fluctuation\_correlation (class in observables)}
-
-\begin{fulllineitems}
-\phantomsection\label{applications/applications.doc:observables.dihedral_fluctuation_correlation}\pysiglinewithargsret{\strong{class }\code{observables.}\bfcode{dihedral\_fluctuation\_correlation}}{\emph{name}, \emph{s}, \emph{stepLength}, \emph{data}, \emph{cvindex}, \emph{mean}}{}
-This routine returns the TCF of a dihedral angle.
-
-\end{fulllineitems}
-
-\index{dihedral\_fluctuation\_correlation\_2 (class in observables)}
-
-\begin{fulllineitems}
-\phantomsection\label{applications/applications.doc:observables.dihedral_fluctuation_correlation_2}\pysiglinewithargsret{\strong{class }\code{observables.}\bfcode{dihedral\_fluctuation\_correlation\_2}}{\emph{name}, \emph{s}, \emph{stepLength}, \emph{data}, \emph{atomids}, \emph{mean}}{}
-This routine returns the TCF of a dihedral angle.
-
-\end{fulllineitems}
-
-\index{dist\_fluctuation\_correlation (class in observables)}
-
-\begin{fulllineitems}
-\phantomsection\label{applications/applications.doc:observables.dist_fluctuation_correlation}\pysiglinewithargsret{\strong{class }\code{observables.}\bfcode{dist\_fluctuation\_correlation}}{\emph{name}, \emph{s}, \emph{stepLength}, \emph{atomids}, \emph{data}, \emph{cellDim}, \emph{mean}}{}
-This routine returns the TCF of the end to end distance.
-
-\end{fulllineitems}
-
-\index{electric\_field (class in observables)}
-
-\begin{fulllineitems}
-\phantomsection\label{applications/applications.doc:observables.electric_field}\pysiglinewithargsret{\strong{class }\code{observables.}\bfcode{electric\_field}}{\emph{name}, \emph{s}, \emph{stepLength}, \emph{atomids}, \emph{data}, \emph{cellDim}, \emph{atom\_exclusions}, \emph{ref\_atoms\_ids=None}}{}
-This class constructs an observable that reports on the time-correlation 
-of the electric field at a point in space.
-
-\end{fulllineitems}
-
-\index{pmf (class in observables)}
-
-\begin{fulllineitems}
-\phantomsection\label{applications/applications.doc:observables.pmf}\pysiglinewithargsret{\strong{class }\code{observables.}\bfcode{pmf}}{\emph{name}, \emph{data}, \emph{data\_width}}{}
-This class represents a PMF observable.
-
-\end{fulllineitems}
-
-
-
-\section{Steered Transition Path Sampling (Steps)}
-\label{applications/applications.doc:steered-transition-path-sampling-steps}
-
-\section{Replica Exchange}
-\label{applications/applications.doc:replica-exchange}
-
-\section{Profiling Applications}
-\label{applications/applications.doc:profiling-applications}
-
 \chapter{Testing}
 \label{test/testing.doc:testing}\label{test/testing.doc::doc}
 Here I will add a description of the unit testing of Walker API implementations and potentially the application testing.
@@ -909,11 +912,11 @@ To add: automatic system for scanning the package files for tests to execute. Th
 \item {\texttt{lammpsWalker}}, \pageref{walker_api/walker_api.doc:module-lammpsWalker}
 \indexspace
 \bigletter{o}
-\item {\texttt{observables}}, \pageref{applications/applications.doc:module-observables}
 \item {\texttt{outputClass}}, \pageref{walker_api/walker_api.doc:module-outputClass}
 \indexspace
 \bigletter{p}
 \item {\texttt{partition}}, \pageref{applications/applications.doc:module-partition}
+\item {\texttt{pyramid}}, \pageref{applications/applications.doc:module-pyramid}
 \indexspace
 \bigletter{w}
 \item {\texttt{walker\_base}}, \pageref{walker_api/walker_api.doc:module-walker_base}

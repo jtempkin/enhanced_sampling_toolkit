@@ -3,15 +3,8 @@ import errors
 
 
 class partition:
-    """
-    Note that the call behavior of the partition object. For example:
-    
-    >>> indicators = sys(wlkr)
-    >>> print indicators
-    """
     def __init__(self, umbrellas=[]):
-        """
-        Construct an instance of the partition.
+        """Construct an instance of the partition.
         """
 
         self._umbrellas = umbrellas
@@ -24,15 +17,13 @@ class partition:
         return None
 
     def __getitem__(self, key):
-        """
-        Return an item in the list.
+        """Return an item in the list.
         """
 
         return self._umbrellas[key]
 
     def __setitem__(self, key, value):
-        """
-        Set item to value.
+        """Set item to value.
         """
 
         if not hasattr(value, '__call__'):
@@ -43,14 +34,25 @@ class partition:
         return None
 
     def index(self, item):
-        """
-        Return the first index in which item appears in partition.
+        """Return the first index in which item appears in partition.
+
+        Extended description.
+
+        Parameters
+        ------------
+        item : obj
+            The window object to check for membership.
+
+        Returns
+        ------------
+        index : int
+            The index of item in the list. Returns ValueError if item is not
+            contained in the partition.
         """
         return self._umbrellas.index(item)
 
     def __delitem__(self, key):
-        """
-        Delete window.
+        """Delete window.
         """
         del self._umbrellas[key]
 
@@ -60,36 +62,42 @@ class partition:
         return None
 
     def __len__(self):
-        """
-        Return the number of windows in the partition.
+        """Return the number of windows in the partition.
         """
 
         return len(self._umbrellas)
 
     def __contains__(self, item):
-        """
-        Return boolean for if the partition contains the specified item.
+        """Return boolean for if the partition contains the specified item.
         """
 
         return item in self._umbrellas
 
     def __iter__(self):
-        """
-        Return an iterator for the list of basis functions.
+        """Return an iterator for the list of basis functions.
         """
 
         return iter(self._umbrellas)
 
     def __repr__(self):
-        """
-        Return string representation of the partition.
+        """Return string representation of the partition.
         """
 
         return "partition(" + repr(self._umbrellas) + ")"
 
     def append(self, value):
-        """
-        Append a new value to the end of the partition
+        """Append a new value to the partition.
+
+        Note that this enforces that the input object is callable. Will throw an exception if value is not callable.
+
+        Parameters
+        ------------
+        value : obj
+            A callable Python object.
+
+        Returns
+        -------------
+        None
         """
 
         if not hasattr(value, '__call__'):
@@ -100,8 +108,7 @@ class partition:
         return None
 
     def __call__(self, pos):
-        """
-        Return a numpy array of the normalized supports of the windows at the given.
+        """Return a numpy array of the normalized supports of the windows at the given.
         """
         # build an array
         indicators = np.asarray([win(pos) for win in self])
@@ -112,4 +119,3 @@ class partition:
 
         # return the normalized values of the windows as an array.
         return indicators / indicators.sum()
-

@@ -38,8 +38,8 @@ Note that partition requires the elements it contains to be callable items. Part
 
 See below for a more detailed specification.
 
-.. automodule:: partition
-    :members: 
+.. autoclass:: partition.partition
+    :members:
 
 Window Module
 <<<<<<<<<<<<<<<<<<<<<<<
