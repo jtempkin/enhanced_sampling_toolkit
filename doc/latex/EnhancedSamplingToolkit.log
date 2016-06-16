@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  6 JAN 2016 15:09
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  7 JUN 2016 17:48
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -255,6 +255,74 @@ Package: fontenc 2005/09/27 v1.99g Standard LaTeX package
 File: t1enc.def 2005/09/27 v1.99g Standard LaTeX file
 LaTeX Font Info:    Redeclaring font encoding T1 on input line 48.
 )<<t1.cmap>>)
+(/usr/local/texlive/2015/texmf-dist/tex/latex/amsmath/amsmath.sty
+Package: amsmath 2013/01/14 v2.14 AMS math features
+\@mathmargin=\skip43
+
+For additional information on amsmath, use the `?' option.
+(/usr/local/texlive/2015/texmf-dist/tex/latex/amsmath/amstext.sty
+Package: amstext 2000/06/29 v2.01
+
+(/usr/local/texlive/2015/texmf-dist/tex/latex/amsmath/amsgen.sty
+File: amsgen.sty 1999/11/30 v2.0
+\@emptytoks=\toks16
+\ex@=\dimen103
+))
+(/usr/local/texlive/2015/texmf-dist/tex/latex/amsmath/amsbsy.sty
+Package: amsbsy 1999/11/29 v1.2d
+\pmbraise@=\dimen104
+)
+(/usr/local/texlive/2015/texmf-dist/tex/latex/amsmath/amsopn.sty
+Package: amsopn 1999/12/14 v2.01 operator names
+)
+\inf@bad=\count88
+LaTeX Info: Redefining \frac on input line 210.
+\uproot@=\count89
+\leftroot@=\count90
+LaTeX Info: Redefining \overline on input line 306.
+\classnum@=\count91
+\DOTSCASE@=\count92
+LaTeX Info: Redefining \ldots on input line 378.
+LaTeX Info: Redefining \dots on input line 381.
+LaTeX Info: Redefining \cdots on input line 466.
+\Mathstrutbox@=\box26
+\strutbox@=\box27
+\big@size=\dimen105
+LaTeX Font Info:    Redeclaring font encoding OML on input line 566.
+LaTeX Font Info:    Redeclaring font encoding OMS on input line 567.
+\macc@depth=\count93
+\c@MaxMatrixCols=\count94
+\dotsspace@=\muskip10
+\c@parentequation=\count95
+\dspbrk@lvl=\count96
+\tag@help=\toks17
+\row@=\count97
+\column@=\count98
+\maxfields@=\count99
+\andhelp@=\toks18
+\eqnshift@=\dimen106
+\alignsep@=\dimen107
+\tagshift@=\dimen108
+\tagwidth@=\dimen109
+\totwidth@=\dimen110
+\lineht@=\dimen111
+\@envbody=\toks19
+\multlinegap=\skip44
+\multlinetaggap=\skip45
+\mathdisplay@stack=\toks20
+LaTeX Info: Redefining \[ on input line 2665.
+LaTeX Info: Redefining \] on input line 2666.
+)
+(/usr/local/texlive/2015/texmf-dist/tex/latex/amsfonts/amssymb.sty
+Package: amssymb 2013/01/14 v3.01 AMS font symbols
+
+(/usr/local/texlive/2015/texmf-dist/tex/latex/amsfonts/amsfonts.sty
+Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
+\symAMSa=\mathgroup4
+\symAMSb=\mathgroup5
+LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
+(Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
+))
 (/usr/local/texlive/2015/texmf-dist/tex/generic/babel/babel.sty
 Package: babel 2014/09/25 3.9l The Babel package
 
@@ -263,8 +331,8 @@ Language: english 2012/08/20 v3.3p English support from the babel system
 
 (/usr/local/texlive/2015/texmf-dist/tex/generic/babel/babel.def
 File: babel.def 2014/09/25 3.9l Babel common definitions
-\babel@savecnt=\count88
-\U@D=\dimen103
+\babel@savecnt=\count100
+\U@D=\dimen112
 )
 \l@canadian = a dialect from \language\l@american 
 \l@australian = a dialect from \language\l@british 
@@ -274,46 +342,46 @@ File: babel.def 2014/09/25 3.9l Babel common definitions
 Package: times 2005/04/12 PSNFSS-v9.2a (SPQR) 
 ) (./fncychap.sty
 Package: fncychap 2007/07/30 v1.34 LaTeX package (Revised chapters)
-\RW=\skip43
-\mylen=\skip44
-\myhi=\skip45
-\px=\skip46
-\py=\skip47
-\pyy=\skip48
-\pxx=\skip49
-\c@AlphaCnt=\count89
-\c@AlphaDecCnt=\count90
+\RW=\skip46
+\mylen=\skip47
+\myhi=\skip48
+\px=\skip49
+\py=\skip50
+\pyy=\skip51
+\pxx=\skip52
+\c@AlphaCnt=\count101
+\c@AlphaDecCnt=\count102
 ) (/usr/local/texlive/2015/texmf-dist/tex/latex/tools/longtable.sty
 Package: longtable 2014/10/28 v4.11 Multi-page Table package (DPC)
-\LTleft=\skip50
-\LTright=\skip51
-\LTpre=\skip52
-\LTpost=\skip53
-\LTchunksize=\count91
-\LTcapwidth=\dimen104
-\LT@head=\box26
-\LT@firsthead=\box27
-\LT@foot=\box28
-\LT@lastfoot=\box29
-\LT@cols=\count92
-\LT@rows=\count93
-\c@LT@tables=\count94
-\c@LT@chunks=\count95
-\LT@p@ftn=\toks16
+\LTleft=\skip53
+\LTright=\skip54
+\LTpre=\skip55
+\LTpost=\skip56
+\LTchunksize=\count103
+\LTcapwidth=\dimen113
+\LT@head=\box28
+\LT@firsthead=\box29
+\LT@foot=\box30
+\LT@lastfoot=\box31
+\LT@cols=\count104
+\LT@rows=\count105
+\c@LT@tables=\count106
+\c@LT@chunks=\count107
+\LT@p@ftn=\toks21
 )
 (./sphinx.sty
 Package: sphinx 2010/01/15 LaTeX package (Sphinx markup)
 
 (/usr/local/texlive/2015/texmf-dist/tex/latex/fancyhdr/fancyhdr.sty
-\fancy@headwidth=\skip54
-\f@ncyO@elh=\skip55
-\f@ncyO@erh=\skip56
-\f@ncyO@olh=\skip57
-\f@ncyO@orh=\skip58
-\f@ncyO@elf=\skip59
-\f@ncyO@erf=\skip60
-\f@ncyO@olf=\skip61
-\f@ncyO@orf=\skip62
+\fancy@headwidth=\skip57
+\f@ncyO@elh=\skip58
+\f@ncyO@erh=\skip59
+\f@ncyO@olh=\skip60
+\f@ncyO@orh=\skip61
+\f@ncyO@elf=\skip62
+\f@ncyO@erf=\skip63
+\f@ncyO@olf=\skip64
+\f@ncyO@orf=\skip65
 )
 (/usr/local/texlive/2015/texmf-dist/tex/latex/base/textcomp.sty
 Package: textcomp 2005/09/27 v1.99g Standard LaTeX package
@@ -475,101 +543,43 @@ Package textcomp Info: Setting ptmj sub-encoding to TS1/4 on input line 409.
 Package: fancybox 2010/05/15 1.4
 
 Style option: `fancybox' v1.4 <2010/05/15> (tvz)
-\@fancybox=\box30
-\shadowsize=\dimen105
-\@Sbox=\box31
-\do@VerbBox=\toks17
-\the@fancyput=\toks18
-\this@fancyput=\toks19
-\EndVerbatimTokens=\toks20
+\@fancybox=\box32
+\shadowsize=\dimen114
+\@Sbox=\box33
+\do@VerbBox=\toks22
+\the@fancyput=\toks23
+\this@fancyput=\toks24
+\EndVerbatimTokens=\toks25
 \Verbatim@Outfile=\write3
 \Verbatim@Infile=\read1
 ) (/usr/local/texlive/2015/texmf-dist/tex/latex/titlesec/titlesec.sty
 Package: titlesec 2011/12/15 v2.10.0 Sectioning titles
-\ttl@box=\box32
-\beforetitleunit=\skip63
-\aftertitleunit=\skip64
-\ttl@plus=\dimen106
-\ttl@minus=\dimen107
-\ttl@toksa=\toks21
-\titlewidth=\dimen108
-\titlewidthlast=\dimen109
-\titlewidthfirst=\dimen110
+\ttl@box=\box34
+\beforetitleunit=\skip66
+\aftertitleunit=\skip67
+\ttl@plus=\dimen115
+\ttl@minus=\dimen116
+\ttl@toksa=\toks26
+\titlewidth=\dimen117
+\titlewidthlast=\dimen118
+\titlewidthfirst=\dimen119
 )
 (./tabulary.sty
 Package: tabulary 2008/12/01 v0.9 tabulary package (DPC)
  (/usr/local/texlive/2015/texmf-dist/tex/latex/tools/array.sty
 Package: array 2014/10/28 v2.4c Tabular extension package (FMi)
-\col@sep=\dimen111
-\extrarowheight=\dimen112
-\NC@list=\toks22
-\extratabsurround=\skip65
-\backup@length=\skip66
+\col@sep=\dimen120
+\extrarowheight=\dimen121
+\NC@list=\toks27
+\extratabsurround=\skip68
+\backup@length=\skip69
 )
-\TY@count=\count96
-\TY@linewidth=\dimen113
-\tymin=\dimen114
-\tymax=\dimen115
-\TY@tablewidth=\dimen116
-) (/usr/local/texlive/2015/texmf-dist/tex/latex/amsmath/amsmath.sty
-Package: amsmath 2013/01/14 v2.14 AMS math features
-\@mathmargin=\skip67
-
-For additional information on amsmath, use the `?' option.
-(/usr/local/texlive/2015/texmf-dist/tex/latex/amsmath/amstext.sty
-Package: amstext 2000/06/29 v2.01
-
-(/usr/local/texlive/2015/texmf-dist/tex/latex/amsmath/amsgen.sty
-File: amsgen.sty 1999/11/30 v2.0
-\@emptytoks=\toks23
-\ex@=\dimen117
-))
-(/usr/local/texlive/2015/texmf-dist/tex/latex/amsmath/amsbsy.sty
-Package: amsbsy 1999/11/29 v1.2d
-\pmbraise@=\dimen118
-)
-(/usr/local/texlive/2015/texmf-dist/tex/latex/amsmath/amsopn.sty
-Package: amsopn 1999/12/14 v2.01 operator names
-)
-\inf@bad=\count97
-LaTeX Info: Redefining \frac on input line 210.
-\uproot@=\count98
-\leftroot@=\count99
-LaTeX Info: Redefining \overline on input line 306.
-\classnum@=\count100
-\DOTSCASE@=\count101
-LaTeX Info: Redefining \ldots on input line 378.
-LaTeX Info: Redefining \dots on input line 381.
-LaTeX Info: Redefining \cdots on input line 466.
-\Mathstrutbox@=\box33
-\strutbox@=\box34
-\big@size=\dimen119
-LaTeX Font Info:    Redeclaring font encoding OML on input line 566.
-LaTeX Font Info:    Redeclaring font encoding OMS on input line 567.
-\macc@depth=\count102
-\c@MaxMatrixCols=\count103
-\dotsspace@=\muskip10
-\c@parentequation=\count104
-\dspbrk@lvl=\count105
-\tag@help=\toks24
-\row@=\count106
-\column@=\count107
-\maxfields@=\count108
-\andhelp@=\toks25
-\eqnshift@=\dimen120
-\alignsep@=\dimen121
-\tagshift@=\dimen122
-\tagwidth@=\dimen123
-\totwidth@=\dimen124
-\lineht@=\dimen125
-\@envbody=\toks26
-\multlinegap=\skip68
-\multlinetaggap=\skip69
-\mathdisplay@stack=\toks27
-LaTeX Info: Redefining \[ on input line 2665.
-LaTeX Info: Redefining \] on input line 2666.
-)
-(/usr/local/texlive/2015/texmf-dist/tex/latex/base/makeidx.sty
+\TY@count=\count108
+\TY@linewidth=\dimen122
+\tymin=\dimen123
+\tymax=\dimen124
+\TY@tablewidth=\dimen125
+) (/usr/local/texlive/2015/texmf-dist/tex/latex/base/makeidx.sty
 Package: makeidx 2014/09/29 v1.0m Standard LaTeX package
 )
 (/usr/local/texlive/2015/texmf-dist/tex/latex/framed/framed.sty
@@ -583,13 +593,13 @@ Package: framed 2011/10/22 v 0.96: framed or shaded text with page breaks
 (/usr/local/texlive/2015/texmf-dist/tex/latex/base/ifthen.sty
 Package: ifthen 2014/09/29 v1.1c Standard LaTeX ifthen package (DPC)
 )
-(/usr/local/texlive/2015/texmf-dist/tex/latex/graphics/color.sty
-Package: color 2014/10/28 v1.1a Standard LaTeX Color (DPC)
+(/usr/local/texlive/2015/texmf-dist/tex/latex/xcolor/xcolor.sty
+Package: xcolor 2007/01/21 v2.11 LaTeX color extensions (UK)
 
 (/usr/local/texlive/2015/texmf-dist/tex/latex/latexconfig/color.cfg
 File: color.cfg 2007/01/18 v1.5 color configuration of teTeX/TeXLive
 )
-Package color Info: Driver file: pdftex.def on input line 142.
+Package xcolor Info: Driver file: pdftex.def on input line 225.
 
 (/usr/local/texlive/2015/texmf-dist/tex/latex/pdftex-def/pdftex.def
 File: pdftex.def 2011/05/27 v0.06d Graphics/color for pdfTeX
@@ -601,7 +611,17 @@ Package: infwarerr 2010/04/08 v1.3 Providing info/warning/error messages (HO)
 Package: ltxcmds 2011/11/09 v1.22 LaTeX kernel commands for general use (HO)
 )
 \Gread@gobject=\count109
-))
+)
+Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1337.
+Package xcolor Info: Model `hsb' substituted by `rgb' on input line 1341.
+Package xcolor Info: Model `RGB' extended on input line 1353.
+Package xcolor Info: Model `HTML' substituted by `rgb' on input line 1355.
+Package xcolor Info: Model `Hsb' substituted by `hsb' on input line 1356.
+Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1357.
+Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1358.
+Package xcolor Info: Model `Gray' substituted by `gray' on input line 1359.
+Package xcolor Info: Model `wave' substituted by `hsb' on input line 1360.
+)
 (/usr/local/texlive/2015/texmf-dist/tex/latex/fancyvrb/fancyvrb.sty
 Package: fancyvrb 2008/02/07
 
@@ -662,7 +682,7 @@ Package graphics Info: Driver file: pdftex.def on input line 94.
 \Gin@req@width=\dimen134
 )
 (/usr/local/texlive/2015/texmf-dist/tex/generic/pdftex/pdfcolor.tex)
-\distancetoright=\skip71
+\Sphinx@scratchlength=\skip71
 \py@argswidth=\skip72
 \py@noticelength=\skip73
 \lineblockindentation=\skip74
@@ -793,20 +813,38 @@ Package: hypcap 2011/02/16 v1.11 Adjusting the anchors of captions (HO)
 )
 \DUlineblockindent=\skip76
 
-(/usr/local/texlive/2015/texmf-dist/tex/latex/float/float.sty
-Package: float 2001/11/08 v1.3d Float enhancements (AL)
-\c@float@type=\count124
-\float@exts=\toks30
-\float@box=\box40
-\@float@everytoks=\toks31
-\@floatcapt=\box41
+(./newfloat.sty
+Package: newfloat 2015/09/17 v1.1-109 Defining new floating environments (AR)
 )
-\@float@every@literal-block=\toks32
-\c@literal-block=\count125
+Package newfloat Info: New float `literal-block' with options `' on input line 
+627.
+\c@literal-block=\count124
+\newfloat@ftype=\count125
+Package newfloat Info: float type `literal-block'=8 on input line 627.
+
+(/usr/local/texlive/2015/texmf-dist/tex/latex/capt-of/capt-of.sty
+Package: capt-of 2009/12/29 v0.2 standard captions outside of floats
 )
+(/usr/local/texlive/2015/texmf-dist/tex/latex/needspace/needspace.sty
+Package: needspace 2010/09/12 v1.3d reserve vertical space
+))
 (/usr/local/texlive/2015/texmf-dist/tex/latex/multirow/multirow.sty
 \bigstrutjot=\dimen140
 )
+(/usr/local/texlive/2015/texmf-dist/tex/latex/eqparbox/eqparbox.sty
+Package: eqparbox 2013/03/15 v4.0 Create equal-widthed boxes
+\eqp@tempdima=\skip77
+\eqp@tempdimb=\skip78
+\eqp@tabular@box=\box40
+\eqp@list@box=\box41
+\eqp@list@indent=\skip79
+
+(/usr/local/texlive/2015/texmf-dist/tex/latex/environ/environ.sty
+Package: environ 2014/05/04 v0.3 A new way to define environments
+
+(/usr/local/texlive/2015/texmf-dist/tex/latex/trimspaces/trimspaces.sty
+Package: trimspaces 2009/09/17 v1.1 Trim spaces around a token list
+)))
 \@indexfile=\write5
 \openout5 = `EnhancedSamplingToolkit.idx'.
 
@@ -815,29 +853,29 @@ Writing index file EnhancedSamplingToolkit.idx
 (./EnhancedSamplingToolkit.aux)
 \openout1 = `EnhancedSamplingToolkit.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 125.
-LaTeX Font Info:    ... okay on input line 125.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 125.
-LaTeX Font Info:    ... okay on input line 125.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 125.
-LaTeX Font Info:    ... okay on input line 125.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 125.
-LaTeX Font Info:    ... okay on input line 125.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 125.
-LaTeX Font Info:    ... okay on input line 125.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 125.
-LaTeX Font Info:    ... okay on input line 125.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 125.
-LaTeX Font Info:    Try loading font information for TS1+cmr on input line 125.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 136.
+LaTeX Font Info:    ... okay on input line 136.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 136.
+LaTeX Font Info:    ... okay on input line 136.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 136.
+LaTeX Font Info:    ... okay on input line 136.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 136.
+LaTeX Font Info:    ... okay on input line 136.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 136.
+LaTeX Font Info:    ... okay on input line 136.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 136.
+LaTeX Font Info:    ... okay on input line 136.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 136.
+LaTeX Font Info:    Try loading font information for TS1+cmr on input line 136.
 
 
 (/usr/local/texlive/2015/texmf-dist/tex/latex/base/ts1cmr.fd
 File: ts1cmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
-LaTeX Font Info:    ... okay on input line 125.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 125.
-LaTeX Font Info:    ... okay on input line 125.
-LaTeX Font Info:    Try loading font information for T1+ptm on input line 125.
+LaTeX Font Info:    ... okay on input line 136.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 136.
+LaTeX Font Info:    ... okay on input line 136.
+LaTeX Font Info:    Try loading font information for T1+ptm on input line 136.
 
 (/usr/local/texlive/2015/texmf-dist/tex/latex/psnfss/t1ptm.fd
 File: t1ptm.fd 2001/06/04 font definitions for T1/ptm.
@@ -849,12 +887,12 @@ File: t1ptm.fd 2001/06/04 font definitions for T1/ptm.
 \scratchbox=\box42
 \nofMPsegments=\count127
 \nofMParguments=\count128
-\everyMPshowfont=\toks33
+\everyMPshowfont=\toks30
 \MPscratchCnt=\count129
 \MPscratchDim=\dimen142
 \MPnumerator=\count130
 \makeMPintoPDFobject=\count131
-\everyMPtoPDFconversion=\toks34
+\everyMPtoPDFconversion=\toks31
 ) (/usr/local/texlive/2015/texmf-dist/tex/latex/oberdiek/epstopdf-base.sty
 Package: epstopdf-base 2010/02/09 v2.5 Base part for package epstopdf
 
@@ -871,7 +909,7 @@ File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
 \AtBeginShipoutBox=\box43
-Package hyperref Info: Link coloring ON on input line 125.
+Package hyperref Info: Link coloring ON on input line 136.
 
 (/usr/local/texlive/2015/texmf-dist/tex/latex/hyperref/nameref.sty
 Package: nameref 2012/10/27 v2.43 Cross-referencing by name of section
@@ -881,38 +919,49 @@ Package: gettitlestring 2010/12/03 v1.4 Cleanup title references (HO)
 )
 \c@section@level=\count132
 )
-LaTeX Info: Redefining \ref on input line 125.
-LaTeX Info: Redefining \pageref on input line 125.
-LaTeX Info: Redefining \nameref on input line 125.
+LaTeX Info: Redefining \ref on input line 136.
+LaTeX Info: Redefining \pageref on input line 136.
+LaTeX Info: Redefining \nameref on input line 136.
 
 (./EnhancedSamplingToolkit.out) (./EnhancedSamplingToolkit.out)
 \@outlinefile=\write6
 \openout6 = `EnhancedSamplingToolkit.out'.
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 128--128
+Underfull \hbox (badness 10000) in paragraph at lines 139--139
 
  []
 
-LaTeX Font Info:    Try loading font information for T1+phv on input line 128.
+LaTeX Font Info:    Try loading font information for T1+phv on input line 139.
 (/usr/local/texlive/2015/texmf-dist/tex/latex/psnfss/t1phv.fd
 File: t1phv.fd 2001/06/04 scalable font definitions for T1/phv.
 )
 LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <24.88> not available
-(Font)              Font shape `T1/phv/b/n' tried instead on input line 128.
+(Font)              Font shape `T1/phv/b/n' tried instead on input line 139.
 LaTeX Font Info:    Font shape `T1/phv/m/it' in size <17.28> not available
-(Font)              Font shape `T1/phv/m/sl' tried instead on input line 128.
+(Font)              Font shape `T1/phv/m/sl' tried instead on input line 139.
 LaTeX Font Info:    Font shape `T1/phv/bx/it' in size <17.28> not available
-(Font)              Font shape `T1/phv/b/it' tried instead on input line 128.
+(Font)              Font shape `T1/phv/b/it' tried instead on input line 139.
 LaTeX Font Info:    Font shape `T1/phv/b/it' in size <17.28> not available
-(Font)              Font shape `T1/phv/b/sl' tried instead on input line 128.
+(Font)              Font shape `T1/phv/b/sl' tried instead on input line 139.
 LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <17.28> not available
-(Font)              Font shape `T1/phv/b/n' tried instead on input line 128.
-<<ot1.cmap>><<oml.cmap>><<oms.cmap>><<omx.cmap>> [1
+(Font)              Font shape `T1/phv/b/n' tried instead on input line 139.
+<<ot1.cmap>><<oml.cmap>><<oms.cmap>><<omx.cmap>>
+LaTeX Font Info:    Try loading font information for U+msa on input line 139.
+
+(/usr/local/texlive/2015/texmf-dist/tex/latex/amsfonts/umsa.fd
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
+)
+LaTeX Font Info:    Try loading font information for U+msb on input line 139.
+
+(/usr/local/texlive/2015/texmf-dist/tex/latex/amsfonts/umsb.fd
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+) [1
 
 {/usr/local/texlive/2015/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2
 
-] (./EnhancedSamplingToolkit.toc
+]
+(./EnhancedSamplingToolkit.toc
 LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <10> not available
 (Font)              Font shape `T1/ptm/b/n' tried instead on input line 2.
 )
@@ -922,17 +971,17 @@ LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <10> not available
 
 Adding blank page after the table of contents.
 LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <10> not available
-(Font)              Font shape `T1/phv/b/n' tried instead on input line 128.
+(Font)              Font shape `T1/phv/b/n' tried instead on input line 139.
 [1
 
 ] [2]
 Chapter 1.
 LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <14.4> not available
-(Font)              Font shape `T1/phv/b/n' tried instead on input line 133.
+(Font)              Font shape `T1/phv/b/n' tried instead on input line 144.
 LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <14.4> not available
-(Font)              Font shape `T1/ptm/b/n' tried instead on input line 133.
+(Font)              Font shape `T1/ptm/b/n' tried instead on input line 144.
 LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <24.88> not available
-(Font)              Font shape `T1/ptm/b/n' tried instead on input line 133.
+(Font)              Font shape `T1/ptm/b/n' tried instead on input line 144.
 [1
 
 
@@ -940,51 +989,51 @@ LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <24.88> not available
 
 ]
 Chapter 2.
-LaTeX Font Info:    Try loading font information for T1+pcr on input line 163.
+LaTeX Font Info:    Try loading font information for T1+pcr on input line 174.
 (/usr/local/texlive/2015/texmf-dist/tex/latex/psnfss/t1pcr.fd
 File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
 )
 LaTeX Font Info:    Font shape `T1/pcr/bx/n' in size <10> not available
-(Font)              Font shape `T1/pcr/b/n' tried instead on input line 163.
+(Font)              Font shape `T1/pcr/b/n' tried instead on input line 174.
  [3]
 LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <12> not available
-(Font)              Font shape `T1/phv/b/n' tried instead on input line 280.
+(Font)              Font shape `T1/phv/b/n' tried instead on input line 291.
 
-Underfull \hbox (badness 10000) in paragraph at lines 286--286
+Underfull \hbox (badness 10000) in paragraph at lines 297--297
 []\T1/ptm/m/it/10 temperature\T1/ptm/m/n/10 , \T1/ptm/m/it/10 damp-ing_coeffici
 ent\T1/ptm/m/n/10 , \T1/ptm/m/it/10 shake=False\T1/ptm/m/n/10 , \T1/ptm/m/it/10
  seed=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 lin-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 294--294
+Underfull \hbox (badness 10000) in paragraph at lines 305--305
 []\T1/ptm/m/it/10 temperature\T1/ptm/m/n/10 , \T1/ptm/m/it/10 damp-ing_coeffici
 ent\T1/ptm/m/n/10 , \T1/ptm/m/it/10 shake=False\T1/ptm/m/n/10 , \T1/ptm/m/it/10
  seed=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 lin-
  []
 
 [4]
-LaTeX Font Info:    Try loading font information for TS1+ptm on input line 343.
+LaTeX Font Info:    Try loading font information for TS1+ptm on input line 354.
 
  (/usr/local/texlive/2015/texmf-dist/tex/latex/psnfss/ts1ptm.fd
 File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
 )
-Overfull \hbox (22.14064pt too wide) in paragraph at lines 376--376
+Overfull \hbox (22.14064pt too wide) in paragraph at lines 387--387
 []
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 376--376
+Underfull \hbox (badness 10000) in paragraph at lines 387--387
 
  []
 
 
-Overfull \hbox (185.60857pt too wide) in paragraph at lines 397--397
+Overfull \hbox (185.60857pt too wide) in paragraph at lines 408--408
 []
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 397--397
+Underfull \hbox (badness 10000) in paragraph at lines 408--408
 
  []
 
@@ -992,128 +1041,104 @@ Underfull \hbox (badness 10000) in paragraph at lines 397--397
 
 ]
 Chapter 3.
-[9] [10]
-Underfull \hbox (badness 10000) in paragraph at lines 796--798
-[]\T1/ptm/m/n/10 This should ide-ally be a
+LaTeX Font Info:    Font shape `T1/pcr/bx/n' in size <9> not available
+(Font)              Font shape `T1/pcr/b/n' tried instead on input line 628.
+LaTeX Font Info:    Font shape `T1/pcr/m/it' in size <9> not available
+(Font)              Font shape `T1/pcr/m/sl' tried instead on input line 636.
+[9]
+LaTeX Font Info:    Font shape `T1/pcr/m/it' in size <10> not available
+(Font)              Font shape `T1/pcr/m/sl' tried instead on input line 699.
+
+Underfull \hbox (badness 10000) in paragraph at lines 756--756
+[]\T1/ptm/m/it/10 center\T1/ptm/m/n/10 , \T1/ptm/m/it/10 width\T1/ptm/m/n/10 , 
+\T1/ptm/m/it/10 ref_center=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 ref_width=None\
+T1/ptm/m/n/10 , \T1/ptm/m/it/10 time=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 pe-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 805--812
-[]\T1/ptm/m/n/10 where the
+Underfull \hbox (badness 10000) in paragraph at lines 756--756
+\T1/ptm/m/it/10 ri-odic_length=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 max_list_si
+ze=100\T1/ptm/m/n/10 , \T1/ptm/m/it/10 ini-tial_conditions=[]\T1/ptm/m/n/10 , \
+T1/ptm/m/it/10 ini-
  []
 
-[11] [12] [13] [14
+[10]
+Underfull \hbox (badness 10000) in paragraph at lines 867--867
+[]\T1/ptm/m/it/10 center\T1/ptm/m/n/10 , \T1/ptm/m/it/10 width\T1/ptm/m/n/10 , 
+\T1/ptm/m/it/10 ref_center=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 ref_width=None\
+T1/ptm/m/n/10 , \T1/ptm/m/it/10 time=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 pe-
+ []
 
-]
+
+Underfull \hbox (badness 10000) in paragraph at lines 867--867
+\T1/ptm/m/it/10 ri-odic_length=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 max_list_si
+ze=100\T1/ptm/m/n/10 , \T1/ptm/m/it/10 ini-tial_conditions=[]\T1/ptm/m/n/10 , \
+T1/ptm/m/it/10 ini-
+ []
+
+[11] [12]
 Chapter 4.
-[15] [16
+[13
 
-] [17
+] [14
+
+] [15
 
 
-] (./EnhancedSamplingToolkit.ind [18
+] (./EnhancedSamplingToolkit.ind [16
 
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 6--7
-[]\T1/ptm/m/n/10 add_entry_point() (ba-s-is-Func-tions.basisFunction
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 7--8
-[]\T1/ptm/m/n/10 add_local_obserbale() (ba-s-is-Func-tions.basisFunction
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 8--9
-[]\T1/ptm/m/n/10 add_new_entry_point() (ba-s-is-Func-tions.basisFunction
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 19--20
-[]\T1/ptm/m/n/10 build_keylist_to_index_map() (par-ti-tion.partition
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 36--37
+Underfull \hbox (badness 10000) in paragraph at lines 30--31
 []\T1/ptm/m/n/10 destroyColvars() (lammp-sWalker.lammpsWalker
  []
 
-
-Underfull \hbox (badness 10000) in paragraph at lines 48--49
-[]\T1/ptm/m/n/10 empty_new_entry_points() (ba-s-is-Func-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 56--57
-[]\T1/ptm/m/n/10 flush_data_to_file() (ba-s-is-Func-tions.basisFunction
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 62--63
-[]\T1/ptm/m/n/10 get_entry_point() (ba-s-is-Func-tions.basisFunction
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 63--64
-[]\T1/ptm/m/n/10 get_local_observales() (ba-s-is-Func-tions.basisFunction
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 75--76
-[]\T1/ptm/m/n/10 initialize_entry_points() (ba-s-is-Func-tions.basisFunction
- []
-
-[19
+[17
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 114--115
-[]\T1/ptm/m/n/10 remove_local_observales() (ba-s-is-Func-
+Underfull \hbox (badness 10000) in paragraph at lines 102--103
+[]\T1/ptm/m/n/10 set_initial_conditions_probability() (win-dow.window
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 131--132
+Underfull \hbox (badness 10000) in paragraph at lines 109--110
 []\T1/ptm/m/n/10 setTemperature() (lammp-sWalker.lammpsWalker
  []
 
+[18
 
-Underfull \hbox (badness 10000) in paragraph at lines 143--144
-[]\T1/ptm/m/n/10 update_entry_points_fluxes() (ba-s-is-Func-
- []
-
-[20])
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1138.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 1138.
+])
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 992.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 992.
  (./EnhancedSamplingToolkit.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1138.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1138.
-
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 992.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 992.
 Package rerunfilecheck Info: File `EnhancedSamplingToolkit.out' has not changed
 .
-(rerunfilecheck)             Checksum: 5A50E3878EF8348E7D28FB6E66E6ACD4;814.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1138.
+(rerunfilecheck)             Checksum: BE15981D57130679EBCA9A52B444708E;1202.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 992.
  ) 
 Here is how much of TeX's memory you used:
- 9406 strings out of 493089
- 136449 string characters out of 6134842
- 237319 words of memory out of 5000000
- 12503 multiletter control sequences out of 15000+600000
- 57958 words of font info for 63 fonts, out of 8000000 for 9000
+ 10289 strings out of 493089
+ 146791 string characters out of 6134842
+ 250584 words of memory out of 5000000
+ 13359 multiletter control sequences out of 15000+600000
+ 64379 words of font info for 82 fonts, out of 8000000 for 9000
  1142 hyphenation exceptions out of 8191
- 36i,12n,45p,706b,524s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 36i,12n,45p,1327b,480s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2015/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/t
 exlive/2015/texmf-dist/fonts/type1/urw/courier/ucrb8a.pfb></usr/local/texlive/2
 015/texmf-dist/fonts/type1/urw/courier/ucrr8a.pfb></usr/local/texlive/2015/texm
-f-dist/fonts/type1/urw/helvetic/uhvb8a.pfb></usr/local/texlive/2015/texmf-dist/
-fonts/type1/urw/helvetic/uhvbo8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/
-type1/urw/helvetic/uhvr8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/u
-rw/times/utmb8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/urw/times/u
-tmr8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/urw/times/utmri8a.pfb
->
-Output written on EnhancedSamplingToolkit.pdf (24 pages, 137440 bytes).
+f-dist/fonts/type1/urw/courier/ucrro8a.pfb></usr/local/texlive/2015/texmf-dist/
+fonts/type1/urw/helvetic/uhvb8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/t
+ype1/urw/helvetic/uhvbo8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/u
+rw/helvetic/uhvr8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/urw/time
+s/utmb8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/urw/times/utmr8a.p
+fb></usr/local/texlive/2015/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
+Output written on EnhancedSamplingToolkit.pdf (22 pages, 141998 bytes).
 PDF statistics:
- 446 PDF objects out of 1000 (max. 8388607)
- 402 compressed objects within 5 object streams
- 133 named destinations out of 1000 (max. 500000)
- 125 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 414 PDF objects out of 1000 (max. 8388607)
+ 372 compressed objects within 4 object streams
+ 110 named destinations out of 1000 (max. 500000)
+ 165 words of extra memory for PDF output out of 10000 (max. 10000000)
 

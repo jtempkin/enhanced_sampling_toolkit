@@ -1,7 +1,7 @@
 This is makeindex, version 2.15 [TeX Live 2015] (kpathsea + Thai support).
 Scanning style file ./python.ist......done (6 attributes redefined, 0 ignored).
-Scanning input file EnhancedSamplingToolkit.idx....done (94 entries accepted, 0 rejected).
-Sorting entries....done (651 comparisons).
-Generating output file EnhancedSamplingToolkit.ind....done (151 lines written, 0 warnings).
+Scanning input file EnhancedSamplingToolkit.idx....done (73 entries accepted, 0 rejected).
+Sorting entries....done (504 comparisons).
+Generating output file EnhancedSamplingToolkit.ind....done (130 lines written, 0 warnings).
 Output written in EnhancedSamplingToolkit.ind.
 Transcript written in EnhancedSamplingToolkit.ilg.

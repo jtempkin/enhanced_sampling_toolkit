@@ -31,6 +31,7 @@
 \indexentry{getColvars() (lammpsWalker.lammpsWalker method)|hyperpage}{6}
 \indexentry{getConfig() (lammpsWalker.lammpsWalker method)|hyperpage}{6}
 \indexentry{getVel() (lammpsWalker.lammpsWalker method)|hyperpage}{6}
+\indexentry{get\_time() (lammpsWalker.lammpsWalker method)|hyperpage}{6}
 \indexentry{minimize() (lammpsWalker.lammpsWalker method)|hyperpage}{6}
 \indexentry{propagate() (lammpsWalker.lammpsWalker method)|hyperpage}{6}
 \indexentry{removeOutput() (lammpsWalker.lammpsWalker method)|hyperpage}{6}
@@ -41,41 +42,27 @@
 \indexentry{setTemperature() (lammpsWalker.lammpsWalker method)|hyperpage}{6}
 \indexentry{setTimestep() (lammpsWalker.lammpsWalker method)|hyperpage}{6}
 \indexentry{setVel() (lammpsWalker.lammpsWalker method)|hyperpage}{6}
-\indexentry{partition (module)|hyperpage}{9}
-\indexentry{partition (class in partition)|hyperpage}{9}
-\indexentry{accumulateObservables() (partition.partition method)|hyperpage}{9}
-\indexentry{addObservable() (partition.partition method)|hyperpage}{9}
-\indexentry{build\_keylist\_to\_index\_map() (partition.partition method)|hyperpage}{9}
-\indexentry{build\_neighbor\_list() (partition.partition method)|hyperpage}{9}
-\indexentry{communicateMPI() (partition.partition method)|hyperpage}{9}
-\indexentry{computeObservables() (partition.partition method)|hyperpage}{9}
-\indexentry{computeZ() (partition.partition method)|hyperpage}{9}
-\indexentry{get\_basis\_function\_values() (partition.partition method)|hyperpage}{10}
-\indexentry{reinject() (partition.partition method)|hyperpage}{10}
-\indexentry{removeObservable() (partition.partition method)|hyperpage}{10}
-\indexentry{resetObservable() (partition.partition method)|hyperpage}{10}
-\indexentry{sample() (partition.partition method)|hyperpage}{10}
-\indexentry{set\_umbrellas() (partition.partition method)|hyperpage}{10}
-\indexentry{updateF() (partition.partition method)|hyperpage}{10}
-\indexentry{basisFunctions (module)|hyperpage}{10}
-\indexentry{Box (class in basisFunctions)|hyperpage}{10}
-\indexentry{indicator() (basisFunctions.Box method)|hyperpage}{10}
-\indexentry{Gaussian (class in basisFunctions)|hyperpage}{10}
-\indexentry{indicator() (basisFunctions.Gaussian method)|hyperpage}{10}
-\indexentry{Pyramid (class in basisFunctions)|hyperpage}{10}
-\indexentry{ref\_indicator() (basisFunctions.Pyramid method)|hyperpage}{11}
-\indexentry{time\_indicator() (basisFunctions.Pyramid method)|hyperpage}{11}
-\indexentry{basisFunction (class in basisFunctions)|hyperpage}{11}
-\indexentry{add\_entry\_point() (basisFunctions.basisFunction method)|hyperpage}{11}
-\indexentry{add\_local\_obserbale() (basisFunctions.basisFunction method)|hyperpage}{11}
-\indexentry{add\_new\_entry\_point() (basisFunctions.basisFunction method)|hyperpage}{11}
-\indexentry{empty\_new\_entry\_points() (basisFunctions.basisFunction method)|hyperpage}{11}
-\indexentry{flush\_data\_to\_file() (basisFunctions.basisFunction method)|hyperpage}{11}
-\indexentry{get\_entry\_point() (basisFunctions.basisFunction method)|hyperpage}{11}
-\indexentry{get\_local\_observales() (basisFunctions.basisFunction method)|hyperpage}{11}
-\indexentry{initialize\_entry\_points() (basisFunctions.basisFunction method)|hyperpage}{11}
-\indexentry{remove\_local\_observales() (basisFunctions.basisFunction method)|hyperpage}{12}
-\indexentry{update\_entry\_points\_fluxes() (basisFunctions.basisFunction method)|hyperpage}{12}
+\indexentry{set\_time() (lammpsWalker.lammpsWalker method)|hyperpage}{6}
+\indexentry{partition (class in partition)|hyperpage}{10}
+\indexentry{\_\_call\_\_() (partition.partition method)|hyperpage}{10}
+\indexentry{\_\_init\_\_() (partition.partition method)|hyperpage}{10}
+\indexentry{append() (partition.partition method)|hyperpage}{10}
+\indexentry{index() (partition.partition method)|hyperpage}{10}
+\indexentry{window (module)|hyperpage}{10}
+\indexentry{window (class in window)|hyperpage}{10}
+\indexentry{add\_entry\_point() (window.window method)|hyperpage}{11}
+\indexentry{clear\_flux\_list() (window.window method)|hyperpage}{11}
+\indexentry{get\_entry\_point() (window.window method)|hyperpage}{11}
+\indexentry{get\_flux\_lists() (window.window method)|hyperpage}{11}
+\indexentry{get\_initial\_conditions() (window.window method)|hyperpage}{11}
+\indexentry{reinject() (window.window method)|hyperpage}{11}
+\indexentry{set\_initial\_conditions() (window.window method)|hyperpage}{11}
+\indexentry{set\_initial\_conditions\_probability() (window.window method)|hyperpage}{11}
+\indexentry{update\_fluxes() (window.window method)|hyperpage}{11}
+\indexentry{pyramid (module)|hyperpage}{11}
+\indexentry{Pyramid (class in pyramid)|hyperpage}{11}
+\indexentry{ref\_indicator() (pyramid.Pyramid method)|hyperpage}{11}
+\indexentry{time\_indicator() (pyramid.Pyramid method)|hyperpage}{11}
 \indexentry{entryPoints (module)|hyperpage}{12}
 \indexentry{entry\_point (class in entryPoints)|hyperpage}{12}
 \indexentry{cv (entryPoints.entry\_point attribute)|hyperpage}{12}
@@ -84,11 +71,3 @@
 \indexentry{ref\_p (entryPoints.entry\_point attribute)|hyperpage}{12}
 \indexentry{ref\_q (entryPoints.entry\_point attribute)|hyperpage}{12}
 \indexentry{time (entryPoints.entry\_point attribute)|hyperpage}{12}
-\indexentry{observables (module)|hyperpage}{12}
-\indexentry{P1 (class in observables)|hyperpage}{12}
-\indexentry{cv\_indicator\_correlation (class in observables)|hyperpage}{13}
-\indexentry{dihedral\_fluctuation\_correlation (class in observables)|hyperpage}{13}
-\indexentry{dihedral\_fluctuation\_correlation\_2 (class in observables)|hyperpage}{13}
-\indexentry{dist\_fluctuation\_correlation (class in observables)|hyperpage}{13}
-\indexentry{electric\_field (class in observables)|hyperpage}{13}
-\indexentry{pmf (class in observables)|hyperpage}{13}

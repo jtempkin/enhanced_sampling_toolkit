@@ -8,38 +8,29 @@ Nonequilibrium Umbrella Sampling
 
 The Nonequilibrium Umbrella Sampling (NEUS) application module provides a flexible set of tools built on top of the Walker API that implements the found in **Tempkin et at, in prep**. 
 
-More detailed examples of the specific implementations of the use of the can be found in the examples subdirectory. 
+The NEUS application tools developed here include three things
 
-Partition Module
-<<<<<<<<<<<<<<<<<<<
+* an module called Window that implements the data structures and routines that represent a single spatiotemporal discretization in the NEUS scheme. In the paper, this would correspond to a single value of the J(t) process.
+* a module called partition that represents a collection of these windows.
+* a set of routines for solving the affine eigenvalue problem.
 
-The partition module provides a simple structure for handling and manipulating a list of windows. The partition module is effectively a callable Python list. As such, it supports. 
+DEV: Put here a basic overview of the types of calculations one can do using this code base with a reference to the testable code in the examples/ subdirectory.
 
-To initialize a partition object:
+* A summary of some of the results or a summary of a basic implementation could be really useful here. 
+* Include a LAMMPS walker implementation of NEUS on the dipeptide example (should illustration the usage model in a real application)
 
->>> from est.neus import partition
->>> import numpy as np
->>> sys = partition.partition()
+Partition Module Basic Usage
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-One can add elements to the partition one by one:
+.. include:: neus/partition-basic-usage.rst
 
->>> 
+.. include:: neus/Untitled.rst
 
-Or hand partition a list at initialization:
-
->>> from est.neus import Box
->>> windows = [Box.box(i,j) for i in range(5) for j in range(10)]
->>> sys = partition.partition(windows)
->>> print sys
-
-Note that partition requires the elements it contains to be callable items. Partition will enforce this behavior:
-
->>> sys.append("not callable")
-
-See below for a more detailed specification.
+Partition Class
+##################
 
 .. autoclass:: partition.partition
-    :members:
+    :members: __init__, __call__, index, append
 
 Window Module
 <<<<<<<<<<<<<<<<<<<<<<<
@@ -60,6 +51,9 @@ To
 The Pyramid module implements a support function for the Window class of the form:
 
 **equation**.
+
+Pyramid Class
+################
 
 .. automodule:: pyramid
     :members:

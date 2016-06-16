@@ -1,0 +1,230 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>&lt;no title&gt; &mdash; Enhanced Sampling Toolkit 0.1a documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Enhanced Sampling Toolkit 0.1a documentation" href="../../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Enhanced Sampling Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../intro.doc.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../walker_api/walker_api.doc.html">Walker API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../applications.doc.html">Applications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/examples.doc.html">Examples - NEUS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../test/testing.doc.html">Testing</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">Enhanced Sampling Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+    <li>&lt;no title&gt;</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../../_sources/applications/neus/partition-basic-usage.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <p>The partition module provides a simple structure for handling and
+manipulating a list of windows. The partition module is effectively a
+callable Python list.</p>
+<p>To initialize a partition object:</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">partition</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="n">sys</span> <span class="o">=</span> <span class="n">partition</span><span class="o">.</span><span class="n">partition</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>One can add elements to the partition one by one:</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span></span><span class="c1"># import a window object with a pyramid support</span>
+<span class="kn">import</span> <span class="nn">pyramid</span>
+<span class="n">win</span> <span class="o">=</span> <span class="n">pyramid</span><span class="o">.</span><span class="n">Pyramid</span><span class="p">([</span><span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">])</span>
+
+<span class="n">sys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">win</span><span class="p">)</span>
+
+<span class="k">print</span> <span class="n">sys</span>
+</pre></div>
+</div>
+<div class="code highlight-python"><div class="highlight"><pre><span></span><span class="n">partition</span><span class="p">([</span><span class="n">Pyramid</span><span class="p">([</span> <span class="mf">0.</span><span class="p">],</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">([</span> <span class="mf">0.</span><span class="p">],</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">([</span> <span class="mf">0.</span><span class="p">],</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">])])</span>
+</pre></div>
+</div>
+<p>Or hand partition a list at initialization:</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span></span><span class="n">windows</span> <span class="o">=</span> <span class="p">[</span><span class="n">pyramid</span><span class="o">.</span><span class="n">Pyramid</span><span class="p">(</span><span class="n">i</span><span class="p">,[</span><span class="mf">1.0</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="mi">11</span><span class="p">)]</span>
+<span class="n">sys</span> <span class="o">=</span> <span class="n">partition</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="n">windows</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">sys</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">partition</span><span class="p">([</span><span class="n">Pyramid</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">(</span><span class="mf">3.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">(</span><span class="mf">4.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">(</span><span class="mf">5.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">(</span><span class="mf">6.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">(</span><span class="mf">7.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">(</span><span class="mf">8.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">(</span><span class="mf">9.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">])])</span>
+</pre></div>
+</div>
+<p>Further, partition supports the addition operation for merging two
+partition objects:</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span></span><span class="c1">#union = sys1 + sys2</span>
+<span class="c1">#print union</span>
+</pre></div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Jeremy O. B. Tempkin.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.1a',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

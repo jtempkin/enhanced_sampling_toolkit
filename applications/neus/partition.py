@@ -1,3 +1,36 @@
+"""
+
+Or hand partition a list at initialization:
+
+>>> from est.neus import Box
+>>> windows = [Box.box(i,j) for i in range(5) for j in range(10)]
+>>> sys = partition.partition(windows)
+>>> print sys
+
+Note that partition requires the elements it contains to be callable items. Partition will enforce this behavior:
+
+>>> sys.append("not callable")
+
+See below for a more detailed specification.
+
+Here we will show some basic usage of the partition class.
+
+.. code:: python
+
+    import numpy as np
+    import window
+
+.. code:: python
+
+    wins = [i for i in range(10)]
+    print wins
+
+
+.. parsed-literal::
+
+    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+"""
+
 import numpy as np
 import errors
 

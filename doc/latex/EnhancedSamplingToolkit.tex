@@ -605,58 +605,106 @@ We plan to implement an OpenMM walker API module in a future release.
 \label{applications/applications.doc:nonequilibrium-umbrella-sampling}
 The Nonequilibrium Umbrella Sampling (NEUS) application module provides a flexible set of tools built on top of the Walker API that implements the found in \textbf{Tempkin et at, in prep}.
 
-More detailed examples of the specific implementations of the use of the can be found in the examples subdirectory.
+Put here a basic overview of the types of calculations one can do using this code base with a reference to the testable code in the examples/ subdirectory.
+\begin{itemize}
+\item {} 
+A summary of some of the results or a summary of a basic implementation could be really useful here.
+
+\item {} 
+Include a LAMMPS walker implementation of NEUS on the di
+
+\end{itemize}
 
 
-\subsection{Partition Module}
-\label{applications/applications.doc:partition-module}
-The partition module provides a simple structure for handling and manipulating a list of windows. The partition module is effectively a callable Python list. As such, it supports.
+\subsection{Partition Module Basic Usage}
+\label{applications/applications.doc:partition-module-basic-usage}
+The partition module provides a simple structure for handling and
+manipulating a list of windows. The partition module is effectively a
+callable Python list.
 
 To initialize a partition object:
 
 \begin{Verbatim}[commandchars=\\\{\}]
-\PYG{g+gp}{\PYGZgt{}\PYGZgt{}\PYGZgt{} }\PYG{k+kn}{from} \PYG{n+nn}{est}\PYG{n+nn}{.}\PYG{n+nn}{neus} \PYG{k}{import} \PYG{n}{partition}
-\PYG{g+gp}{\PYGZgt{}\PYGZgt{}\PYGZgt{} }\PYG{k+kn}{import} \PYG{n+nn}{numpy} \PYG{k}{as} \PYG{n+nn}{np}
-\PYG{g+gp}{\PYGZgt{}\PYGZgt{}\PYGZgt{} }\PYG{n}{sys} \PYG{o}{=} \PYG{n}{partition}\PYG{o}{.}\PYG{n}{partition}\PYG{p}{(}\PYG{p}{)}
+\PYG{k+kn}{import} \PYG{n+nn}{partition}
+\PYG{k+kn}{import} \PYG{n+nn}{numpy} \PYG{k}{as} \PYG{n+nn}{np}
+\PYG{n}{sys} \PYG{o}{=} \PYG{n}{partition}\PYG{o}{.}\PYG{n}{partition}\PYG{p}{(}\PYG{p}{)}
 \end{Verbatim}
 
 One can add elements to the partition one by one:
 
 \begin{Verbatim}[commandchars=\\\{\}]
-\PYG{g+go}{\PYGZgt{}\PYGZgt{}\PYGZgt{}}
+\PYG{c+c1}{\PYGZsh{} import a window object with a pyramid support}
+\PYG{k+kn}{import} \PYG{n+nn}{pyramid}
+\PYG{n}{win} \PYG{o}{=} \PYG{n}{pyramid}\PYG{o}{.}\PYG{n}{Pyramid}\PYG{p}{(}\PYG{p}{[}\PYG{l+m+mf}{0.0}\PYG{p}{]}\PYG{p}{,} \PYG{p}{[}\PYG{l+m+mf}{1.0}\PYG{p}{]}\PYG{p}{)}
+
+\PYG{n}{sys}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{win}\PYG{p}{)}
+
+\PYG{n+nb}{print} \PYG{n}{sys}
+\end{Verbatim}
+
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{n}{partition}\PYG{p}{(}\PYG{p}{[}\PYG{n}{Pyramid}\PYG{p}{(}\PYG{p}{[} \PYG{l+m+mf}{0.}\PYG{p}{]}\PYG{p}{,} \PYG{p}{[} \PYG{l+m+mf}{1.}\PYG{p}{]}\PYG{p}{)}\PYG{p}{,} \PYG{n}{Pyramid}\PYG{p}{(}\PYG{p}{[} \PYG{l+m+mf}{0.}\PYG{p}{]}\PYG{p}{,} \PYG{p}{[} \PYG{l+m+mf}{1.}\PYG{p}{]}\PYG{p}{)}\PYG{p}{,} \PYG{n}{Pyramid}\PYG{p}{(}\PYG{p}{[} \PYG{l+m+mf}{0.}\PYG{p}{]}\PYG{p}{,} \PYG{p}{[} \PYG{l+m+mf}{1.}\PYG{p}{]}\PYG{p}{)}\PYG{p}{]}\PYG{p}{)}
 \end{Verbatim}
 
 Or hand partition a list at initialization:
 
 \begin{Verbatim}[commandchars=\\\{\}]
-\PYG{g+gp}{\PYGZgt{}\PYGZgt{}\PYGZgt{} }\PYG{k+kn}{from} \PYG{n+nn}{est}\PYG{n+nn}{.}\PYG{n+nn}{neus} \PYG{k}{import} \PYG{n}{Box}
-\PYG{g+gp}{\PYGZgt{}\PYGZgt{}\PYGZgt{} }\PYG{n}{windows} \PYG{o}{=} \PYG{p}{[}\PYG{n}{Box}\PYG{o}{.}\PYG{n}{box}\PYG{p}{(}\PYG{n}{i}\PYG{p}{,}\PYG{n}{j}\PYG{p}{)} \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{l+m+mi}{5}\PYG{p}{)} \PYG{k}{for} \PYG{n}{j} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{l+m+mi}{10}\PYG{p}{)}\PYG{p}{]}
-\PYG{g+gp}{\PYGZgt{}\PYGZgt{}\PYGZgt{} }\PYG{n}{sys} \PYG{o}{=} \PYG{n}{partition}\PYG{o}{.}\PYG{n}{partition}\PYG{p}{(}\PYG{n}{windows}\PYG{p}{)}
-\PYG{g+gp}{\PYGZgt{}\PYGZgt{}\PYGZgt{} }\PYG{n+nb}{print} \PYG{n}{sys}
+\PYG{n}{windows} \PYG{o}{=} \PYG{p}{[}\PYG{n}{pyramid}\PYG{o}{.}\PYG{n}{Pyramid}\PYG{p}{(}\PYG{n}{i}\PYG{p}{,}\PYG{p}{[}\PYG{l+m+mf}{1.0}\PYG{p}{]}\PYG{p}{)} \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n}{np}\PYG{o}{.}\PYG{n}{linspace}\PYG{p}{(}\PYG{l+m+mf}{0.0}\PYG{p}{,} \PYG{l+m+mf}{10.0}\PYG{p}{,} \PYG{l+m+mi}{11}\PYG{p}{)}\PYG{p}{]}
+\PYG{n}{sys} \PYG{o}{=} \PYG{n}{partition}\PYG{o}{.}\PYG{n}{partition}\PYG{p}{(}\PYG{n}{windows}\PYG{p}{)}
+\PYG{n+nb}{print} \PYG{n}{sys}
 \end{Verbatim}
-
-Note that partition requires the elements it contains to be callable items. Partition will enforce this behavior:
 
 \begin{Verbatim}[commandchars=\\\{\}]
-\PYG{g+gp}{\PYGZgt{}\PYGZgt{}\PYGZgt{} }\PYG{n}{sys}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{not callable}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+\PYG{n}{partition}\PYG{p}{(}\PYG{p}{[}\PYG{n}{Pyramid}\PYG{p}{(}\PYG{l+m+mf}{0.0}\PYG{p}{,} \PYG{p}{[} \PYG{l+m+mf}{1.}\PYG{p}{]}\PYG{p}{)}\PYG{p}{,} \PYG{n}{Pyramid}\PYG{p}{(}\PYG{l+m+mf}{1.0}\PYG{p}{,} \PYG{p}{[} \PYG{l+m+mf}{1.}\PYG{p}{]}\PYG{p}{)}\PYG{p}{,} \PYG{n}{Pyramid}\PYG{p}{(}\PYG{l+m+mf}{2.0}\PYG{p}{,} \PYG{p}{[} \PYG{l+m+mf}{1.}\PYG{p}{]}\PYG{p}{)}\PYG{p}{,} \PYG{n}{Pyramid}\PYG{p}{(}\PYG{l+m+mf}{3.0}\PYG{p}{,} \PYG{p}{[} \PYG{l+m+mf}{1.}\PYG{p}{]}\PYG{p}{)}\PYG{p}{,} \PYG{n}{Pyramid}\PYG{p}{(}\PYG{l+m+mf}{4.0}\PYG{p}{,} \PYG{p}{[} \PYG{l+m+mf}{1.}\PYG{p}{]}\PYG{p}{)}\PYG{p}{,} \PYG{n}{Pyramid}\PYG{p}{(}\PYG{l+m+mf}{5.0}\PYG{p}{,} \PYG{p}{[} \PYG{l+m+mf}{1.}\PYG{p}{]}\PYG{p}{)}\PYG{p}{,} \PYG{n}{Pyramid}\PYG{p}{(}\PYG{l+m+mf}{6.0}\PYG{p}{,} \PYG{p}{[} \PYG{l+m+mf}{1.}\PYG{p}{]}\PYG{p}{)}\PYG{p}{,} \PYG{n}{Pyramid}\PYG{p}{(}\PYG{l+m+mf}{7.0}\PYG{p}{,} \PYG{p}{[} \PYG{l+m+mf}{1.}\PYG{p}{]}\PYG{p}{)}\PYG{p}{,} \PYG{n}{Pyramid}\PYG{p}{(}\PYG{l+m+mf}{8.0}\PYG{p}{,} \PYG{p}{[} \PYG{l+m+mf}{1.}\PYG{p}{]}\PYG{p}{)}\PYG{p}{,} \PYG{n}{Pyramid}\PYG{p}{(}\PYG{l+m+mf}{9.0}\PYG{p}{,} \PYG{p}{[} \PYG{l+m+mf}{1.}\PYG{p}{]}\PYG{p}{)}\PYG{p}{,} \PYG{n}{Pyramid}\PYG{p}{(}\PYG{l+m+mf}{10.0}\PYG{p}{,} \PYG{p}{[} \PYG{l+m+mf}{1.}\PYG{p}{]}\PYG{p}{)}\PYG{p}{]}\PYG{p}{)}
 \end{Verbatim}
 
-See below for a more detailed specification.
-\phantomsection\label{applications/applications.doc:module-partition}\index{partition (module)}\index{partition (class in partition)}
+Further, partition supports the addition operation for merging two
+partition objects:
+
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{}union = sys1 + sys2}
+\PYG{c+c1}{\PYGZsh{}print union}
+\end{Verbatim}
+
+
+\subsubsection{Partition Class}
+\label{applications/applications.doc:partition-class}\index{partition (class in partition)}
 
 \begin{fulllineitems}
-\phantomsection\label{applications/applications.doc:partition.partition}\pysiglinewithargsret{\strong{class }\code{partition.}\bfcode{partition}}{\emph{umbrellas={[}{]}}}{}
-Note that the call behavior of the partition object. For example:
+\phantomsection\label{applications/applications.doc:partition.partition}\pysiglinewithargsret{\strong{class }\code{partition.}\bfcode{partition}}{\emph{umbrellas={[}{]}}}{}~\index{\_\_call\_\_() (partition.partition method)}
 
-\begin{Verbatim}[commandchars=\\\{\}]
-\PYG{g+gp}{\PYGZgt{}\PYGZgt{}\PYGZgt{} }\PYG{n}{indicators} \PYG{o}{=} \PYG{n}{sys}\PYG{p}{(}\PYG{n}{wlkr}\PYG{p}{)}
-\PYG{g+gp}{\PYGZgt{}\PYGZgt{}\PYGZgt{} }\PYG{n+nb}{print} \PYG{n}{indicators}
-\end{Verbatim}
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:partition.partition.__call__}\pysiglinewithargsret{\bfcode{\_\_call\_\_}}{\emph{pos}}{}
+Return a numpy array of the normalized supports of the windows at the given.
+
+\end{fulllineitems}
+
+\index{\_\_init\_\_() (partition.partition method)}
+
+\begin{fulllineitems}
+\phantomsection\label{applications/applications.doc:partition.partition.__init__}\pysiglinewithargsret{\bfcode{\_\_init\_\_}}{\emph{umbrellas={[}{]}}}{}
+Construct an instance of the partition.
+
+\end{fulllineitems}
+
 \index{append() (partition.partition method)}
 
 \begin{fulllineitems}
 \phantomsection\label{applications/applications.doc:partition.partition.append}\pysiglinewithargsret{\bfcode{append}}{\emph{value}}{}
-Append a new value to the end of the partition
+Append a new value to the partition.
+
+Note that this enforces that the input object is callable. Will throw an exception if value is not callable.
+\begin{quote}\begin{description}
+\item[{Parameters}] \leavevmode
+\textbf{\texttt{value}} (\emph{\texttt{obj}}) -- A callable Python object.
+
+\item[{Returns}] \leavevmode
+
+
+\item[{Return type}] \leavevmode
+None
+
+\end{description}\end{quote}
 
 \end{fulllineitems}
 
@@ -665,6 +713,20 @@ Append a new value to the end of the partition
 \begin{fulllineitems}
 \phantomsection\label{applications/applications.doc:partition.partition.index}\pysiglinewithargsret{\bfcode{index}}{\emph{item}}{}
 Return the first index in which item appears in partition.
+
+Extended description.
+\begin{quote}\begin{description}
+\item[{Parameters}] \leavevmode
+\textbf{\texttt{item}} (\emph{\texttt{obj}}) -- The window object to check for membership.
+
+\item[{Returns}] \leavevmode
+\textbf{index} -- The index of item in the list. Returns ValueError if item is not
+contained in the partition.
+
+\item[{Return type}] \leavevmode
+int
+
+\end{description}\end{quote}
 
 \end{fulllineitems}
 
@@ -794,7 +856,10 @@ Set neighbor fluxes as numpy array.
 The Pyramid module implements a support function for the Window class of the form:
 
 \textbf{equation}.
-\phantomsection\label{applications/applications.doc:module-pyramid}\index{pyramid (module)}
+
+
+\subsubsection{Pyramid Class}
+\label{applications/applications.doc:pyramid-class}\label{applications/applications.doc:module-pyramid}\index{pyramid (module)}
 Class definition for Pyramid shaped window. Inherets from Window.
 \index{Pyramid (class in pyramid)}
 
@@ -915,7 +980,6 @@ To add: automatic system for scanning the package files for tests to execute. Th
 \item {\texttt{outputClass}}, \pageref{walker_api/walker_api.doc:module-outputClass}
 \indexspace
 \bigletter{p}
-\item {\texttt{partition}}, \pageref{applications/applications.doc:module-partition}
 \item {\texttt{pyramid}}, \pageref{applications/applications.doc:module-pyramid}
 \indexspace
 \bigletter{w}

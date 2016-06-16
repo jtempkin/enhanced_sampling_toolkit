@@ -1,20 +1,6 @@
 # -*- coding: utf-8 -*-
-"""
-This module implements the Walker API for the LAMMPS MD engine. See walker_base.py for a specification of the API. For details concerning the usage of the LAMMPS MD package see the excellent documentation at the LAMMPS webpage:
-
-http://lammps.sandia.gov/
-
-In particular, you may want to see how the Python wrapper to LAMMPS on which this implementation is based:
-
-http://lammps.sandia.gov/doc/Section_python.html
-
-Here we will outline basic usage guides for the walker API usage in LAMMPS. To begin using the lammpsWalker module
-
-* highlight here an example code which shows how to use the LAMMPS walker module.
-"""
 
 import random
-#import sys
 from walker_base import walker
 import collectiveVariables
 import outputClass
@@ -22,7 +8,6 @@ import numpy as np
 import ctypes
 import os
 import shutil
-#from lammps import lammps
 
 
 class lammpsWalker(walker):

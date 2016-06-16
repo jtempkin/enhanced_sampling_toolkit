@@ -12,4 +12,5 @@ Welcome to Enhanced Sampling Toolkit's documentation!
    intro.doc
    walker_api/walker_api.doc
    applications/applications.doc
+   applications/examples/examples.doc
    test/testing.doc

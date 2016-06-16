@@ -1,108 +1,120 @@
 # -*- coding: utf-8 -*-
-"""
-DEVELOPER NOTE: we may want to use abstract properties in the future. 
-"""
 import abc
 
+
 class walker(object):
-    """
-    This object acts as an abstract base class that sets the core specification defining the Walker API. These routines 
-    """
-    __metaclass__=abc.ABCMeta
-        
+    """Basic API specification of the walker object."""
+    __metaclass__ = abc.ABCMeta
+
     @abc.abstractmethod
-    def destroyColvars(self):
+    def get_position(self):
+        """Return the postiton of the walker.
+
+        The return array is provided in the format [x1, y1, z1, x2, ...].
+
+        Returns
+        ---------
+        numpy.ndarray
+            A one-dimensional array of the current coordinates.
         """
-        Removes all collective variables from the walker. 
-        """
-        return 
- 
+        return None
+
     @abc.abstractmethod
-    def addColvars(self, cv):
+    def set_position(self, configuration):
+        """Set the configuration of the system.
+
+        Takes an input array in the form of [x1, y1, z1, x2,..].
+
+        Parameters
+        --------------
+
+        configuration : numpy.ndarray
+            A one-dimentional numpy array of system coordinates.
         """
-        Adds a new collective variable to the walker. Subsequent calls to routines that act on the defined collective variables will use the complete list of collective variables in the order they are added. To wipe this list of variables, see the destroyColvars() routine. 
+        return None
+
+    @abc.abstractmethod
+    def get_velocity(self):
+        """Return the velocities of the system.
+
+        The velocities are returned in a format that matches the getConfig() routine, specifically [v_x1, v_y1, v_z1, v_x2, v_y2, v_z2, ...] where v_x1 represents the x component of the velocity on the first particle, etc.
+
+        Returns
+        ------------
+        numpy.ndarray
+            A one dimensional numpy array of the current velocities.
         """
         return
 
     @abc.abstractmethod
-    def getConfig(self):
-        """
-        This function should return the postition of the walker in configuration space as a one-dimensional numpy array. The coordinates are returned as [x1, y1, z1, x2, y2, z2, ...]. 
-        """
-        return 
-        
-    @abc.abstractmethod
-    def setConfig(self, configuration):
-        """
-        Sets the configuration of the At minimum, it should take some sort of specification of the configuration.
+    def set_velocity(self, velocity):
+        """Set the velocities of the system.
+
+        Takes a one dimensional array of the velocities in the format [v_x1, v_y1, v_z1, v_x2, v_y2, v_z2, ...] where v_x1 represents the x component of the velocity on the first particle, etc. 
+
+        Parameters
+        -------------
+        velocity : numpy.ndarray
+            A one-dimentional numpy array of velocities.
         """
         return
 
     @abc.abstractmethod
-    def getVel(self): 
+    def draw_velocity(self, distType='uniform'):
+        """Draw a new value of the velocities.
+
+        Redraws velocities from a specified distribtion.
+
+        Parameters
+        ------------
+        distType : string, optional
+            Specifies the type of distribution from which to draw the velocities. Currently supports 'uniform' and 'gaussian'.
         """
-        This function returns the velocities of the system as a one-dimensional numpy array. The velocities are returned in a format that matches the getConfig() routine, specifically [v_x1, v_y1, v_z1, v_x2, v_y2, v_z2, ...]. 
-        """
-        return
+        return None
 
     @abc.abstractmethod
-    def setVel(self):
-        """
-        This routine sets the velocities of the system.
-        """
-        return
+    def reverse_velocity(self, multFactor=-1.0):
+        """Reverse the velocity of the walker.
 
-    @abc.abstractmethod
-    def drawVel(self):
+        Sets the velocity to multFactor * vel.
+
+        Parameters
+        ------------
+        multFactor : float
+            Factor to scale the velocities. Takes -1.0 as default.
         """
-        Draws a new value of the velocities for the walker. Can redraw velocities according to a uniform or Gaussian distributions. 
-        """
-        return
-    
-    @abc.abstractmethod        
-    def reverseVel(self): 
-        """
-        This function reverses the velocity of the walker. The new velocities are given as 
-        """
-        return
-    
+        return None
+
     @abc.abstractmethod
     def equilibrate(self, center, restraint, numSteps):
         """
         """
         return
-            
+
     @abc.abstractmethod
-    def getColvars(self):
+    def get_colvars(self):
+        """Return the location of the walker in the collective variable space.
+
+        Returns
+        ---------
+        numpy.ndarray
+            A one-dimensional numpy array of the current collective variables.
         """
-        This function returns the location of the walker in the collective variable space. Values are returned as a one-dimensional numpy array 
-        """
-        return
-        
+        return None
+
     @abc.abstractmethod
-    def propagate(self,numsteps):
+    def propagate(self, nSteps):
+        """Integrate the dynamics of the model forward in time.
+
+        Parameters
+        -----------
+        nSteps : int
+            The number of time steps to integrate forward in time.
         """
-        Integrates the dynamics of the model forward in time. Takes the numSteps argument specifying the number of time steps to take. 
-        """
-        return
-    
+        return None
+
     @abc.abstractmethod
     def close(self):
+        """Destroy the walker.
         """
-        Destroys the walker. 
-        """
-        return
-        
-    @abc.abstractmethod
-    def setOutput(self):
-        """
-        This routine adds a source of output for the walker to write information to disk.
-        """
-        return 
-        
-    @abc.abstractmethod
-    def removeOutput(self):
-        """
-        This routine adds a source of output for the walker to write information to disk.
-        """
-        return 
+        return None

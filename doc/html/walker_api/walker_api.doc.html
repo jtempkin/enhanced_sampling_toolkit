@@ -1,92 +1,174 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Walker API &mdash; Enhanced Sampling Toolkit 0.1a documentation</title>
-    
-    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '0.1a',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="Enhanced Sampling Toolkit 0.1a documentation" href="../index.html" />
-    <link rel="next" title="Applications" href="../applications/applications.doc.html" />
-    <link rel="prev" title="Introduction" href="../intro.doc.html" /> 
-  </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="../applications/applications.doc.html" title="Applications"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="../intro.doc.html" title="Introduction"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Enhanced Sampling Toolkit 0.1a documentation</a> &raquo;</li> 
-      </ul>
-    </div>  
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Walker API &mdash; Enhanced Sampling Toolkit 0.1a documentation</title>
+  
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Enhanced Sampling Toolkit 0.1a documentation" href="../index.html"/>
+        <link rel="next" title="Applications" href="../applications/applications.doc.html"/>
+        <link rel="prev" title="Introduction" href="../intro.doc.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Enhanced Sampling Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../intro.doc.html">Introduction</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Walker API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#lammps-walker-module">LAMMPS Walker Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#openmm-walker-module">OpenMM Walker Module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../applications/applications.doc.html">Applications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../applications/examples/examples.doc.html">Examples - NEUS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../test/testing.doc.html">Testing</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../index.html">Enhanced Sampling Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+      
+    <li>Walker API</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/walker_api/walker_api.doc.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="walker-api">
 <h1>Walker API<a class="headerlink" href="#walker-api" title="Permalink to this headline">¶</a></h1>
-<p>The central design principle of the Walker API is to provide an
-abstracted interface between the &#8220;algorithm&#8221; level code and the
-code that integrates the dynamics of the model. This section describes the base API used to define the walker objects. The base class is declared internally using Python&#8217;s abstract base class module. The implementations of the bindings specific to the dynamics packages are registered to this base class definition through direct subclassing of the modules. A key feature of this decision is that it enforces the implementation of the dynamics bindings to implement each of the following methods in their class declarations. However, many of the methods can be overridden with empty methods if an implementation is incomplete or does not require all of the base class methods.</p>
-<div class="section" id="module-walker_base">
-<span id="the-core-walker-application-programming-interface-api"></span><h2>The Core Walker Application Programming Interface (API)<a class="headerlink" href="#module-walker_base" title="Permalink to this headline">¶</a></h2>
-<p>DEVELOPER NOTE: we may want to use abstract properties in the future.</p>
-<dl class="class">
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>The central design principle of the Walker API is to provide an abstracted interface between the &#8220;algorithm&#8221; level code and the code that implements the underlying dynamical model. This section describes the base API used to define the walker object and the API routines. The implementations of the bindings specific to the dynamics packages are registered to this base class definition through direct subclassing of the modules. A key feature of this decision is that it enforces the implementation of the dynamics bindings to implement each of the following methods in their class declarations. However, many of the methods can be overridden with empty methods if an implementation is incomplete or does not require all of the base class methods.</p>
+<span class="target" id="module-walker_base"></span><dl class="class">
 <dt id="walker_base.walker">
 <em class="property">class </em><code class="descclassname">walker_base.</code><code class="descname">walker</code><a class="reference internal" href="../_modules/walker_base.html#walker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#walker_base.walker" title="Permalink to this definition">¶</a></dt>
-<dd><p>This object acts as an abstract base class that sets the core specification defining the Walker API. These routines</p>
-<dl class="method">
-<dt id="walker_base.walker.addColvars">
-<code class="descname">addColvars</code><span class="sig-paren">(</span><em>cv</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/walker_base.html#walker.addColvars"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#walker_base.walker.addColvars" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds a new collective variable to the walker. Subsequent calls to routines that act on the defined collective variables will use the complete list of collective variables in the order they are added. To wipe this list of variables, see the destroyColvars() routine.</p>
-</dd></dl>
-
+<dd><p>Basic API specification of the walker object.</p>
+<p class="rubric">Methods</p>
 <dl class="method">
 <dt id="walker_base.walker.close">
 <code class="descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/walker_base.html#walker.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#walker_base.walker.close" title="Permalink to this definition">¶</a></dt>
-<dd><p>Destroys the walker.</p>
+<dd><p>Destroy the walker.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="walker_base.walker.destroyColvars">
-<code class="descname">destroyColvars</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/walker_base.html#walker.destroyColvars"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#walker_base.walker.destroyColvars" title="Permalink to this definition">¶</a></dt>
-<dd><p>Removes all collective variables from the walker.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="walker_base.walker.drawVel">
-<code class="descname">drawVel</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/walker_base.html#walker.drawVel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#walker_base.walker.drawVel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Draws a new value of the velocities for the walker. Can redraw velocities according to a uniform or Gaussian distributions.</p>
+<dt id="walker_base.walker.draw_velocity">
+<code class="descname">draw_velocity</code><span class="sig-paren">(</span><em>distType='uniform'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/walker_base.html#walker.draw_velocity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#walker_base.walker.draw_velocity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw a new value of the velocities.</p>
+<p>Redraws velocities from a specified distribtion.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>distType</strong> : string, optional</p>
+<blockquote class="last">
+<div><p>Specifies the type of distribution from which to draw the velocities. Currently supports &#8216;uniform&#8217; and &#8216;gaussian&#8217;.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -95,92 +177,138 @@ code that integrates the dynamics of the model. This section describes the base 
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="walker_base.walker.getColvars">
-<code class="descname">getColvars</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/walker_base.html#walker.getColvars"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#walker_base.walker.getColvars" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function returns the location of the walker in the collective variable space. Values are returned as a one-dimensional numpy array</p>
+<dt id="walker_base.walker.get_colvars">
+<code class="descname">get_colvars</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/walker_base.html#walker.get_colvars"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#walker_base.walker.get_colvars" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the location of the walker in the collective variable space.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">numpy.ndarray</p>
+<blockquote class="last">
+<div><p>A one-dimensional numpy array of the current collective variables.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
-<dt id="walker_base.walker.getConfig">
-<code class="descname">getConfig</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/walker_base.html#walker.getConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#walker_base.walker.getConfig" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function should return the postition of the walker in configuration space as a one-dimensional numpy array. The coordinates are returned as [x1, y1, z1, x2, y2, z2, ...].</p>
+<dt id="walker_base.walker.get_position">
+<code class="descname">get_position</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/walker_base.html#walker.get_position"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#walker_base.walker.get_position" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the postiton of the walker.</p>
+<p>The return array is provided in the format [x1, y1, z1, x2, ...].</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">numpy.ndarray</p>
+<blockquote class="last">
+<div><p>A one-dimensional array of the current coordinates.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
-<dt id="walker_base.walker.getVel">
-<code class="descname">getVel</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/walker_base.html#walker.getVel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#walker_base.walker.getVel" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function returns the velocities of the system as a one-dimensional numpy array. The velocities are returned in a format that matches the getConfig() routine, specifically [v_x1, v_y1, v_z1, v_x2, v_y2, v_z2, ...].</p>
+<dt id="walker_base.walker.get_velocity">
+<code class="descname">get_velocity</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/walker_base.html#walker.get_velocity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#walker_base.walker.get_velocity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the velocities of the system.</p>
+<p>The velocities are returned in a format that matches the getConfig() routine, specifically [v_x1, v_y1, v_z1, v_x2, v_y2, v_z2, ...] where v_x1 represents the x component of the velocity on the first particle, etc.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">numpy.ndarray</p>
+<blockquote class="last">
+<div><p>A one dimensional numpy array of the current velocities.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="walker_base.walker.propagate">
-<code class="descname">propagate</code><span class="sig-paren">(</span><em>numsteps</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/walker_base.html#walker.propagate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#walker_base.walker.propagate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Integrates the dynamics of the model forward in time. Takes the numSteps argument specifying the number of time steps to take.</p>
+<code class="descname">propagate</code><span class="sig-paren">(</span><em>nSteps</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/walker_base.html#walker.propagate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#walker_base.walker.propagate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Integrate the dynamics of the model forward in time.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>nSteps</strong> : int</p>
+<blockquote class="last">
+<div><p>The number of time steps to integrate forward in time.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
-<dt id="walker_base.walker.removeOutput">
-<code class="descname">removeOutput</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/walker_base.html#walker.removeOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#walker_base.walker.removeOutput" title="Permalink to this definition">¶</a></dt>
-<dd><p>This routine adds a source of output for the walker to write information to disk.</p>
+<dt id="walker_base.walker.reverse_velocity">
+<code class="descname">reverse_velocity</code><span class="sig-paren">(</span><em>multFactor=-1.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/walker_base.html#walker.reverse_velocity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#walker_base.walker.reverse_velocity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reverse the velocity of the walker.</p>
+<p>Sets the velocity to multFactor * vel.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>multFactor</strong> : float</p>
+<blockquote class="last">
+<div><p>Factor to scale the velocities. Takes -1.0 as default.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
-<dt id="walker_base.walker.reverseVel">
-<code class="descname">reverseVel</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/walker_base.html#walker.reverseVel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#walker_base.walker.reverseVel" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function reverses the velocity of the walker. The new velocities are given as</p>
+<dt id="walker_base.walker.set_position">
+<code class="descname">set_position</code><span class="sig-paren">(</span><em>configuration</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/walker_base.html#walker.set_position"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#walker_base.walker.set_position" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the configuration of the system.</p>
+<p>Takes an input array in the form of [x1, y1, z1, x2,..].</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>configuration</strong> : numpy.ndarray</p>
+<blockquote class="last">
+<div><p>A one-dimentional numpy array of system coordinates.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
-<dt id="walker_base.walker.setConfig">
-<code class="descname">setConfig</code><span class="sig-paren">(</span><em>configuration</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/walker_base.html#walker.setConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#walker_base.walker.setConfig" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets the configuration of the At minimum, it should take some sort of specification of the configuration.</p>
+<dt id="walker_base.walker.set_velocity">
+<code class="descname">set_velocity</code><span class="sig-paren">(</span><em>velocity</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/walker_base.html#walker.set_velocity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#walker_base.walker.set_velocity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the velocities of the system.</p>
+<p>Takes a one dimensional array of the velocities in the format [v_x1, v_y1, v_z1, v_x2, v_y2, v_z2, ...] where v_x1 represents the x component of the velocity on the first particle, etc.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>velocity</strong> : numpy.ndarray</p>
+<blockquote class="last">
+<div><p>A one-dimentional numpy array of velocities.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
-<dl class="method">
-<dt id="walker_base.walker.setOutput">
-<code class="descname">setOutput</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/walker_base.html#walker.setOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#walker_base.walker.setOutput" title="Permalink to this definition">¶</a></dt>
-<dd><p>This routine adds a source of output for the walker to write information to disk.</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="walker_base.walker.setVel">
-<code class="descname">setVel</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/walker_base.html#walker.setVel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#walker_base.walker.setVel" title="Permalink to this definition">¶</a></dt>
-<dd><p>This routine sets the velocities of the system.</p>
-</dd></dl>
-
-</dd></dl>
-
-<div class="section" id="module-dynamics">
-<span id="dynamics-modules"></span><h3>Dynamics Modules<a class="headerlink" href="#module-dynamics" title="Permalink to this headline">¶</a></h3>
-<p>This module contains definitions of the dynamics classes using to wrap information about driving dynamics inside the walkers.</p>
-<dl class="class">
-<dt id="dynamics.baoab">
-<em class="property">class </em><code class="descclassname">dynamics.</code><code class="descname">baoab</code><span class="sig-paren">(</span><em>temperature</em>, <em>damping_coefficient</em>, <em>shake=False</em>, <em>seed=None</em>, <em>linear_momentum=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dynamics.html#baoab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dynamics.baoab" title="Permalink to this definition">¶</a></dt>
-<dd><p>This class implements the baoab integrator.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="dynamics.langevin">
-<em class="property">class </em><code class="descclassname">dynamics.</code><code class="descname">langevin</code><span class="sig-paren">(</span><em>temperature</em>, <em>damping_coefficient</em>, <em>shake=False</em>, <em>seed=None</em>, <em>linear_momentum=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dynamics.html#langevin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dynamics.langevin" title="Permalink to this definition">¶</a></dt>
-<dd><p>This class specifies the langevin dynamcis parameters needed.</p>
-</dd></dl>
-
-</div>
-<div class="section" id="module-outputClass">
-<span id="setting-walker-output-files"></span><h3>Setting Walker Output Files<a class="headerlink" href="#module-outputClass" title="Permalink to this headline">¶</a></h3>
-<p>Created on Thu Apr 16 15:03:56 2015</p>
-<p>&#64;author: jeremytempkin</p>
-<dl class="class">
-<dt id="outputClass.outputClass">
-<em class="property">class </em><code class="descclassname">outputClass.</code><code class="descname">outputClass</code><span class="sig-paren">(</span><em>name</em>, <em>outputType</em>, <em>filename</em>, <em>nSteps=1000</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/outputClass.html#outputClass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#outputClass.outputClass" title="Permalink to this definition">¶</a></dt>
-<dd><p>This class acts a container object for an output for a walker object.</p>
-</dd></dl>
-
-</div>
-<div class="section" id="module-collectiveVariables">
-<span id="setting-walker-collective-variables"></span><h3>Setting Walker Collective Variables<a class="headerlink" href="#module-collectiveVariables" title="Permalink to this headline">¶</a></h3>
-<p>A container class for collective variable definitions. We provide here a container class for</p>
-</div>
 </div>
 <div class="section" id="lammps-walker-module">
 <h2>LAMMPS Walker Module<a class="headerlink" href="#lammps-walker-module" title="Permalink to this headline">¶</a></h2>
@@ -189,186 +317,6 @@ code that integrates the dynamics of the model. This section describes the base 
 <p>In particular, you may want to see how the Python wrapper to LAMMPS on which this implementation is based:</p>
 <p><a class="reference external" href="http://lammps.sandia.gov/doc/Section_python.html">http://lammps.sandia.gov/doc/Section_python.html</a></p>
 <p>Here we will outline basic usage guides for the walker API usage in LAMMPS.</p>
-<span class="target" id="module-lammpsWalker"></span><p>This module implements the Walker API for the LAMMPS MD engine. See walker_base.py for a specification of the API. For details concerning the usage of the LAMMPS MD package see the excellent documentation at the LAMMPS webpage:</p>
-<p><a class="reference external" href="http://lammps.sandia.gov/">http://lammps.sandia.gov/</a></p>
-<p>In particular, you may want to see how the Python wrapper to LAMMPS on which this implementation is based:</p>
-<p><a class="reference external" href="http://lammps.sandia.gov/doc/Section_python.html">http://lammps.sandia.gov/doc/Section_python.html</a></p>
-<p>Here we will outline basic usage guides for the walker API usage in LAMMPS. To begin using the lammpsWalker module</p>
-<ul class="simple">
-<li>highlight here an example code which shows how to use the LAMMPS walker module.</li>
-</ul>
-<dl class="class">
-<dt id="lammpsWalker.lammpsWalker">
-<em class="property">class </em><code class="descclassname">lammpsWalker.</code><code class="descname">lammpsWalker</code><span class="sig-paren">(</span><em>inputFilename</em>, <em>logFilename</em>, <em>index=0</em>, <em>debug=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lammpsWalker.html#lammpsWalker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lammpsWalker.lammpsWalker" title="Permalink to this definition">¶</a></dt>
-<dd><p>This class implements the enhanced sampling walker API for the bindings to the LAMMPS package.</p>
-<p>Some usage issues to note:</p>
-<p>1) Collective variables (CVs) are defined to the walker by constructing a list of
-CVs internally in the walker.colvars object. These CVs list takes the following
-format:</p>
-<p>[&#8220;coordinateType&#8221;, atomids....]</p>
-<p>The coordinate type specifies which type of coordinate the CV is
-(i.e. bond, angle, dihedral, etc.). The next items in the list are the atom
-indecies involved in this specific instance of the CV.</p>
-<p>The walker will use this list to initialize them to the underlying LAMMPS objects.</p>
-<dl class="method">
-<dt id="lammpsWalker.lammpsWalker.addColvars">
-<code class="descname">addColvars</code><span class="sig-paren">(</span><em>name</em>, <em>cvType</em>, <em>atomIDs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lammpsWalker.html#lammpsWalker.addColvars"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lammpsWalker.lammpsWalker.addColvars" title="Permalink to this definition">¶</a></dt>
-<dd><p>Implements the addition of a collective variable to the list of collective variables held by this walker.</p>
-<dl class="docutils">
-<dt>name -</dt>
-<dd>A internal string used to reference this collective variable. Collective variable names must be unique.</dd>
-<dt>cvType -</dt>
-<dd><dl class="first last docutils">
-<dt>A string refering to the type of collective variable. Currently the following variables are supported:</dt>
-<dd><ul class="first last simple">
-<li>&#8216;bond&#8217;</li>
-<li>&#8216;angle&#8217;</li>
-<li>&#8216;dihedral&#8217;</li>
-<li>&#8216;x&#8217;, &#8216;y&#8217;, &#8216;z&#8217; positions</li>
-<li>&#8216;x&#8217;, &#8216;y&#8217;, &#8216;z&#8217; velocity components</li>
-</ul>
-</dd>
-</dl>
-</dd>
-<dt>atomIDs -</dt>
-<dd><dl class="first last docutils">
-<dt>A list of the atom indecies involved in the collective variable. Should provide the right number of atom indecies for the collective variable:</dt>
-<dd><ul class="first last simple">
-<li>&#8216;bond&#8217; -&gt; 2</li>
-<li>&#8216;angle&#8217;-&gt; 3</li>
-<li>&#8216;dihedral&#8217; -&gt; 4</li>
-<li>position or velocity component -&gt; 1</li>
-</ul>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="lammpsWalker.lammpsWalker.close">
-<code class="descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lammpsWalker.html#lammpsWalker.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lammpsWalker.lammpsWalker.close" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function closes the LAMMPS object.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="lammpsWalker.lammpsWalker.command">
-<code class="descname">command</code><span class="sig-paren">(</span><em>command</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lammpsWalker.html#lammpsWalker.command"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lammpsWalker.lammpsWalker.command" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function allows the user to issue a LAMMPS command directly to the
-LAMMPS object.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="lammpsWalker.lammpsWalker.destroyColvars">
-<code class="descname">destroyColvars</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lammpsWalker.html#lammpsWalker.destroyColvars"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lammpsWalker.lammpsWalker.destroyColvars" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function removes the colvars set by setColvars(). By default, it removes all of the collective variables in the list. It does not remove them from the collective variables list.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="lammpsWalker.lammpsWalker.drawVel">
-<code class="descname">drawVel</code><span class="sig-paren">(</span><em>distType='gaussian'</em>, <em>temperature=310.0</em>, <em>seed=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lammpsWalker.html#lammpsWalker.drawVel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lammpsWalker.lammpsWalker.drawVel" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function redraws the velocities from a maxwell-boltzmann dist.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="lammpsWalker.lammpsWalker.equilibrate">
-<code class="descname">equilibrate</code><span class="sig-paren">(</span><em>center</em>, <em>restraint</em>, <em>numSteps</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lammpsWalker.html#lammpsWalker.equilibrate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lammpsWalker.lammpsWalker.equilibrate" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function prepares a LAMMPS image to be at the specified target position given by the vector &#8216;center&#8217; passed and an arguments.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="lammpsWalker.lammpsWalker.getColvars">
-<code class="descname">getColvars</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lammpsWalker.html#lammpsWalker.getColvars"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lammpsWalker.lammpsWalker.getColvars" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function returns the current position of the LAMMPS simulation in
-colvars space.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="lammpsWalker.lammpsWalker.getConfig">
-<code class="descname">getConfig</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lammpsWalker.html#lammpsWalker.getConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lammpsWalker.lammpsWalker.getConfig" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function returns the current position of the LAMMPS simulation.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="lammpsWalker.lammpsWalker.getVel">
-<code class="descname">getVel</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lammpsWalker.html#lammpsWalker.getVel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lammpsWalker.lammpsWalker.getVel" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function returns the current velocities from the LAMMPS simulation.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="lammpsWalker.lammpsWalker.get_time">
-<code class="descname">get_time</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lammpsWalker.html#lammpsWalker.get_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lammpsWalker.lammpsWalker.get_time" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the time associated with the state of the walker.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="lammpsWalker.lammpsWalker.minimize">
-<code class="descname">minimize</code><span class="sig-paren">(</span><em>args=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lammpsWalker.html#lammpsWalker.minimize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lammpsWalker.lammpsWalker.minimize" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function runs a minimization routine with the specified type.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="lammpsWalker.lammpsWalker.propagate">
-<code class="descname">propagate</code><span class="sig-paren">(</span><em>numSteps</em>, <em>pre='no'</em>, <em>post='no'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lammpsWalker.html#lammpsWalker.propagate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lammpsWalker.lammpsWalker.propagate" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function issues a run command to the underlying dynamics to propagate the dynamics a given number of steps.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="lammpsWalker.lammpsWalker.removeOutput">
-<code class="descname">removeOutput</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lammpsWalker.html#lammpsWalker.removeOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lammpsWalker.lammpsWalker.removeOutput" title="Permalink to this definition">¶</a></dt>
-<dd><p>This routine removes the ouput pipes for information to be written to disk from the underlying dynamics engine. Right now this simply clears all existing output.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="lammpsWalker.lammpsWalker.reverseVel">
-<code class="descname">reverseVel</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lammpsWalker.html#lammpsWalker.reverseVel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lammpsWalker.lammpsWalker.reverseVel" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function reverses the velocities of a given LAMMPS simulation</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="lammpsWalker.lammpsWalker.setConfig">
-<code class="descname">setConfig</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lammpsWalker.html#lammpsWalker.setConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lammpsWalker.lammpsWalker.setConfig" title="Permalink to this definition">¶</a></dt>
-<dd><p>This routine sets the internal configuration.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="lammpsWalker.lammpsWalker.setDynamics">
-<code class="descname">setDynamics</code><span class="sig-paren">(</span><em>dynamics_instance</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lammpsWalker.html#lammpsWalker.setDynamics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lammpsWalker.lammpsWalker.setDynamics" title="Permalink to this definition">¶</a></dt>
-<dd><p>This routine sets the dynamics for the walker.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="lammpsWalker.lammpsWalker.setOutput">
-<code class="descname">setOutput</code><span class="sig-paren">(</span><em>name</em>, <em>outputType</em>, <em>filename</em>, <em>nSteps</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lammpsWalker.html#lammpsWalker.setOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lammpsWalker.lammpsWalker.setOutput" title="Permalink to this definition">¶</a></dt>
-<dd><p>This routine sets up a mechanism for writing system information to file directly from the dynamics engine. This is equivalent to output constructed</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="lammpsWalker.lammpsWalker.setTemperature">
-<code class="descname">setTemperature</code><span class="sig-paren">(</span><em>temp</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lammpsWalker.html#lammpsWalker.setTemperature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lammpsWalker.lammpsWalker.setTemperature" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function sets the temperature of the walker object.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="lammpsWalker.lammpsWalker.setTimestep">
-<code class="descname">setTimestep</code><span class="sig-paren">(</span><em>timestep</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lammpsWalker.html#lammpsWalker.setTimestep"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lammpsWalker.lammpsWalker.setTimestep" title="Permalink to this definition">¶</a></dt>
-<dd><p>This routine sets the dynamics time step.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="lammpsWalker.lammpsWalker.setVel">
-<code class="descname">setVel</code><span class="sig-paren">(</span><em>vel</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lammpsWalker.html#lammpsWalker.setVel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lammpsWalker.lammpsWalker.setVel" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function sets the velocity to the lammps simulation.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="lammpsWalker.lammpsWalker.set_time">
-<code class="descname">set_time</code><span class="sig-paren">(</span><em>t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lammpsWalker.html#lammpsWalker.set_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lammpsWalker.lammpsWalker.set_time" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the time of the walker.</p>
-</dd></dl>
-
-</dd></dl>
-
 </div>
 <div class="section" id="openmm-walker-module">
 <h2>OpenMM Walker Module<a class="headerlink" href="#openmm-walker-module" title="Permalink to this headline">¶</a></h2>
@@ -377,74 +325,72 @@ colvars space.</p>
 </div>
 
 
+           </div>
           </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="../index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Walker API</a><ul>
-<li><a class="reference internal" href="#module-walker_base">The Core Walker Application Programming Interface (API)</a><ul>
-<li><a class="reference internal" href="#module-dynamics">Dynamics Modules</a></li>
-<li><a class="reference internal" href="#module-outputClass">Setting Walker Output Files</a></li>
-<li><a class="reference internal" href="#module-collectiveVariables">Setting Walker Collective Variables</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#lammps-walker-module">LAMMPS Walker Module</a></li>
-<li><a class="reference internal" href="#openmm-walker-module">OpenMM Walker Module</a></li>
-</ul>
-</li>
-</ul>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../applications/applications.doc.html" class="btn btn-neutral float-right" title="Applications" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../intro.doc.html" class="btn btn-neutral" title="Introduction" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="../intro.doc.html"
-                        title="previous chapter">Introduction</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="../applications/applications.doc.html"
-                        title="next chapter">Applications</a></p>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../_sources/walker_api/walker_api.doc.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Jeremy O. B. Tempkin.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="../applications/applications.doc.html" title="Applications"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="../intro.doc.html" title="Introduction"
-             >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Enhanced Sampling Toolkit 0.1a documentation</a> &raquo;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &copy; Copyright 2015, Jeremy O. B. Tempkin.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.1a',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
 </html>

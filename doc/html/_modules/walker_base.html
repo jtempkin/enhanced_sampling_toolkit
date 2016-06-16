@@ -1,198 +1,315 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>walker_base &mdash; Enhanced Sampling Toolkit 0.1a documentation</title>
-    
-    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '0.1a',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="Enhanced Sampling Toolkit 0.1a documentation" href="../index.html" />
-    <link rel="up" title="Module code" href="index.html" /> 
-  </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Enhanced Sampling Toolkit 0.1a documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
-      </ul>
-    </div>  
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>walker_base &mdash; Enhanced Sampling Toolkit 0.1a documentation</title>
+  
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Enhanced Sampling Toolkit 0.1a documentation" href="../index.html"/>
+        <link rel="up" title="Module code" href="index.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Enhanced Sampling Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../intro.doc.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../walker_api/walker_api.doc.html">Walker API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../applications/applications.doc.html">Applications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../applications/examples/examples.doc.html">Examples - NEUS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../test/testing.doc.html">Testing</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../index.html">Enhanced Sampling Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="index.html">Module code</a> &raquo;</li>
+      
+    <li>walker_base</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <h1>Source code for walker_base</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">DEVELOPER NOTE: we may want to use abstract properties in the future. </span>
-<span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">abc</span>
 
+
 <div class="viewcode-block" id="walker"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#walker_base.walker">[docs]</a><span class="k">class</span> <span class="nc">walker</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This object acts as an abstract base class that sets the core specification defining the Walker API. These routines </span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">__metaclass__</span><span class="o">=</span><span class="n">abc</span><span class="o">.</span><span class="n">ABCMeta</span>
-        
+    <span class="sd">&quot;&quot;&quot;Basic API specification of the walker object.&quot;&quot;&quot;</span>
+    <span class="n">__metaclass__</span> <span class="o">=</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABCMeta</span>
+
     <span class="nd">@abc.abstractmethod</span>
-<div class="viewcode-block" id="walker.destroyColvars"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#walker_base.walker.destroyColvars">[docs]</a>    <span class="k">def</span> <span class="nf">destroyColvars</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Removes all collective variables from the walker. </span>
+<div class="viewcode-block" id="walker.get_position"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#walker_base.walker.get_position">[docs]</a>    <span class="k">def</span> <span class="nf">get_position</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the postiton of the walker.</span>
+
+<span class="sd">        The return array is provided in the format [x1, y1, z1, x2, ...].</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        ---------</span>
+<span class="sd">        numpy.ndarray</span>
+<span class="sd">            A one-dimensional array of the current coordinates.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> </div>
- 
+        <span class="k">return</span> <span class="bp">None</span></div>
+
     <span class="nd">@abc.abstractmethod</span>
-<div class="viewcode-block" id="walker.addColvars"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#walker_base.walker.addColvars">[docs]</a>    <span class="k">def</span> <span class="nf">addColvars</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cv</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Adds a new collective variable to the walker. Subsequent calls to routines that act on the defined collective variables will use the complete list of collective variables in the order they are added. To wipe this list of variables, see the destroyColvars() routine. </span>
+<div class="viewcode-block" id="walker.set_position"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#walker_base.walker.set_position">[docs]</a>    <span class="k">def</span> <span class="nf">set_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">configuration</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set the configuration of the system.</span>
+
+<span class="sd">        Takes an input array in the form of [x1, y1, z1, x2,..].</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        --------------</span>
+
+<span class="sd">        configuration : numpy.ndarray</span>
+<span class="sd">            A one-dimentional numpy array of system coordinates.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">None</span></div>
+
+    <span class="nd">@abc.abstractmethod</span>
+<div class="viewcode-block" id="walker.get_velocity"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#walker_base.walker.get_velocity">[docs]</a>    <span class="k">def</span> <span class="nf">get_velocity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the velocities of the system.</span>
+
+<span class="sd">        The velocities are returned in a format that matches the getConfig() routine, specifically [v_x1, v_y1, v_z1, v_x2, v_y2, v_z2, ...] where v_x1 represents the x component of the velocity on the first particle, etc.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        ------------</span>
+<span class="sd">        numpy.ndarray</span>
+<span class="sd">            A one dimensional numpy array of the current velocities.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span></div>
 
     <span class="nd">@abc.abstractmethod</span>
-<div class="viewcode-block" id="walker.getConfig"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#walker_base.walker.getConfig">[docs]</a>    <span class="k">def</span> <span class="nf">getConfig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This function should return the postition of the walker in configuration space as a one-dimensional numpy array. The coordinates are returned as [x1, y1, z1, x2, y2, z2, ...]. </span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> </div>
-        
-    <span class="nd">@abc.abstractmethod</span>
-<div class="viewcode-block" id="walker.setConfig"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#walker_base.walker.setConfig">[docs]</a>    <span class="k">def</span> <span class="nf">setConfig</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">configuration</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Sets the configuration of the At minimum, it should take some sort of specification of the configuration.</span>
+<div class="viewcode-block" id="walker.set_velocity"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#walker_base.walker.set_velocity">[docs]</a>    <span class="k">def</span> <span class="nf">set_velocity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">velocity</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set the velocities of the system.</span>
+
+<span class="sd">        Takes a one dimensional array of the velocities in the format [v_x1, v_y1, v_z1, v_x2, v_y2, v_z2, ...] where v_x1 represents the x component of the velocity on the first particle, etc. </span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -------------</span>
+<span class="sd">        velocity : numpy.ndarray</span>
+<span class="sd">            A one-dimentional numpy array of velocities.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span></div>
 
     <span class="nd">@abc.abstractmethod</span>
-<div class="viewcode-block" id="walker.getVel"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#walker_base.walker.getVel">[docs]</a>    <span class="k">def</span> <span class="nf">getVel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This function returns the velocities of the system as a one-dimensional numpy array. The velocities are returned in a format that matches the getConfig() routine, specifically [v_x1, v_y1, v_z1, v_x2, v_y2, v_z2, ...]. </span>
+<div class="viewcode-block" id="walker.draw_velocity"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#walker_base.walker.draw_velocity">[docs]</a>    <span class="k">def</span> <span class="nf">draw_velocity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">distType</span><span class="o">=</span><span class="s1">&#39;uniform&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Draw a new value of the velocities.</span>
+
+<span class="sd">        Redraws velocities from a specified distribtion.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ------------</span>
+<span class="sd">        distType : string, optional</span>
+<span class="sd">            Specifies the type of distribution from which to draw the velocities. Currently supports &#39;uniform&#39; and &#39;gaussian&#39;.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span></div>
+        <span class="k">return</span> <span class="bp">None</span></div>
 
     <span class="nd">@abc.abstractmethod</span>
-<div class="viewcode-block" id="walker.setVel"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#walker_base.walker.setVel">[docs]</a>    <span class="k">def</span> <span class="nf">setVel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This routine sets the velocities of the system.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span></div>
+<div class="viewcode-block" id="walker.reverse_velocity"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#walker_base.walker.reverse_velocity">[docs]</a>    <span class="k">def</span> <span class="nf">reverse_velocity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multFactor</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Reverse the velocity of the walker.</span>
 
-    <span class="nd">@abc.abstractmethod</span>
-<div class="viewcode-block" id="walker.drawVel"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#walker_base.walker.drawVel">[docs]</a>    <span class="k">def</span> <span class="nf">drawVel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Draws a new value of the velocities for the walker. Can redraw velocities according to a uniform or Gaussian distributions. </span>
+<span class="sd">        Sets the velocity to multFactor * vel.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ------------</span>
+<span class="sd">        multFactor : float</span>
+<span class="sd">            Factor to scale the velocities. Takes -1.0 as default.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span></div>
-    
-    <span class="nd">@abc.abstractmethod</span>        
-<div class="viewcode-block" id="walker.reverseVel"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#walker_base.walker.reverseVel">[docs]</a>    <span class="k">def</span> <span class="nf">reverseVel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This function reverses the velocity of the walker. The new velocities are given as </span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span></div>
-    
+        <span class="k">return</span> <span class="bp">None</span></div>
+
     <span class="nd">@abc.abstractmethod</span>
 <div class="viewcode-block" id="walker.equilibrate"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#walker_base.walker.equilibrate">[docs]</a>    <span class="k">def</span> <span class="nf">equilibrate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">restraint</span><span class="p">,</span> <span class="n">numSteps</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span></div>
-            
+
     <span class="nd">@abc.abstractmethod</span>
-<div class="viewcode-block" id="walker.getColvars"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#walker_base.walker.getColvars">[docs]</a>    <span class="k">def</span> <span class="nf">getColvars</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This function returns the location of the walker in the collective variable space. Values are returned as a one-dimensional numpy array </span>
+<div class="viewcode-block" id="walker.get_colvars"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#walker_base.walker.get_colvars">[docs]</a>    <span class="k">def</span> <span class="nf">get_colvars</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the location of the walker in the collective variable space.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        ---------</span>
+<span class="sd">        numpy.ndarray</span>
+<span class="sd">            A one-dimensional numpy array of the current collective variables.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span></div>
-        
+        <span class="k">return</span> <span class="bp">None</span></div>
+
     <span class="nd">@abc.abstractmethod</span>
-<div class="viewcode-block" id="walker.propagate"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#walker_base.walker.propagate">[docs]</a>    <span class="k">def</span> <span class="nf">propagate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">numsteps</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Integrates the dynamics of the model forward in time. Takes the numSteps argument specifying the number of time steps to take. </span>
+<div class="viewcode-block" id="walker.propagate"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#walker_base.walker.propagate">[docs]</a>    <span class="k">def</span> <span class="nf">propagate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nSteps</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Integrate the dynamics of the model forward in time.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">        nSteps : int</span>
+<span class="sd">            The number of time steps to integrate forward in time.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span></div>
-    
+        <span class="k">return</span> <span class="bp">None</span></div>
+
     <span class="nd">@abc.abstractmethod</span>
 <div class="viewcode-block" id="walker.close"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#walker_base.walker.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Destroys the walker. </span>
+        <span class="sd">&quot;&quot;&quot;Destroy the walker.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span></div>
-        
-    <span class="nd">@abc.abstractmethod</span>
-<div class="viewcode-block" id="walker.setOutput"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#walker_base.walker.setOutput">[docs]</a>    <span class="k">def</span> <span class="nf">setOutput</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This routine adds a source of output for the walker to write information to disk.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> </div>
-        
-    <span class="nd">@abc.abstractmethod</span>
-<div class="viewcode-block" id="walker.removeOutput"><a class="viewcode-back" href="../walker_api/walker_api.doc.html#walker_base.walker.removeOutput">[docs]</a>    <span class="k">def</span> <span class="nf">removeOutput</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This routine adds a source of output for the walker to write information to disk.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> </div></div>
+        <span class="k">return</span> <span class="bp">None</span></div></div>
 </pre></div>
 
+           </div>
           </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Enhanced Sampling Toolkit 0.1a documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &raquo;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
         &copy; Copyright 2015, Jeremy O. B. Tempkin.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
-    </div>
-  </body>
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.1a',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
 </html>
