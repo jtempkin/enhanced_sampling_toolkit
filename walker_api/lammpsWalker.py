@@ -81,7 +81,7 @@ class lammpsWalker(walker):
 
         self.dynamics = None
 
-        self.Y_s = (self.getConfig(), self.getVel())
+        self.Y_s = (self.get_position(), self.get_velocity())
 
         self.time = 0.0
 
@@ -152,7 +152,7 @@ class lammpsWalker(walker):
 
         return self.lmp
 
-    def addColvars(self, name, cvType, atomIDs):
+    def add_colvars(self, name, cvType, atomIDs):
         """
         Implements the addition of a collective variable to the list of collective variables held by this walker.
 
@@ -216,11 +216,11 @@ class lammpsWalker(walker):
 
         self.propagate(0, pre='yes')
 
-        self.ref_cv = self.getColvars()
+        self.ref_cv = self.get_colvars()
 
         return 0
 
-    def destroyColvars(self):
+    def destroy_colvars(self):
         """
         This function removes the colvars set by setColvars(). By default, it removes all of the collective variables in the list. It does not remove them from the collective variables list.
         """
@@ -293,7 +293,7 @@ class lammpsWalker(walker):
 
         return 0
 
-    def getConfig(self):
+    def get_position(self):
         """
         This function returns the current position of the LAMMPS simulation.
         """
@@ -301,7 +301,7 @@ class lammpsWalker(walker):
 
         return config
 
-    def getVel(self):
+    def get_velocity(self):
         """
         This function returns the current velocities from the LAMMPS simulation.
         """
@@ -309,7 +309,7 @@ class lammpsWalker(walker):
 
         return vel
 
-    def setVel(self, vel):
+    def set_velocity(self, vel):
         """
         This function sets the velocity to the lammps simulation.
         """
@@ -320,7 +320,7 @@ class lammpsWalker(walker):
 
         return 0
 
-    def getColvars(self):
+    def get_colvars(self):
         """
         This function returns the current position of the LAMMPS simulation in
         colvars space.
@@ -342,7 +342,7 @@ class lammpsWalker(walker):
 
         return np.array(cvarray)
 
-    def setConfig(self, config):
+    def set_position(self, config):
         """
         This routine sets the internal configuration.
         """
@@ -352,7 +352,7 @@ class lammpsWalker(walker):
 
         return 0
 
-    def drawVel(self, distType = 'gaussian', temperature = 310.0, seed = None):
+    def draw_velocity(self, distType = 'gaussian', temperature = 310.0, seed = None):
         """
         This function redraws the velocities from a maxwell-boltzmann dist.
         """
@@ -362,11 +362,11 @@ class lammpsWalker(walker):
         if distType == 'gaussian':
             self.command("velocity all create " + str(temperature) + " " + str(seed) + " dist gaussian")
         else:
-            print "The drawVel() routine was passed a distribution Type that was not understood."
+            print "The draw_velocity() routine was passed a distribution Type that was not understood."
 
         return 0
 
-    def reverseVel(self):
+    def reverse_velocity(self):
         """
         This function reverses the velocities of a given LAMMPS simulation
         """
@@ -392,7 +392,7 @@ class lammpsWalker(walker):
 
         return 0
 
-    def setDynamics(self, dynamics_instance):
+    def set_dynamics(self, dynamics_instance):
         """
         This routine sets the dynamics for the walker.
         """
@@ -467,17 +467,17 @@ class lammpsWalker(walker):
 
         return 0
 
-    def setTemperature(self, temp):
+    def set_temperature(self, temp):
         """
         This function sets the temperature of the walker object.
         """
         self.dynamics.temperature = temp
 
-        self.setDynamics(self.dynamics)
+        self.set_dynamics(self.dynamics)
 
         return 0
 
-    def setTimestep(self, timestep):
+    def set_timestep(self, timestep):
         """
         This routine sets the dynamics time step.
         """
@@ -485,7 +485,7 @@ class lammpsWalker(walker):
 
         return 0
 
-    def setOutput(self, name, outputType, filename, nSteps):
+    def set_output(self, name, outputType, filename, nSteps):
         """
         This routine sets up a mechanism for writing system information to file directly from the dynamics engine. This is equivalent to output constructed
         """
@@ -507,7 +507,7 @@ class lammpsWalker(walker):
             self.command("dump " + dump.name + " all " + " ".join([dump.type, str(dump.nSteps), dump.destination]))
 
 
-    def removeOutput(self):
+    def remove_output(self):
         """
         This routine removes the ouput pipes for information to be written to disk from the underlying dynamics engine. Right now this simply clears all existing output.
         """
@@ -526,7 +526,7 @@ class lammpsWalker(walker):
 
     def set_time(self, t):
         """
-        Set the time of the walker.
+        Set the timestep of the walker.
         """
 
         self.time = t
