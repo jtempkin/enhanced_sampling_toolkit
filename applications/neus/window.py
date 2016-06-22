@@ -64,6 +64,7 @@ class window:
 
         # create a dictionary of neighboring flux lists. We will store sets of entry point objects here
         self.flux_lists = {}
+        self.flux_weights = {}
 
         return None
 
@@ -132,8 +133,13 @@ class window:
         # now choose neighbor with probability p
         neighbor = np.random.choice(p.size, p=p)
 
-        # now draw an entry point from the flux list
-        ep = random.choice(self.flux_lists[neighbor])
+        # now draw an entry point from the flux list according to entry weight
+        p = np.array(self.flux_weights[neighbor])
+        p /= p.sum()
+        # we have to draw this value from the deque index
+        indx = np.random.choice(np.arange(p.size), p=p)
+        # draw the ep value
+        ep = self.flux_lists[neighbor][indx]
 
         return ep
 
@@ -146,7 +152,7 @@ class window:
 
         return None
 
-    def add_entry_point(self, ep, key):
+    def add_entry_point(self, ep, key, weight=1.0):
         """
         Add a new entry point to the specified flux list. If key is not already know, create a new set with label "key" and add it to the dictionary.
         """
@@ -156,9 +162,13 @@ class window:
         # check to see if dictionary key exists for provided key. if not create new dictionary key implemented as a double ended queue from collections
         if key in self.flux_lists:
             self.flux_lists[key].append(ep)
+            self.flux_weights[key].append(weight)
         else:
             self.flux_lists[key] = collections.deque(maxlen=self.max_list_size)
             self.flux_lists[key].append(ep)
+            # create and add weight
+            self.flux_weights[key] = collections.deque(maxlen=self.max_list_size)
+            self.flux_weights[key].append(weight)
 
         return None
 
@@ -193,6 +203,7 @@ class window:
         """
 
         self.flux_lists.clear()
+        self.flux_weights.clear()
 
         return None
 
@@ -201,3 +212,11 @@ class window:
         Return the dictionary of the flux lists.
         """
         return self.flux_lists
+
+    def get_flux_weights(self):
+        """Return the dictionary of the flux weights.
+
+        Returns
+        -----------------
+        """
+        return self.flux_weights
