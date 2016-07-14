@@ -11,12 +11,18 @@ import ctypes
 import os
 import shutil
 
-class walker(object):
-    """
-    This object acts as an abstract base class that sets the core specification defining the Walker API. These routines
-    """
-    __metaclass__=abc.ABCMeta
 
+class walker(object):
+    def __init__(self, inputFilename):
+        """Create an instance of the openMM walker.
+
+        Parameters
+        ---------------
+        """
+
+        
+
+        return None
     @abc.abstractmethod
     def destroyColvars(self):
         """

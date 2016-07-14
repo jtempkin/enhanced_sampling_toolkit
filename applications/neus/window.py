@@ -1,15 +1,4 @@
 """
-An implementation of the window object in the NEUS toolkit.
-"""
-
-import numpy as np
-from entryPoints import entry_point
-import collections
-import copy
-import random
-
-class window:
-    """
     The window object defines a single piece of the discretization defined by the NEUS J(t) process. An instance of the window object corresponds to a single value of the J. The object defines a data structure for storing the entry point flux lists defined by ~pi. It also defines a routine for returning an entry point based on the defined fluxes.
 
     This object contains the following items:
@@ -20,12 +9,30 @@ class window:
     * routines for reinjection
     * routines for updating fluxes
     * routines for updating entry point lists
+"""
 
-    """
+import numpy as np
+from entryPoints import entry_point
+import collections
+import copy
+import random
 
+
+class window:
     def __init__(self, center, width, ref_center=None, ref_width=None, time=None, periodic_length = None, max_list_size=100, initial_conditions=[], initial_conditions_probability=0.0, a=0.0):
-        """
-        Create an intsance of a window object.
+        """Create an intsance of a window object.
+
+        Parameters
+        ---------------
+        center : ndarray, list
+            The coordinates of the 
+        width : ndarray, list
+            
+        ref_center : ndarray, list
+
+        ref_width : ndarray, list
+            
+        
         """
         # initialize the handed parameters
         self.center = np.asarray(center)
@@ -69,8 +76,12 @@ class window:
         return None
 
     def __len__(self):
-        """
-        Return the total number of entry points stored in this window.
+        """Return the total number of entry points stored in this window.
+
+        Returns
+        -------------
+        len : int
+            The total number of entry points stored in the flux lists.
         """
 
         size = 0
@@ -82,8 +93,9 @@ class window:
         return size
 
     def __nonzero__(self):
-        """
-        Return true if this window has at least one entry point to draw from in the initial distribution or the flux lists.
+        """Return boolean value of the window.
+
+        Returns True if there is at least one entry point stored in the flux lists or if there is at least one entry point stored in the initial conditions library. Returns False otherwise.
         """
 
         if (len(self) > 0) or len(self.get_initial_conditions()) > 0:
@@ -92,8 +104,12 @@ class window:
             return False
 
     def __repr__(self):
-        """
-        Return the string identifying this window instance.
+        """Return the string representation of this window instance.
+
+        Returns
+        -----------
+        repr : string
+            Returns the string represenation of the window.
         """
 
         string = "window(" + str(self.center) + ")"
@@ -101,8 +117,14 @@ class window:
         return "window(" + str(self.center) + ")"
 
     def reinject(self):
-        """
-        Return an entry point drawn proportional to the neighbor fluxes.
+        """Return an entry point drawn proportional to the neighbor fluxes.
+
+        ***description of the drawing algorithm***
+
+        Returns
+        ------------
+        ep : entry_point
+            Returns an entry point draw from 
         """
 
         # choose from initial distribution with probability stored
@@ -144,8 +166,14 @@ class window:
         return ep
 
     def update_fluxes(self, fluxes):
-        """
-        Set neighbor fluxes as numpy array.
+        """Set neighbor fluxes.
+
+        Sets the array of fluxes observed from the neighboring windows. 
+
+        Parameters
+        --------------
+        fluxes : ndarray
+            A numpy array of the fluxes from the neighbors.
         """
 
         self.fluxes = fluxes

@@ -84,7 +84,7 @@
                 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../intro.doc.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../walker_api/walker_api.doc.html">Walker API</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="">Applications</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Applications</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#nonequilibrium-umbrella-sampling">Nonequilibrium Umbrella Sampling</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#partition-module-basic-usage">Partition Module Basic Usage</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#partition-class">Partition Class</a></li>
@@ -123,7 +123,7 @@
         <div class="rst-content">
           
 
-
+ 
 
 
 
@@ -167,44 +167,44 @@
 manipulating a list of windows. The partition module is effectively a
 callable Python list.</p>
 <p>To initialize a partition object:</p>
-<div class="code python highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">partition</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">partition</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="n">sys</span> <span class="o">=</span> <span class="n">partition</span><span class="o">.</span><span class="n">partition</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>One can add elements to the partition one by one:</p>
-<div class="code python highlight-python"><div class="highlight"><pre><span></span><span class="c1"># import a window object with a pyramid support</span>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1"># import a window object with a pyramid support</span>
 <span class="kn">import</span> <span class="nn">pyramid</span>
 <span class="n">win</span> <span class="o">=</span> <span class="n">pyramid</span><span class="o">.</span><span class="n">Pyramid</span><span class="p">([</span><span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">])</span>
 
 <span class="n">sys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">win</span><span class="p">)</span>
 
-<span class="k">print</span> <span class="n">sys</span>
+<span class="nb">print</span> <span class="n">sys</span>
 </pre></div>
 </div>
-<div class="code highlight-python"><div class="highlight"><pre><span></span><span class="n">partition</span><span class="p">([</span><span class="n">Pyramid</span><span class="p">([</span> <span class="mf">0.</span><span class="p">],</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">([</span> <span class="mf">0.</span><span class="p">],</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">([</span> <span class="mf">0.</span><span class="p">],</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">])])</span>
+<div class="code highlight-default"><div class="highlight"><pre><span></span><span class="n">partition</span><span class="p">([</span><span class="n">Pyramid</span><span class="p">([</span> <span class="mf">0.</span><span class="p">],</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">([</span> <span class="mf">0.</span><span class="p">],</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">([</span> <span class="mf">0.</span><span class="p">],</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">])])</span>
 </pre></div>
 </div>
 <p>Or hand partition a list at initialization:</p>
-<div class="code python highlight-python"><div class="highlight"><pre><span></span><span class="n">windows</span> <span class="o">=</span> <span class="p">[</span><span class="n">pyramid</span><span class="o">.</span><span class="n">Pyramid</span><span class="p">(</span><span class="n">i</span><span class="p">,[</span><span class="mf">1.0</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="mi">11</span><span class="p">)]</span>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">windows</span> <span class="o">=</span> <span class="p">[</span><span class="n">pyramid</span><span class="o">.</span><span class="n">Pyramid</span><span class="p">(</span><span class="n">i</span><span class="p">,[</span><span class="mf">1.0</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="mi">11</span><span class="p">)]</span>
 <span class="n">sys</span> <span class="o">=</span> <span class="n">partition</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="n">windows</span><span class="p">)</span>
-<span class="k">print</span> <span class="n">sys</span>
+<span class="nb">print</span> <span class="n">sys</span>
 </pre></div>
 </div>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">partition</span><span class="p">([</span><span class="n">Pyramid</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">(</span><span class="mf">3.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">(</span><span class="mf">4.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">(</span><span class="mf">5.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">(</span><span class="mf">6.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">(</span><span class="mf">7.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">(</span><span class="mf">8.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">(</span><span class="mf">9.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">])])</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">partition</span><span class="p">([</span><span class="n">Pyramid</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">(</span><span class="mf">3.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">(</span><span class="mf">4.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">(</span><span class="mf">5.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">(</span><span class="mf">6.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">(</span><span class="mf">7.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">(</span><span class="mf">8.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">(</span><span class="mf">9.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">])])</span>
 </pre></div>
 </div>
 <p>Further, partition supports the addition operation for merging two
 partition objects:</p>
-<div class="code python highlight-python"><div class="highlight"><pre><span></span><span class="c1">#union = sys1 + sys2</span>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1">#union = sys1 + sys2</span>
 <span class="c1">#print union</span>
 </pre></div>
 </div>
-<div class="code python highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">import</span> <span class="nn">toyplot</span>
 </pre></div>
 </div>
-<div class="code python highlight-python"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
 <span class="n">y</span> <span class="o">=</span> <span class="n">x</span> <span class="o">**</span> <span class="mi">2</span>
 <span class="n">canvas</span> <span class="o">=</span> <span class="n">toyplot</span><span class="o">.</span><span class="n">Canvas</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
 <span class="n">axes</span> <span class="o">=</span> <span class="n">canvas</span><span class="o">.</span><span class="n">cartesian</span><span class="p">()</span>
@@ -445,17 +445,13 @@ contained in the partition.</p>
 <h3>Window Module<a class="headerlink" href="#window-module" title="Permalink to this headline">¶</a></h3>
 <p>The window object defines a single spatiotemporal restriction of the discretization defined by the NEUS J(t) process. An instance of the window object corresponds to a single value of the J. The object defines a data structure for storing the entry point flux lists defined by ~pi. It also defintes the routines require for constructing the flux lists and returning physically weighted elements.</p>
 <p>To import and initialize a window object:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">est.neus</span> <span class="kn">import</span> <span class="n">Window</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">est.neus</span> <span class="k">import</span> <span class="n">Window</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">win</span> <span class="o">=</span> <span class="n">Window</span><span class="o">.</span><span class="n">window</span><span class="p">(</span><span class="n">center</span><span class="o">=</span><span class="p">[],</span> <span class="n">width</span><span class="o">=</span><span class="p">[])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="s2">&quot;Hello&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="s2">&quot;Hello&quot;</span>
 </pre></div>
 </div>
 <p>To</p>
-<span class="target" id="module-window"></span><p>An implementation of the window object in the NEUS toolkit.</p>
-<dl class="class">
-<dt id="window.window">
-<em class="property">class </em><code class="descclassname">window.</code><code class="descname">window</code><span class="sig-paren">(</span><em>center</em>, <em>width</em>, <em>ref_center=None</em>, <em>ref_width=None</em>, <em>time=None</em>, <em>periodic_length=None</em>, <em>max_list_size=100</em>, <em>initial_conditions=[]</em>, <em>initial_conditions_probability=0.0</em>, <em>a=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/window.html#window"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#window.window" title="Permalink to this definition">¶</a></dt>
-<dd><p>The window object defines a single piece of the discretization defined by the NEUS J(t) process. An instance of the window object corresponds to a single value of the J. The object defines a data structure for storing the entry point flux lists defined by ~pi. It also defines a routine for returning an entry point based on the defined fluxes.</p>
+<span class="target" id="module-window"></span><p>The window object defines a single piece of the discretization defined by the NEUS J(t) process. An instance of the window object corresponds to a single value of the J. The object defines a data structure for storing the entry point flux lists defined by ~pi. It also defines a routine for returning an entry point based on the defined fluxes.</p>
 <p>This object contains the following items:</p>
 <ul class="simple">
 <li>data structure for containing flux lists</li>
@@ -465,63 +461,6 @@ contained in the partition.</p>
 <li>routines for updating fluxes</li>
 <li>routines for updating entry point lists</li>
 </ul>
-<p class="rubric">Methods</p>
-<dl class="method">
-<dt id="window.window.add_entry_point">
-<code class="descname">add_entry_point</code><span class="sig-paren">(</span><em>ep</em>, <em>key</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/window.html#window.add_entry_point"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#window.window.add_entry_point" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add a new entry point to the specified flux list. If key is not already know, create a new set with label &#8220;key&#8221; and add it to the dictionary.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="window.window.clear_flux_list">
-<code class="descname">clear_flux_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/window.html#window.clear_flux_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#window.window.clear_flux_list" title="Permalink to this definition">¶</a></dt>
-<dd><p>Clear the flux list of all entries.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="window.window.get_entry_point">
-<code class="descname">get_entry_point</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/window.html#window.get_entry_point"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#window.window.get_entry_point" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return an entry point from the store flux lists proportional to the entry point fluxes.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="window.window.get_flux_lists">
-<code class="descname">get_flux_lists</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/window.html#window.get_flux_lists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#window.window.get_flux_lists" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the dictionary of the flux lists.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="window.window.get_initial_conditions">
-<code class="descname">get_initial_conditions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/window.html#window.get_initial_conditions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#window.window.get_initial_conditions" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the distribution of initial conditions.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="window.window.reinject">
-<code class="descname">reinject</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/window.html#window.reinject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#window.window.reinject" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return an entry point drawn proportional to the neighbor fluxes.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="window.window.set_initial_conditions">
-<code class="descname">set_initial_conditions</code><span class="sig-paren">(</span><em>distribution</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/window.html#window.set_initial_conditions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#window.window.set_initial_conditions" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the distribution of initial conditions to this window. This corresponds the distribution of the process at J(0). Distribution is expected to be an iterable of entry point objects.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="window.window.set_initial_conditions_probability">
-<code class="descname">set_initial_conditions_probability</code><span class="sig-paren">(</span><em>p</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/window.html#window.set_initial_conditions_probability"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#window.window.set_initial_conditions_probability" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the probability for drawing from the initial conditions.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="window.window.update_fluxes">
-<code class="descname">update_fluxes</code><span class="sig-paren">(</span><em>fluxes</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/window.html#window.update_fluxes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#window.window.update_fluxes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set neighbor fluxes as numpy array.</p>
-</dd></dl>
-
-</dd></dl>
-
 <p>The Pyramid module implements a support function for the Window class of the form:</p>
 <p><strong>equation</strong>.</p>
 <div class="section" id="module-pyramid">

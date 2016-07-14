@@ -10,7 +10,7 @@ setup(name="est",
       author="Jeremy Tempkin",
       author_email="jtempkin@uchicago.edu",
       url="https://github.com/jtempkin/enhanced-sampling-toolkit",
-      requires={},
+      requires={"numpy"},
       package_dir={'applications': 'neus'},
       packages=['neus', 'walker'],
       )
