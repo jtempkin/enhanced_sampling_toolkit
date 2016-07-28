@@ -1,0 +1,170 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>NEUS Application Basic Usage Guide &mdash; Enhanced Sampling Toolkit 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/pyramid.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Enhanced Sampling Toolkit 0.1a documentation" href="../index.html" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Neuton&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nobile:regular,italic,bold,bolditalic&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
+<!--[if lte IE 6]>
+<link rel="stylesheet" href="../_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
+<![endif]-->
+
+  </head>
+  <body role="document">
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Enhanced Sampling Toolkit 0.1a documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="neus-application-basic-usage-guide">
+<h1>NEUS Application Basic Usage Guide<a class="headerlink" href="#neus-application-basic-usage-guide" title="Permalink to this headline">¶</a></h1>
+<p>The NEUS application later is composed of two fundamental objects:</p>
+<ul class="simple">
+<li>A Window object</li>
+<li>A partition object</li>
+</ul>
+<p>The Window object represents the data structures and routines that
+represent a single spatiotemporal restriction, or a single &#8220;window&#8221; in
+your NEUS scheme. In the language of NEUS, this corresponds to a single
+restricted value of the <span class="math">\(J^{(t)}\)</span> process.</p>
+<p>The partition object represents a list of Window instances. Again, in
+the language of NEUS, it represents the full space of the
+<span class="math">\(J^{(t)}\)</span> process.</p>
+<p>In the following, we will illustrate some basic usage of these objects
+with the idea of familiarizing the user with their tools and syntax. For
+a fuller example of how one can use these tools to do a full NEUS
+calculation, please refer to the examples section.</p>
+<p>Ok, let&#8217;s write out the goals of this section:</p>
+<ul class="simple">
+<li>illustrate the basic usage + syntax of the NEUS objects</li>
+<li>show how these objects can be used to set up an NEUS calculation in
+the language of the paper.</li>
+</ul>
+<div class="section" id="window-objects">
+<h2>Window objects<a class="headerlink" href="#window-objects" title="Permalink to this headline">¶</a></h2>
+<p>Let&#8217;s start with the windows. The NEUS application in the toolkit
+provides a parent module. Different shapes of the supports in space-time
+are supported by class inherentence.</p>
+</div>
+<div class="section" id="partition-objects">
+<h2>Partition objects<a class="headerlink" href="#partition-objects" title="Permalink to this headline">¶</a></h2>
+<p>To initialize a partition object:</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">partition</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="n">sys</span> <span class="o">=</span> <span class="n">partition</span><span class="o">.</span><span class="n">partition</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>One can add elements to the partition one by one:</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1"># import a window object with a pyramid support</span>
+<span class="kn">import</span> <span class="nn">pyramid</span>
+<span class="n">win</span> <span class="o">=</span> <span class="n">pyramid</span><span class="o">.</span><span class="n">Pyramid</span><span class="p">([</span><span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">])</span>
+
+<span class="n">sys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">win</span><span class="p">)</span>
+
+<span class="nb">print</span> <span class="n">sys</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">partition</span><span class="p">([</span><span class="n">Pyramid</span><span class="p">([</span> <span class="mf">0.</span><span class="p">],</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">([</span> <span class="mf">0.</span><span class="p">],</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">([</span> <span class="mf">0.</span><span class="p">],</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">])])</span>
+</pre></div>
+</div>
+<p>Or hand partition a list at initialization:</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">windows</span> <span class="o">=</span> <span class="p">[</span><span class="n">pyramid</span><span class="o">.</span><span class="n">Pyramid</span><span class="p">(</span><span class="n">i</span><span class="p">,[</span><span class="mf">1.0</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="mi">11</span><span class="p">)]</span>
+<span class="n">sys</span> <span class="o">=</span> <span class="n">partition</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="n">windows</span><span class="p">)</span>
+<span class="nb">print</span> <span class="n">sys</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">partition</span><span class="p">([</span><span class="n">Pyramid</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">(</span><span class="mf">3.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">(</span><span class="mf">4.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">(</span><span class="mf">5.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">(</span><span class="mf">6.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">(</span><span class="mf">7.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">(</span><span class="mf">8.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">(</span><span class="mf">9.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">])])</span>
+</pre></div>
+</div>
+<p>Further, partition supports the addition operation for merging two
+partition objects:</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1">#union = sys1 + sys2</span>
+<span class="c1">#print union</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">NEUS Application Basic Usage Guide</a><ul>
+<li><a class="reference internal" href="#window-objects">Window objects</a></li>
+<li><a class="reference internal" href="#partition-objects">Partition objects</a></li>
+</ul>
+</li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Enhanced Sampling Toolkit 0.1a documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2015, Jeremy O. B. Tempkin.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
+    </div>
+  </body>
+</html>

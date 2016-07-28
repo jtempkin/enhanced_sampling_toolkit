@@ -1,0 +1,87 @@
+
+NEUS Application Basic Usage Guide
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The NEUS application later is composed of two fundamental objects:
+
+-  A Window object
+-  A partition object
+
+The Window object represents the data structures and routines that
+represent a single spatiotemporal restriction, or a single "window" in
+your NEUS scheme. In the language of NEUS, this corresponds to a single
+restricted value of the :math:`J^{(t)}` process.
+
+The partition object represents a list of Window instances. Again, in
+the language of NEUS, it represents the full space of the
+:math:`J^{(t)}` process.
+
+In the following, we will illustrate some basic usage of these objects
+with the idea of familiarizing the user with their tools and syntax. For
+a fuller example of how one can use these tools to do a full NEUS
+calculation, please refer to the examples section.
+
+Ok, let's write out the goals of this section:
+
+-  illustrate the basic usage + syntax of the NEUS objects
+-  show how these objects can be used to set up an NEUS calculation in
+   the language of the paper.
+
+Window objects
+^^^^^^^^^^^^^^
+
+Let's start with the windows. The NEUS application in the toolkit
+provides a parent module. Different shapes of the supports in space-time
+are supported by class inherentence.
+
+Partition objects
+^^^^^^^^^^^^^^^^^
+
+To initialize a partition object:
+
+.. code:: python
+
+    import partition
+    import numpy as np
+    sys = partition.partition()
+
+One can add elements to the partition one by one:
+
+.. code:: python
+
+    # import a window object with a pyramid support
+    import pyramid
+    win = pyramid.Pyramid([0.0], [1.0])
+    
+    sys.append(win)
+    
+    print sys
+
+
+.. parsed-literal::
+
+    partition([Pyramid([ 0.], [ 1.]), Pyramid([ 0.], [ 1.]), Pyramid([ 0.], [ 1.])])
+
+
+Or hand partition a list at initialization:
+
+.. code:: python
+
+    windows = [pyramid.Pyramid(i,[1.0]) for i in np.linspace(0.0, 10.0, 11)]
+    sys = partition.partition(windows)
+    print sys
+
+
+.. parsed-literal::
+
+    partition([Pyramid(0.0, [ 1.]), Pyramid(1.0, [ 1.]), Pyramid(2.0, [ 1.]), Pyramid(3.0, [ 1.]), Pyramid(4.0, [ 1.]), Pyramid(5.0, [ 1.]), Pyramid(6.0, [ 1.]), Pyramid(7.0, [ 1.]), Pyramid(8.0, [ 1.]), Pyramid(9.0, [ 1.]), Pyramid(10.0, [ 1.])])
+
+
+Further, partition supports the addition operation for merging two
+partition objects:
+
+.. code:: python
+
+    #union = sys1 + sys2
+    #print union
+

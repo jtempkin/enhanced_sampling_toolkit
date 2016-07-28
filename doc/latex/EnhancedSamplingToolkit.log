@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  7 JUN 2016 17:48
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  27 JUL 2016 23:11
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -850,7 +850,7 @@ Package: trimspaces 2009/09/17 v1.1 Trim spaces around a token list
 
 
 Writing index file EnhancedSamplingToolkit.idx
-(./EnhancedSamplingToolkit.aux)
+No file EnhancedSamplingToolkit.aux.
 \openout1 = `EnhancedSamplingToolkit.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 136.
@@ -867,7 +867,6 @@ LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 136.
 LaTeX Font Info:    ... okay on input line 136.
 LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 136.
 LaTeX Font Info:    Try loading font information for TS1+cmr on input line 136.
-
 
 (/usr/local/texlive/2015/texmf-dist/tex/latex/base/ts1cmr.fd
 File: ts1cmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
@@ -922,8 +921,6 @@ Package: gettitlestring 2010/12/03 v1.4 Cleanup title references (HO)
 LaTeX Info: Redefining \ref on input line 136.
 LaTeX Info: Redefining \pageref on input line 136.
 LaTeX Info: Redefining \nameref on input line 136.
-
-(./EnhancedSamplingToolkit.out) (./EnhancedSamplingToolkit.out)
 \@outlinefile=\write6
 \openout6 = `EnhancedSamplingToolkit.out'.
 
@@ -954,191 +951,4 @@ File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
 LaTeX Font Info:    Try loading font information for U+msb on input line 139.
 
-(/usr/local/texlive/2015/texmf-dist/tex/latex/amsfonts/umsb.fd
-File: umsb.fd 2013/01/14 v3.01 AMS symbols B
-) [1
-
-{/usr/local/texlive/2015/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2
-
-]
-(./EnhancedSamplingToolkit.toc
-LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <10> not available
-(Font)              Font shape `T1/ptm/b/n' tried instead on input line 2.
-)
-\tf@toc=\write7
-\openout7 = `EnhancedSamplingToolkit.toc'.
-
-
-Adding blank page after the table of contents.
-LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <10> not available
-(Font)              Font shape `T1/phv/b/n' tried instead on input line 139.
-[1
-
-] [2]
-Chapter 1.
-LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <14.4> not available
-(Font)              Font shape `T1/phv/b/n' tried instead on input line 144.
-LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <14.4> not available
-(Font)              Font shape `T1/ptm/b/n' tried instead on input line 144.
-LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <24.88> not available
-(Font)              Font shape `T1/ptm/b/n' tried instead on input line 144.
-[1
-
-
-] [2
-
-]
-Chapter 2.
-LaTeX Font Info:    Try loading font information for T1+pcr on input line 174.
-(/usr/local/texlive/2015/texmf-dist/tex/latex/psnfss/t1pcr.fd
-File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
-)
-LaTeX Font Info:    Font shape `T1/pcr/bx/n' in size <10> not available
-(Font)              Font shape `T1/pcr/b/n' tried instead on input line 174.
- [3]
-LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <12> not available
-(Font)              Font shape `T1/phv/b/n' tried instead on input line 291.
-
-Underfull \hbox (badness 10000) in paragraph at lines 297--297
-[]\T1/ptm/m/it/10 temperature\T1/ptm/m/n/10 , \T1/ptm/m/it/10 damp-ing_coeffici
-ent\T1/ptm/m/n/10 , \T1/ptm/m/it/10 shake=False\T1/ptm/m/n/10 , \T1/ptm/m/it/10
- seed=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 lin-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 305--305
-[]\T1/ptm/m/it/10 temperature\T1/ptm/m/n/10 , \T1/ptm/m/it/10 damp-ing_coeffici
-ent\T1/ptm/m/n/10 , \T1/ptm/m/it/10 shake=False\T1/ptm/m/n/10 , \T1/ptm/m/it/10
- seed=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 lin-
- []
-
-[4]
-LaTeX Font Info:    Try loading font information for TS1+ptm on input line 354.
-
- (/usr/local/texlive/2015/texmf-dist/tex/latex/psnfss/ts1ptm.fd
-File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
-)
-Overfull \hbox (22.14064pt too wide) in paragraph at lines 387--387
-[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 387--387
-
- []
-
-
-Overfull \hbox (185.60857pt too wide) in paragraph at lines 408--408
-[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 408--408
-
- []
-
-[5] [6] [7] [8
-
-]
-Chapter 3.
-LaTeX Font Info:    Font shape `T1/pcr/bx/n' in size <9> not available
-(Font)              Font shape `T1/pcr/b/n' tried instead on input line 628.
-LaTeX Font Info:    Font shape `T1/pcr/m/it' in size <9> not available
-(Font)              Font shape `T1/pcr/m/sl' tried instead on input line 636.
-[9]
-LaTeX Font Info:    Font shape `T1/pcr/m/it' in size <10> not available
-(Font)              Font shape `T1/pcr/m/sl' tried instead on input line 699.
-
-Underfull \hbox (badness 10000) in paragraph at lines 756--756
-[]\T1/ptm/m/it/10 center\T1/ptm/m/n/10 , \T1/ptm/m/it/10 width\T1/ptm/m/n/10 , 
-\T1/ptm/m/it/10 ref_center=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 ref_width=None\
-T1/ptm/m/n/10 , \T1/ptm/m/it/10 time=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 pe-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 756--756
-\T1/ptm/m/it/10 ri-odic_length=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 max_list_si
-ze=100\T1/ptm/m/n/10 , \T1/ptm/m/it/10 ini-tial_conditions=[]\T1/ptm/m/n/10 , \
-T1/ptm/m/it/10 ini-
- []
-
-[10]
-Underfull \hbox (badness 10000) in paragraph at lines 867--867
-[]\T1/ptm/m/it/10 center\T1/ptm/m/n/10 , \T1/ptm/m/it/10 width\T1/ptm/m/n/10 , 
-\T1/ptm/m/it/10 ref_center=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 ref_width=None\
-T1/ptm/m/n/10 , \T1/ptm/m/it/10 time=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 pe-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 867--867
-\T1/ptm/m/it/10 ri-odic_length=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 max_list_si
-ze=100\T1/ptm/m/n/10 , \T1/ptm/m/it/10 ini-tial_conditions=[]\T1/ptm/m/n/10 , \
-T1/ptm/m/it/10 ini-
- []
-
-[11] [12]
-Chapter 4.
-[13
-
-] [14
-
-] [15
-
-
-] (./EnhancedSamplingToolkit.ind [16
-
-
-]
-Underfull \hbox (badness 10000) in paragraph at lines 30--31
-[]\T1/ptm/m/n/10 destroyColvars() (lammp-sWalker.lammpsWalker
- []
-
-[17
-
-]
-Underfull \hbox (badness 10000) in paragraph at lines 102--103
-[]\T1/ptm/m/n/10 set_initial_conditions_probability() (win-dow.window
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 109--110
-[]\T1/ptm/m/n/10 setTemperature() (lammp-sWalker.lammpsWalker
- []
-
-[18
-
-])
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 992.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 992.
- (./EnhancedSamplingToolkit.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 992.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 992.
-Package rerunfilecheck Info: File `EnhancedSamplingToolkit.out' has not changed
-.
-(rerunfilecheck)             Checksum: BE15981D57130679EBCA9A52B444708E;1202.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 992.
- ) 
-Here is how much of TeX's memory you used:
- 10289 strings out of 493089
- 146791 string characters out of 6134842
- 250584 words of memory out of 5000000
- 13359 multiletter control sequences out of 15000+600000
- 64379 words of font info for 82 fonts, out of 8000000 for 9000
- 1142 hyphenation exceptions out of 8191
- 36i,12n,45p,1327b,480s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/local/texlive/2015/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/t
-exlive/2015/texmf-dist/fonts/type1/urw/courier/ucrb8a.pfb></usr/local/texlive/2
-015/texmf-dist/fonts/type1/urw/courier/ucrr8a.pfb></usr/local/texlive/2015/texm
-f-dist/fonts/type1/urw/courier/ucrro8a.pfb></usr/local/texlive/2015/texmf-dist/
-fonts/type1/urw/helvetic/uhvb8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/t
-ype1/urw/helvetic/uhvbo8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/u
-rw/helvetic/uhvr8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/urw/time
-s/utmb8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/urw/times/utmr8a.p
-fb></usr/local/texlive/2015/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on EnhancedSamplingToolkit.pdf (22 pages, 141998 bytes).
-PDF statistics:
- 414 PDF objects out of 1000 (max. 8388607)
- 372 compressed objects within 4 object streams
- 110 named destinations out of 1000 (max. 500000)
- 165 words of extra memory for PDF output out of 10000 (max. 10000000)
-
+(/usr

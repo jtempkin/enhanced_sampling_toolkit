@@ -1,0 +1,151 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>LAMMPS Walker Basic Usage &mdash; Enhanced Sampling Toolkit 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/pyramid.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Enhanced Sampling Toolkit 0.1a documentation" href="../../index.html" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Neuton&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nobile:regular,italic,bold,bolditalic&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
+<!--[if lte IE 6]>
+<link rel="stylesheet" href="../../_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
+<![endif]-->
+
+  </head>
+  <body role="document">
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Enhanced Sampling Toolkit 0.1a documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="lammps-walker-basic-usage">
+<h1>LAMMPS Walker Basic Usage<a class="headerlink" href="#lammps-walker-basic-usage" title="Permalink to this headline">¶</a></h1>
+<p>In this notebook, we will highlight some examples of how the LAMMPS
+Walker API implementation can be used.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="k">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="c1"># import the LAMMPS walker binding</span>
+<span class="kn">from</span> <span class="nn">walker_api</span> <span class="k">import</span> <span class="n">lammps_walker</span>
+
+<span class="c1"># instantiate a copy using the example input script</span>
+<span class="n">walker</span> <span class="o">=</span> <span class="n">lammps_walker</span><span class="o">.</span><span class="n">Lammps</span><span class="p">(</span><span class="s2">&quot;input.diala&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The underlying model for the alanine dipeptide in vacuum is specificed
+in the &#8220;input.diala&#8221; file. This input file is read by LAMMPS&#8217;s own
+command parser, so it should be written as a standard LAMMPS input file.</p>
+<p>You can use the API routines to interrogate certain properties of the
+model, such as returning an array of the positions currently stored, or
+the coordinates of some collective variables which are implemented as
+LAMMPS computes.</p>
+<p>The following script generates a time-series of the phi dihedral angle
+for the alanine dipeptide in vacuum.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1"># get an array of the initial position</span>
+<span class="n">initial_position</span> <span class="o">=</span> <span class="n">walker</span><span class="o">.</span><span class="n">get_position</span><span class="p">()</span>
+<span class="n">initial_time</span> <span class="o">=</span> <span class="n">walker</span><span class="o">.</span><span class="n">get_time</span><span class="p">()</span>
+
+<span class="c1"># remove any set walker collective variables</span>
+<span class="n">walker</span><span class="o">.</span><span class="n">destroy_colvars</span><span class="p">()</span>
+
+<span class="c1"># add the phi dihedral with name &quot;phi&quot;</span>
+<span class="n">walker</span><span class="o">.</span><span class="n">add_colvars</span><span class="p">(</span><span class="s2">&quot;phi&quot;</span><span class="p">,</span> <span class="s2">&quot;dihedral&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span><span class="mi">15</span><span class="p">])</span>
+
+<span class="n">colvars</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="c1"># now we&#39;ll sample the phi dihedral</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
+
+    <span class="c1"># move the walker forward in time</span>
+    <span class="n">walker</span><span class="o">.</span><span class="n">propagate</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+
+    <span class="c1"># record the value of the phi dihedral</span>
+    <span class="n">cv</span> <span class="o">=</span> <span class="n">walker</span><span class="o">.</span><span class="n">get_colvars</span><span class="p">()</span>
+    <span class="n">colvars</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cv</span><span class="p">)</span>
+
+
+<span class="c1"># plot the timeseries</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">colvars</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;time (ps)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;phi (degrees)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="mi">180</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="mi">180</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../../_images/output_3_12.png" src="../../_images/output_3_12.png" />
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Enhanced Sampling Toolkit 0.1a documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2015, Jeremy O. B. Tempkin.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
+    </div>
+  </body>
+</html>

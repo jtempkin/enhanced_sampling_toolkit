@@ -5,17 +5,12 @@
 Walker API
 ========================
 
-Introduction
--------------
+The Walker API is built to provide an abstract interface between the "algorithm" level code and the code that implements the underlying dynamical model. 
 
-The central design principle of the Walker API is to provide an abstracted interface between the "algorithm" level code and the code that implements the underlying dynamical model. This section describes the base API used to define the walker object and the API routines. The implementations of the bindings specific to the dynamics packages are registered to this base class definition through direct subclassing of the modules. A key feature of this decision is that it enforces the implementation of the dynamics bindings to implement each of the following methods in their class declarations. However, many of the methods can be overridden with empty methods if an implementation is incomplete or does not require all of the base class methods. 
-
-
-.. automodule:: walker_base
-        :members: 
+This section describes some of the basic usage of the implementation of the walker API for the LAMMPS package. The example pages are written from Jupyter notebooks included in the 'data/' directory for interactive use. The full API is documented in the last section.
 
 LAMMPS Walker Module
--------------------------
+----------------------
 
 This module implements the Walker API for the LAMMPS MD engine. See walker_base.py for a specification of the API. For details concerning the usage of the LAMMPS MD package see the excellent documentation at the LAMMPS webpage:
 
@@ -25,9 +20,19 @@ In particular, you may want to see how the Python wrapper to LAMMPS on which thi
 
 http://lammps.sandia.gov/doc/Section_python.html
 
-Here we will outline basic usage guides for the walker API usage in LAMMPS.
+To use the LAMMPS walker module provided in the toolkit, you will need to have the LAMMPS MD engine available as an importable Python module. Please follow in the instructions provided by the above link to download, compile and install LAMMPS for Python. To check to see if LAMMPS is installed correctly, try importing it interactively as
 
-OpenMM Walker Module
--------------------------
+.. code:: Python
+    
+    from lammps import lammps
 
-We plan to implement an OpenMM walker API module in a future release. 
+If this import returns no errors, the LAMMPS Walker module should be able to import and use the compiled LAMMPS build on your machine. 
+
+.. include:: LAMMPS-Walker-Basic-Usage.rst
+
+LAMMPS Walker API
+--------------------
+
+.. automodule:: walker_api.lammps_walker
+    :members:
+

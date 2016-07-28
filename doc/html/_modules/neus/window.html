@@ -1,0 +1,410 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>neus.window &mdash; Enhanced Sampling Toolkit 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/pyramid.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Enhanced Sampling Toolkit 0.1a documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Neuton&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nobile:regular,italic,bold,bolditalic&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
+<!--[if lte IE 6]>
+<link rel="stylesheet" href="../../_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
+<![endif]-->
+
+  </head>
+  <body role="document">
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Enhanced Sampling Toolkit 0.1a documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for neus.window</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;The window object defines a single spatiotemporal restriction of the discretization defined by the NEUS :math:`J^{(t)}` process. An instance of the window object corresponds to a single value of the :math:`J^{(t)}`. The object defines a data structure for storing the entry point flux lists defined by :math:`\pi_{i}(t,xd)`. It also defines the routines require for constructing the flux lists and returning physically weighted elements. </span>
+
+<span class="sd">This object contains the following attributes:</span>
+
+<span class="sd">* data structure for containing flux lists</span>
+<span class="sd">* data structure for the initial conditions distribution at :math:`J^{(0)}`</span>
+<span class="sd">* a list of physical fluxes used to draw entry points proportionally</span>
+<span class="sd">* routines for reinjection</span>
+<span class="sd">* routines for updating fluxes</span>
+<span class="sd">* routines for updating entry point lists</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">entry_points</span> <span class="kn">import</span> <span class="n">entry_point</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">random</span>
+
+
+<div class="viewcode-block" id="Window"><a class="viewcode-back" href="../../neus/neus.doc.html#neus.window.Window">[docs]</a><span class="k">class</span> <span class="nc">Window</span><span class="p">:</span>
+<div class="viewcode-block" id="Window.__init__"><a class="viewcode-back" href="../../neus/neus.doc.html#neus.window.Window.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">ref_center</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">ref_width</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">periodic_length</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">max_list_size</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">initial_conditions</span><span class="o">=</span><span class="p">[],</span> <span class="n">initial_conditions_probability</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create an intsance of a window object.</span>
+
+<span class="sd">        Note that the width parameter refers to the maximum distance in each direction for which this window is defined to have nonzero support.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ---------------</span>
+<span class="sd">        center : numpy.ndarray, list</span>
+<span class="sd">            The coordinates of the center of the window support.</span>
+
+<span class="sd">        width : numpy.ndarray, list</span>
+<span class="sd">            The width of the support of the window.</span>
+
+<span class="sd">        ref_center : numpy.ndarray, list (None)</span>
+<span class="sd">            The center of the support in the reference configuration at time :math:`t=0`</span>
+
+<span class="sd">        ref_width : numpy.ndarray, list (None)</span>
+<span class="sd">            The width of the support of the reference configuration at time :math:`t=0`</span>
+
+<span class="sd">        time : numpy.ndarray, list (None)</span>
+<span class="sd">            The time interval for which this window has nonzero support.</span>
+
+<span class="sd">        periodic_length : numpy.ndarray, list (None)</span>
+<span class="sd">            The length of the periodicity for each coordinate this window supports.</span>
+
+<span class="sd">        max_list_size : interval (100)</span>
+<span class="sd">            The maximum size of each :math:`\gamma_{ij}` distribution.</span>
+
+<span class="sd">        initial_conditions : iterable</span>
+<span class="sd">            The iterable of entry point objects at time :math:`t=0`.</span>
+
+<span class="sd">        initial_conditions_probability : float</span>
+<span class="sd">            A float between 0.0 and 1.0.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># initialize the handed parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">center</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">center</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">width</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">ref_center</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ref_center</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">ref_center</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ref_center</span> <span class="o">=</span> <span class="n">ref_center</span>
+
+        <span class="k">if</span> <span class="n">ref_width</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ref_width</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">ref_width</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ref_width</span> <span class="o">=</span> <span class="n">ref_width</span>
+
+        <span class="c1"># set time boundary. None represents no time discretization.</span>
+        <span class="k">if</span> <span class="n">time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">time_start</span> <span class="o">=</span> <span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">time_end</span> <span class="o">=</span> <span class="n">time</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">time_start</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">time_end</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="c1"># set periodicity of coordinates.</span>
+        <span class="k">if</span> <span class="n">periodic_length</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wrapping</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">periodicLength</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wrapping</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="c1"># set initial t=0 distribution and probability with which to draw from this distribution</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initial_conditions</span> <span class="o">=</span> <span class="n">initial_conditions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initial_conditions_probability</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+        <span class="c1"># store maximum size of flux list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_list_size</span> <span class="o">=</span> <span class="n">max_list_size</span>
+
+        <span class="c1"># create a dictionary of neighboring flux lists. We will store sets of entry point objects here</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">flux_lists</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">flux_weights</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">return</span> <span class="bp">None</span></div>
+
+<div class="viewcode-block" id="Window.__len__"><a class="viewcode-back" href="../../neus/neus.doc.html#neus.window.Window.__len__">[docs]</a>    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the total number of entry points stored in this window.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------------</span>
+<span class="sd">        len : int</span>
+<span class="sd">            The total number of entry points stored in the flux lists.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">size</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># iterate through keys in flux list dictionary and add up size</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux_lists</span><span class="p">:</span>
+            <span class="n">size</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux_lists</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">size</span></div>
+
+<div class="viewcode-block" id="Window.__nonzero__"><a class="viewcode-back" href="../../neus/neus.doc.html#neus.window.Window.__nonzero__">[docs]</a>    <span class="k">def</span> <span class="nf">__nonzero__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return boolean value of the window.</span>
+
+<span class="sd">        Returns True if there is at least one entry point stored in the flux lists or if there is at least one entry point stored in the initial conditions library. Returns False otherwise.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        ----------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if there is at least one entry point stored in the flux lists. False otherwise.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_initial_conditions</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span></div>
+
+<div class="viewcode-block" id="Window.__repr__"><a class="viewcode-back" href="../../neus/neus.doc.html#neus.window.Window.__repr__">[docs]</a>    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the string representation of this window instance.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -----------</span>
+<span class="sd">        repr : string</span>
+<span class="sd">            Returns the string represenation of the window.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">string</span> <span class="o">=</span> <span class="s2">&quot;window(&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+
+        <span class="k">return</span> <span class="s2">&quot;window(&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span></div>
+
+<div class="viewcode-block" id="Window.reinject"><a class="viewcode-back" href="../../neus/neus.doc.html#neus.window.Window.reinject">[docs]</a>    <span class="k">def</span> <span class="nf">reinject</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return an entry point drawn proportional to the neighbor fluxes.</span>
+
+<span class="sd">        This routine will attempt to return an entry point from the initial distribution attribute with probability equal to value stored in the initial_conditions_probability attribute. With remaining probability, it attempts to draw an entry point from the weighted flux lists.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        ------------</span>
+<span class="sd">        ep : entry_point</span>
+<span class="sd">            Returns an entry point.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># choose from initial distribution with probability stored</span>
+        <span class="k">if</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial_conditions_probability</span><span class="p">:</span>
+            <span class="n">ep</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">initial_conditions</span><span class="p">)</span>
+        <span class="c1"># draw from teh flux lists with remaining probability</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ep</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_entry_point</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">ep</span></div>
+
+<div class="viewcode-block" id="Window.get_entry_point"><a class="viewcode-back" href="../../neus/neus.doc.html#neus.window.Window.get_entry_point">[docs]</a>    <span class="k">def</span> <span class="nf">get_entry_point</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return an entry point from the :math:`\gamma_{ij}`.</span>
+
+<span class="sd">        This routine selects a :math:`\gamma_{ij}` with probability proportional to the value stored in the fluxes array attribute. Once the :math:`\gamma_{ij}` is chosen, the entry point is selected from :math:`\gamma_{ij}` proportional to the weight of each entry point.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -----------</span>
+<span class="sd">        entry_point</span>
+<span class="sd">            An entry point object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">fluxes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
+
+        <span class="c1"># create probability array</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fluxes</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+
+        <span class="c1"># get fluxes for the keys in the flux list</span>
+        <span class="n">p</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">flux_lists</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fluxes</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">flux_lists</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+
+        <span class="c1"># normalize</span>
+        <span class="n">p</span> <span class="o">/=</span> <span class="n">p</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+        <span class="c1"># now choose neighbor with probability p</span>
+        <span class="n">neighbor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">)</span>
+
+        <span class="c1"># now draw an entry point from the flux list according to entry weight</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux_weights</span><span class="p">[</span><span class="n">neighbor</span><span class="p">])</span>
+        <span class="n">p</span> <span class="o">/=</span> <span class="n">p</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="c1"># we have to draw this value from the deque index</span>
+        <span class="n">indx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">size</span><span class="p">),</span> <span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">)</span>
+        <span class="c1"># draw the ep value</span>
+        <span class="n">ep</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux_lists</span><span class="p">[</span><span class="n">neighbor</span><span class="p">][</span><span class="n">indx</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">ep</span></div>
+
+<div class="viewcode-block" id="Window.update_fluxes"><a class="viewcode-back" href="../../neus/neus.doc.html#neus.window.Window.update_fluxes">[docs]</a>    <span class="k">def</span> <span class="nf">update_fluxes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set neighbor fluxes.</span>
+
+<span class="sd">        Sets the array of fluxes observed from the neighboring windows. </span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        --------------</span>
+<span class="sd">        fluxes : ndarray</span>
+<span class="sd">            A numpy array of the fluxes from the neighbors.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">fluxes</span> <span class="o">=</span> <span class="n">fluxes</span>
+
+        <span class="k">return</span> <span class="bp">None</span></div>
+
+<div class="viewcode-block" id="Window.add_entry_point"><a class="viewcode-back" href="../../neus/neus.doc.html#neus.window.Window.add_entry_point">[docs]</a>    <span class="k">def</span> <span class="nf">add_entry_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ep</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add a new entry point to the specified flux list.</span>
+
+<span class="sd">        If key is not already know, create a new set with label &quot;key&quot; and add it to the dictionary. Keys should be the index of the corresponding neighbor window.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ------------</span>
+<span class="sd">        ep : entry_point</span>
+<span class="sd">            The entry point to add to :math:`\gamma_{ij}`</span>
+
+<span class="sd">        key : int</span>
+<span class="sd">            The :math:`i` index of the neighbor.</span>
+
+<span class="sd">        weight : float (1.0)</span>
+<span class="sd">            The weight of the entry_point object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1">#assert key is isinstance(key, int), &quot;Supplied key was not an integer.&quot;</span>
+
+        <span class="c1"># check to see if dictionary key exists for provided key. if not create new dictionary key implemented as a double ended queue from collections</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux_lists</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">flux_lists</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ep</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">flux_weights</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">weight</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">flux_lists</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">deque</span><span class="p">(</span><span class="n">maxlen</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_list_size</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">flux_lists</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ep</span><span class="p">)</span>
+            <span class="c1"># create and add weight</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">flux_weights</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">deque</span><span class="p">(</span><span class="n">maxlen</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_list_size</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">flux_weights</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">weight</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">None</span></div>
+
+<div class="viewcode-block" id="Window.set_initial_conditions"><a class="viewcode-back" href="../../neus/neus.doc.html#neus.window.Window.set_initial_conditions">[docs]</a>    <span class="k">def</span> <span class="nf">set_initial_conditions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">distribution</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set the distribution of initial conditions to this window. </span>
+
+<span class="sd">        This set corresponds the distribution of the process at J(0). Distribution is expected to be an iterable of entry point objects.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ---------------</span>
+<span class="sd">        distribution : iterable</span>
+<span class="sd">            An iterable of entry_point objects.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">initial_conditions</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">distribution</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">None</span></div>
+
+<div class="viewcode-block" id="Window.set_initial_conditions_probability"><a class="viewcode-back" href="../../neus/neus.doc.html#neus.window.Window.set_initial_conditions_probability">[docs]</a>    <span class="k">def</span> <span class="nf">set_initial_conditions_probability</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set the probability for drawing from the initial conditions.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -------------</span>
+<span class="sd">        p : float</span>
+<span class="sd">            A float between 0.0 and 1.0.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">assert</span> <span class="n">p</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s2">&quot;Probability is not valid.&quot;</span>
+        <span class="k">assert</span> <span class="n">p</span> <span class="o">&gt;=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">&quot;Probability is not valid.&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">initial_conditions_probability</span> <span class="o">=</span> <span class="n">p</span>
+
+        <span class="k">return</span> <span class="bp">None</span></div>
+
+<div class="viewcode-block" id="Window.get_initial_conditions"><a class="viewcode-back" href="../../neus/neus.doc.html#neus.window.Window.get_initial_conditions">[docs]</a>    <span class="k">def</span> <span class="nf">get_initial_conditions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the distribution of initial conditions.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        ----------</span>
+<span class="sd">        iterable</span>
+<span class="sd">            An iterable of the initial conditions.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial_conditions</span></div>
+
+<div class="viewcode-block" id="Window.clear_flux_list"><a class="viewcode-back" href="../../neus/neus.doc.html#neus.window.Window.clear_flux_list">[docs]</a>    <span class="k">def</span> <span class="nf">clear_flux_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Clear the :math:`\gamma_{ij}` of all entries.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">flux_lists</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">flux_weights</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">None</span></div>
+
+<div class="viewcode-block" id="Window.get_flux_lists"><a class="viewcode-back" href="../../neus/neus.doc.html#neus.window.Window.get_flux_lists">[docs]</a>    <span class="k">def</span> <span class="nf">get_flux_lists</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the dictionary of the flux lists.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------------</span>
+<span class="sd">        dictionary</span>
+<span class="sd">            The dictionary of the :math:`\gamma_{ij}`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux_lists</span></div>
+
+<div class="viewcode-block" id="Window.get_flux_weights"><a class="viewcode-back" href="../../neus/neus.doc.html#neus.window.Window.get_flux_weights">[docs]</a>    <span class="k">def</span> <span class="nf">get_flux_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the dictionary of the entry_point weights.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -----------------</span>
+<span class="sd">        dictionary</span>
+<span class="sd">            A dictionary of the entry point weights.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux_weights</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Enhanced Sampling Toolkit 0.1a documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2015, Jeremy O. B. Tempkin.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
+    </div>
+  </body>
+</html>

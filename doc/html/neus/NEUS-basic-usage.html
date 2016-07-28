@@ -1,0 +1,202 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Window objects &mdash; Enhanced Sampling Toolkit 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/pyramid.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Enhanced Sampling Toolkit 0.1a documentation" href="../index.html" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Neuton&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nobile:regular,italic,bold,bolditalic&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
+<!--[if lte IE 6]>
+<link rel="stylesheet" href="../_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
+<![endif]-->
+
+  </head>
+  <body role="document">
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Enhanced Sampling Toolkit 0.1a documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <p>The NEUS application toolkit provides three modules:</p>
+<ul class="simple">
+<li>A Window object</li>
+<li>A partition object</li>
+<li>An Entry Point collection</li>
+</ul>
+<p>The Window object represents the data strutures and routines that
+represent a single spatiotemporal restriction, or a single &#8220;window&#8221; in
+your NEUS scheme. In the language of NEUS, this corresponds to a single
+restricted value of the <span class="math">\(J^{(t)}\)</span> process.</p>
+<p>The partition object represents a callable list of Window instances.
+Again, in the language of NEUS, it represents the full index space of
+the <span class="math">\(J^{(t)}\)</span> process.</p>
+<p>The entry point module provides a named tuple structure for storing the
+state of the system at a particular point in phase space.</p>
+<p>In the following, we will illustrate some basic usage of these objects
+with the idea of familiarizing the user with their tools and syntax.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="k">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">neus</span> <span class="k">import</span> <span class="n">pyramid</span>
+<span class="kn">from</span> <span class="nn">neus</span> <span class="k">import</span> <span class="n">partition</span>
+</pre></div>
+</div>
+<div class="section" id="window-objects">
+<h1>Window objects<a class="headerlink" href="#window-objects" title="Permalink to this headline">¶</a></h1>
+<p>The NEUS application in the toolkit provides a parent module called
+&#8220;window&#8221;. The shape of the support of each window can be customized by
+writing a class that inherents from the window parent class.</p>
+<p>For example, the NEUS toolkit provides a pyramidal shaped module named
+neus.pyramid.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1"># instantiate a window object</span>
+<span class="n">center</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]</span>
+<span class="n">width</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">]</span>
+<span class="n">win</span> <span class="o">=</span> <span class="n">pyramid</span><span class="o">.</span><span class="n">Pyramid</span><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="n">width</span><span class="p">)</span>
+
+<span class="c1"># plot the support of the pyramid object</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">out</span> <span class="o">=</span> <span class="p">[</span><span class="n">win</span><span class="p">([</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">x</span><span class="p">]</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">lines</span><span class="o">.</span><span class="n">Line2D</span> <span class="n">at</span> <span class="mh">0x10f399c10</span><span class="o">&gt;</span><span class="p">]</span>
+</pre></div>
+</div>
+<img alt="../_images/output_3_11.png" src="../_images/output_3_11.png" />
+</div>
+<div class="section" id="partition-objects">
+<h1>Partition objects<a class="headerlink" href="#partition-objects" title="Permalink to this headline">¶</a></h1>
+<p>The NEUS toolkit provides the partition class that represents a
+collection of window objects. It&#8217;s implementation is effectively a
+callable list, whose call function returns a normlized vector of the
+supports of it&#8217;s elements. Note that it enforces that each element of a
+partition must itself be a callable object.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1"># create an empty partition object</span>
+<span class="n">sys</span> <span class="o">=</span> <span class="n">partition</span><span class="o">.</span><span class="n">Partition</span><span class="p">()</span>
+
+<span class="c1"># create a list of winodw objects</span>
+<span class="n">width</span> <span class="o">=</span> <span class="mf">0.75</span>
+
+<span class="n">centers</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)]</span>
+
+<span class="c1"># now add the windows to partition</span>
+<span class="k">for</span> <span class="n">center</span> <span class="ow">in</span> <span class="n">centers</span><span class="p">:</span>
+    <span class="n">win</span> <span class="o">=</span> <span class="n">pyramid</span><span class="o">.</span><span class="n">Pyramid</span><span class="p">([</span><span class="n">center</span><span class="p">],</span> <span class="p">[</span><span class="n">width</span><span class="p">])</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">win</span><span class="p">)</span>
+
+
+<span class="nb">print</span> <span class="n">sys</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">partition</span><span class="p">([</span><span class="n">Pyramid</span><span class="p">([</span><span class="o">-</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span> <span class="mf">0.75</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">([</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span> <span class="mf">0.75</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span> <span class="mf">0.75</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">([</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span> <span class="mf">0.75</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">([</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span> <span class="mf">0.75</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">([</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span> <span class="mf">0.75</span><span class="p">])])</span>
+</pre></div>
+</div>
+<p>Partition objects act like callable lists so some of the expected list
+operations also work with partitons:</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1"># element access</span>
+<span class="nb">print</span> <span class="n">sys</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="c1"># slicing</span>
+<span class="nb">print</span> <span class="n">sys</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+
+<span class="c1"># list concatenation</span>
+<span class="nb">print</span> <span class="n">sys</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">sys</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Pyramid</span><span class="p">([</span><span class="o">-</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span> <span class="mf">0.75</span><span class="p">])</span>
+<span class="p">[</span><span class="n">Pyramid</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span> <span class="mf">0.75</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">([</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span> <span class="mf">0.75</span><span class="p">])]</span>
+<span class="p">[</span><span class="n">Pyramid</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span> <span class="mf">0.75</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">([</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span> <span class="mf">0.75</span><span class="p">]),</span> <span class="n">Pyramid</span><span class="p">([</span><span class="o">-</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span> <span class="mf">0.75</span><span class="p">])]</span>
+</pre></div>
+</div>
+<p>The partition&#8217;s call routine returns the normalized vector of supports:</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1"># choose a point with nonzero support</span>
+<span class="n">cv</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">2.5</span><span class="p">]</span>
+
+<span class="c1"># return normalized vector of the support</span>
+<span class="nb">print</span> <span class="n">sys</span><span class="p">(</span><span class="n">cv</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span> <span class="mf">0.5</span><span class="p">,</span>  <span class="mf">0.5</span><span class="p">,</span>  <span class="mf">0.</span> <span class="p">,</span>  <span class="mf">0.</span> <span class="p">,</span>  <span class="mf">0.</span> <span class="p">,</span>  <span class="mf">0.</span> <span class="p">])</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Window objects</a></li>
+<li><a class="reference internal" href="#partition-objects">Partition objects</a></li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Enhanced Sampling Toolkit 0.1a documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2015, Jeremy O. B. Tempkin.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
+    </div>
+  </body>
+</html>

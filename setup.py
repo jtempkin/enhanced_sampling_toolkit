@@ -1,16 +1,20 @@
-"""
-Setup configuration file for the Enhanced Sampling Toolkit.
-"""
+from setuptools import setup, find_packages
 
-from distutils.core import setup
+setup(name="enhanced_sampling_toolkit",
+      version="0.1a1",
 
-setup(name="est",
-      version="0.1a",
-      description="A toolkit for rapid prototyping of enhanced sampling algorithms",
-      author="Jeremy Tempkin",
+      #package_dir={'applications': 'neus'},
+      packages=find_packages(),
+      install_requires=[
+        'numpy'
+      ],
+
+      # metadata
+      author="Jeremy O. B. Tempkin",
       author_email="jtempkin@uchicago.edu",
-      url="https://github.com/jtempkin/enhanced-sampling-toolkit",
-      requires={"numpy"},
-      package_dir={'applications': 'neus'},
-      packages=['neus', 'walker'],
+      url="https://github.com/jtempkin/enhanced_sampling_toolkit",
+      description="A toolkit for rapid prototyping of enhanced sampling algorithms.",
+      license="MIT",
+      keywords="enhanced sampling toolkit molecular dynamics"
+
       )

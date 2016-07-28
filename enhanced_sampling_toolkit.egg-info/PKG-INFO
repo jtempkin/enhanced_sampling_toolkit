@@ -1,0 +1,11 @@
+Metadata-Version: 1.0
+Name: enhanced-sampling-toolkit
+Version: 0.1a1
+Summary: A toolkit for rapid prototyping of enhanced sampling algorithms.
+Home-page: https://github.com/jtempkin/enhanced_sampling_toolkit
+Author: Jeremy O. B. Tempkin
+Author-email: jtempkin@uchicago.edu
+License: MIT
+Description: UNKNOWN
+Keywords: enhanced sampling toolkit molecular dynamics
+Platform: UNKNOWN

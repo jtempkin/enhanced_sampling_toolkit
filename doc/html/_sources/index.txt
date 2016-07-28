@@ -7,10 +7,10 @@ Welcome to Enhanced Sampling Toolkit's documentation!
 =====================================================
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 1
 
-   intro.doc
+   introduction.doc
+   installation.doc
    walker_api/walker_api.doc
-   applications/applications.doc
-   applications/examples/examples.doc
+   neus/neus.doc
    test/testing.doc

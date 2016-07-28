@@ -1,6 +1,11 @@
 Testing
 -------------------
 
-Here I will add a description of the unit testing of Walker API implementations and potentially the application testing.
+The Enhanced Sampling Toolkit uses the 
+`pytest module <http://docs.pytest.org/en/latest/>`_ to perform unit tests on module provided in the toolkit. To run the provided test suite, navigate to the test subdirectory and run 
 
-To add: automatic system for scanning the package files for tests to execute. The idea here would be that if contributors to the project add test files the testing suite will automatically find and run these test files.
+.. code:: Bash
+
+    py.test
+
+from the command line. Add the filename as an argument to py.test to run a specific module's tests. 
