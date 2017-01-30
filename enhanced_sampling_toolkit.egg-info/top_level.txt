@@ -1,3 +1,0 @@
-applications
-neus
-walker_api
