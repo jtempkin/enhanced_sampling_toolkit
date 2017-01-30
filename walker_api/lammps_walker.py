@@ -187,7 +187,7 @@ class Lammps(walker):
         cv = self.colvars[-1]
 
         # first set the group for the colvar
-        self.command("group " + cv.name + " id " + " ".join(map(str,cv.atomIDs)))
+        #self.command("group " + cv.name + " id " + " ".join(map(str,cv.atomIDs)))
 
         # now set the appropriate colvar as a compute to LAMMPS
         if cv.type == 'bond':
@@ -208,6 +208,8 @@ class Lammps(walker):
             self.command("compute " + cv.name + " " + cv.name + " property/atom vy")
         elif cv.type == "vz":
             self.command("compute " + cv.name + " " + cv.name + " property/atom vz")
+        elif cv.type == "fe":
+            pass
 
         self.propagate(0, pre='yes')
 
@@ -351,7 +353,8 @@ class Lammps(walker):
             if cv.type in ['x', 'y', 'z', 'vx', 'vy', 'vz']:
                 cvarray.append(self.lmp.extract_compute(cv.name, 1, 1)[0])
             elif cv.type in ['fe']:
-                cvarray.append(self.lmp.extract_compute(cv.name, 0, 1)[0])
+                #cvarray.append(self.lmp.extract_compute(cv.name, 0, 1)[0])
+                cvarray.append(self.lmp.extract_variable("wsum", 0, 0))
             else:
                 #*** We REALLY need assurance here that what we are getting here is in fact not a NULL POINTER.
                 cvarray.append(self.lmp.extract_compute(cv.name, 2, 1)[0])
@@ -369,6 +372,7 @@ class Lammps(walker):
             A one-dimentional numpy array of the position coordinates in [x1, y1, z1, x2, y2, z2,...] format.
             
         """
+
         self.lmp.scatter_atoms("x", 1, 3, config.ctypes.data_as(ctypes.POINTER(ctypes.c_double)))
 
         self.propagate(0, pre='yes')
