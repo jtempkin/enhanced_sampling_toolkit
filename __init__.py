@@ -1,2 +1,0 @@
-"""The Enhanced Sampling Toolkit.
-"""

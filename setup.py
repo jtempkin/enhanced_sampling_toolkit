@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-setup(name="enhanced_sampling_toolkit",
+setup(name="jester",
       version="0.1a1",
 
       #package_dir={'applications': 'neus'},
@@ -16,5 +16,6 @@ setup(name="enhanced_sampling_toolkit",
       description="A toolkit for rapid prototyping of enhanced sampling algorithms.",
       license="MIT",
       keywords="enhanced sampling toolkit molecular dynamics"
-
+      # should add some classifiers
+      # also setup a unit testing hook into this
       )
