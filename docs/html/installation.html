@@ -27,6 +27,7 @@
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Walker API" href="walker.html" />
     <link rel="prev" title="Introduction" href="introduction.html" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Neuton&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nobile:regular,italic,bold,bolditalic&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
@@ -44,8 +45,8 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
+          <a href="walker.html" title="Walker API"
+             accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="introduction.html" title="Introduction"
              accesskey="P">previous</a> |</li>
@@ -61,15 +62,23 @@
   <div class="section" id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
 <p>To install the Enhanced Sampling Toolkit on your local machine, download the package from the <a class="reference external" href="https://github.com/jtempkin/enhanced_sampling_toolkit">Github page</a>.</p>
-<p>To install the toolkit, run</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">install</span>
+<p>There is a simple Makefile implementation for installing the package with pip. To install the package using the Makefile, run:</p>
+<div class="code highlight-default"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">install</span>
 </pre></div>
 </div>
-<p>from the root of the toolkit package. If you plan on developing the files in the toolkit, use</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">develop</span>
+<p>from the root of the toolkit package. If you plan on developing the files in the toolkit and want to install a soft-linked version that points back to the local source, run</p>
+<div class="code highlight-default"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">install</span><span class="o">-</span><span class="n">dev</span>
 </pre></div>
 </div>
-<p>which will use the state of the local files. Note that this will allow changes made locally to the package files to visible in your Python environment.</p>
+<p>Note that this will allow changes made locally to the package files to visible in your active Python environment. To uninstall the package:</p>
+<div class="code highlight-default"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">uninstall</span>
+</pre></div>
+</div>
+<p>If you&#8217;d like to reinstall the package for whatever reason, run:</p>
+<div class="code highlight-default"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">reinstall</span>
+</pre></div>
+</div>
+<p>which will run the uninstall and install lines.</p>
 </div>
 
 
@@ -81,6 +90,9 @@
   <h4>Previous topic</h4>
   <p class="topless"><a href="introduction.html"
                         title="previous chapter">Introduction</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="walker.html"
+                        title="next chapter">Walker API</a></p>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
@@ -102,8 +114,8 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
+          <a href="walker.html" title="Walker API"
+             >next</a> |</li>
         <li class="right" >
           <a href="introduction.html" title="Introduction"
              >previous</a> |</li>

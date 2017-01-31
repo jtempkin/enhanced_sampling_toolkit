@@ -27,7 +27,8 @@
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Installation" href="installation.html" />
+    <link rel="next" title="Testing" href="testing.html" />
+    <link rel="prev" title="Walker API" href="walker.html" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Neuton&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nobile:regular,italic,bold,bolditalic&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
 <!--[if lte IE 6]>
@@ -47,7 +48,10 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="installation.html" title="Installation"
+          <a href="testing.html" title="Testing"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="walker.html" title="Walker API"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">Enhanced Sampling Toolkit 0.1a documentation</a> &#187;</li> 
       </ul>
@@ -58,8 +62,8 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="module-neus">
-<span id="nonequilibrium-umbrella-sampling-neus"></span><h1>Nonequilibrium Umbrella Sampling (NEUS)<a class="headerlink" href="#module-neus" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-jester.neus">
+<span id="nonequilibrium-umbrella-sampling-neus"></span><h1>Nonequilibrium Umbrella Sampling (NEUS)<a class="headerlink" href="#module-jester.neus" title="Permalink to this headline">¶</a></h1>
 <p>The Nonequilibrium Umbrella Sampling (NEUS) application module provides a flexible set of tools built on top of the Walker API that implements the components of the NEUS algorithm described in (NEUS paper citation).</p>
 <p>The NEUS toolkit provided in this package contains three modules:</p>
 <ul class="simple">
@@ -177,65 +181,65 @@ operations also work with partitons:</p>
 <div class="section" id="partition-module-api">
 <h2>Partition Module API<a class="headerlink" href="#partition-module-api" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="neus.partition.Partition">
-<em class="property">class </em><code class="descclassname">neus.partition.</code><code class="descname">Partition</code><span class="sig-paren">(</span><em>umbrellas=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/neus/partition.html#Partition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neus.partition.Partition" title="Permalink to this definition">¶</a></dt>
+<dt id="jester.neus.partition.Partition">
+<em class="property">class </em><code class="descclassname">jester.neus.partition.</code><code class="descname">Partition</code><span class="sig-paren">(</span><em>umbrellas=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jester/neus/partition.html#Partition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jester.neus.partition.Partition" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
-<dt id="neus.partition.Partition.__call__">
-<code class="descname">__call__</code><span class="sig-paren">(</span><em>pos</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/neus/partition.html#Partition.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neus.partition.Partition.__call__" title="Permalink to this definition">¶</a></dt>
+<dt id="jester.neus.partition.Partition.__call__">
+<code class="descname">__call__</code><span class="sig-paren">(</span><em>pos</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jester/neus/partition.html#Partition.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jester.neus.partition.Partition.__call__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a numpy array of the normalized supports of the windows at the given.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="neus.partition.Partition.__contains__">
-<code class="descname">__contains__</code><span class="sig-paren">(</span><em>item</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/neus/partition.html#Partition.__contains__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neus.partition.Partition.__contains__" title="Permalink to this definition">¶</a></dt>
+<dt id="jester.neus.partition.Partition.__contains__">
+<code class="descname">__contains__</code><span class="sig-paren">(</span><em>item</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jester/neus/partition.html#Partition.__contains__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jester.neus.partition.Partition.__contains__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return boolean for if the partition contains the specified item.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="neus.partition.Partition.__delitem__">
-<code class="descname">__delitem__</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/neus/partition.html#Partition.__delitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neus.partition.Partition.__delitem__" title="Permalink to this definition">¶</a></dt>
+<dt id="jester.neus.partition.Partition.__delitem__">
+<code class="descname">__delitem__</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jester/neus/partition.html#Partition.__delitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jester.neus.partition.Partition.__delitem__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete window.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="neus.partition.Partition.__getitem__">
-<code class="descname">__getitem__</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/neus/partition.html#Partition.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neus.partition.Partition.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dt id="jester.neus.partition.Partition.__getitem__">
+<code class="descname">__getitem__</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jester/neus/partition.html#Partition.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jester.neus.partition.Partition.__getitem__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an item in the list.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="neus.partition.Partition.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>umbrellas=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/neus/partition.html#Partition.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neus.partition.Partition.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="jester.neus.partition.Partition.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>umbrellas=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jester/neus/partition.html#Partition.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jester.neus.partition.Partition.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Construct an instance of the partition.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="neus.partition.Partition.__iter__">
-<code class="descname">__iter__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/neus/partition.html#Partition.__iter__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neus.partition.Partition.__iter__" title="Permalink to this definition">¶</a></dt>
+<dt id="jester.neus.partition.Partition.__iter__">
+<code class="descname">__iter__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/jester/neus/partition.html#Partition.__iter__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jester.neus.partition.Partition.__iter__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an iterator for the list of basis functions.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="neus.partition.Partition.__len__">
-<code class="descname">__len__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/neus/partition.html#Partition.__len__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neus.partition.Partition.__len__" title="Permalink to this definition">¶</a></dt>
+<dt id="jester.neus.partition.Partition.__len__">
+<code class="descname">__len__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/jester/neus/partition.html#Partition.__len__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jester.neus.partition.Partition.__len__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the number of windows in the partition.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="neus.partition.Partition.__repr__">
-<code class="descname">__repr__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/neus/partition.html#Partition.__repr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neus.partition.Partition.__repr__" title="Permalink to this definition">¶</a></dt>
+<dt id="jester.neus.partition.Partition.__repr__">
+<code class="descname">__repr__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/jester/neus/partition.html#Partition.__repr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jester.neus.partition.Partition.__repr__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return string representation of the partition.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="neus.partition.Partition.__setitem__">
-<code class="descname">__setitem__</code><span class="sig-paren">(</span><em>key</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/neus/partition.html#Partition.__setitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neus.partition.Partition.__setitem__" title="Permalink to this definition">¶</a></dt>
+<dt id="jester.neus.partition.Partition.__setitem__">
+<code class="descname">__setitem__</code><span class="sig-paren">(</span><em>key</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jester/neus/partition.html#Partition.__setitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jester.neus.partition.Partition.__setitem__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set item to value.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="neus.partition.Partition.append">
-<code class="descname">append</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/neus/partition.html#Partition.append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neus.partition.Partition.append" title="Permalink to this definition">¶</a></dt>
+<dt id="jester.neus.partition.Partition.append">
+<code class="descname">append</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jester/neus/partition.html#Partition.append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jester.neus.partition.Partition.append" title="Permalink to this definition">¶</a></dt>
 <dd><p>Append a new value to the partition.</p>
 <p>Note that this enforces that the input object is callable. Will throw an exception if value is not callable.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -256,8 +260,8 @@ operations also work with partitons:</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="neus.partition.Partition.index">
-<code class="descname">index</code><span class="sig-paren">(</span><em>item</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/neus/partition.html#Partition.index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neus.partition.Partition.index" title="Permalink to this definition">¶</a></dt>
+<dt id="jester.neus.partition.Partition.index">
+<code class="descname">index</code><span class="sig-paren">(</span><em>item</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jester/neus/partition.html#Partition.index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jester.neus.partition.Partition.index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the first index in which item appears in partition.</p>
 <p>Extended description.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -284,8 +288,8 @@ contained in the partition.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-neus.window">
-<span id="window-module-api"></span><h2>Window Module API<a class="headerlink" href="#module-neus.window" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-jester.neus.window">
+<span id="window-module-api"></span><h2>Window Module API<a class="headerlink" href="#module-jester.neus.window" title="Permalink to this headline">¶</a></h2>
 <p>The window object defines a single spatiotemporal restriction of the discretization defined by the NEUS <span class="math">\(J^{(t)}\)</span> process. An instance of the window object corresponds to a single value of the <span class="math">\(J^{(t)}\)</span>. The object defines a data structure for storing the entry point flux lists defined by <span class="math">\(\pi_{i}(t,xd)\)</span>. It also defines the routines require for constructing the flux lists and returning physically weighted elements.</p>
 <p>This object contains the following attributes:</p>
 <ul class="simple">
@@ -297,11 +301,11 @@ contained in the partition.</p>
 <li>routines for updating entry point lists</li>
 </ul>
 <dl class="class">
-<dt id="neus.window.Window">
-<em class="property">class </em><code class="descclassname">neus.window.</code><code class="descname">Window</code><span class="sig-paren">(</span><em>center</em>, <em>width</em>, <em>ref_center=None</em>, <em>ref_width=None</em>, <em>time=None</em>, <em>periodic_length=None</em>, <em>max_list_size=100</em>, <em>initial_conditions=[]</em>, <em>initial_conditions_probability=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/neus/window.html#Window"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neus.window.Window" title="Permalink to this definition">¶</a></dt>
+<dt id="jester.neus.window.Window">
+<em class="property">class </em><code class="descclassname">jester.neus.window.</code><code class="descname">Window</code><span class="sig-paren">(</span><em>center</em>, <em>width</em>, <em>ref_center=None</em>, <em>ref_width=None</em>, <em>time=None</em>, <em>periodic_length=None</em>, <em>max_list_size=100</em>, <em>initial_conditions=[]</em>, <em>initial_conditions_probability=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jester/neus/window.html#Window"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jester.neus.window.Window" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
-<dt id="neus.window.Window.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>center</em>, <em>width</em>, <em>ref_center=None</em>, <em>ref_width=None</em>, <em>time=None</em>, <em>periodic_length=None</em>, <em>max_list_size=100</em>, <em>initial_conditions=[]</em>, <em>initial_conditions_probability=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/neus/window.html#Window.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neus.window.Window.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="jester.neus.window.Window.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>center</em>, <em>width</em>, <em>ref_center=None</em>, <em>ref_width=None</em>, <em>time=None</em>, <em>periodic_length=None</em>, <em>max_list_size=100</em>, <em>initial_conditions=[]</em>, <em>initial_conditions_probability=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jester/neus/window.html#Window.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jester.neus.window.Window.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create an intsance of a window object.</p>
 <p>Note that the width parameter refers to the maximum distance in each direction for which this window is defined to have nonzero support.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -351,8 +355,8 @@ contained in the partition.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="neus.window.Window.__len__">
-<code class="descname">__len__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/neus/window.html#Window.__len__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neus.window.Window.__len__" title="Permalink to this definition">¶</a></dt>
+<dt id="jester.neus.window.Window.__len__">
+<code class="descname">__len__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/jester/neus/window.html#Window.__len__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jester.neus.window.Window.__len__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the total number of entry points stored in this window.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -369,8 +373,8 @@ contained in the partition.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="neus.window.Window.__nonzero__">
-<code class="descname">__nonzero__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/neus/window.html#Window.__nonzero__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neus.window.Window.__nonzero__" title="Permalink to this definition">¶</a></dt>
+<dt id="jester.neus.window.Window.__nonzero__">
+<code class="descname">__nonzero__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/jester/neus/window.html#Window.__nonzero__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jester.neus.window.Window.__nonzero__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return boolean value of the window.</p>
 <p>Returns True if there is at least one entry point stored in the flux lists or if there is at least one entry point stored in the initial conditions library. Returns False otherwise.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -388,8 +392,8 @@ contained in the partition.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="neus.window.Window.__repr__">
-<code class="descname">__repr__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/neus/window.html#Window.__repr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neus.window.Window.__repr__" title="Permalink to this definition">¶</a></dt>
+<dt id="jester.neus.window.Window.__repr__">
+<code class="descname">__repr__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/jester/neus/window.html#Window.__repr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jester.neus.window.Window.__repr__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the string representation of this window instance.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -406,8 +410,8 @@ contained in the partition.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="neus.window.Window.add_entry_point">
-<code class="descname">add_entry_point</code><span class="sig-paren">(</span><em>ep</em>, <em>key</em>, <em>weight=1.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/neus/window.html#Window.add_entry_point"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neus.window.Window.add_entry_point" title="Permalink to this definition">¶</a></dt>
+<dt id="jester.neus.window.Window.add_entry_point">
+<code class="descname">add_entry_point</code><span class="sig-paren">(</span><em>ep</em>, <em>key</em>, <em>weight=1.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jester/neus/window.html#Window.add_entry_point"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jester.neus.window.Window.add_entry_point" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a new entry point to the specified flux list.</p>
 <p>If key is not already know, create a new set with label &#8220;key&#8221; and add it to the dictionary. Keys should be the index of the corresponding neighbor window.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -433,14 +437,14 @@ contained in the partition.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="neus.window.Window.clear_flux_list">
-<code class="descname">clear_flux_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/neus/window.html#Window.clear_flux_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neus.window.Window.clear_flux_list" title="Permalink to this definition">¶</a></dt>
+<dt id="jester.neus.window.Window.clear_flux_list">
+<code class="descname">clear_flux_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/jester/neus/window.html#Window.clear_flux_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jester.neus.window.Window.clear_flux_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Clear the <span class="math">\(\gamma_{ij}\)</span> of all entries.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="neus.window.Window.get_entry_point">
-<code class="descname">get_entry_point</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/neus/window.html#Window.get_entry_point"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neus.window.Window.get_entry_point" title="Permalink to this definition">¶</a></dt>
+<dt id="jester.neus.window.Window.get_entry_point">
+<code class="descname">get_entry_point</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/jester/neus/window.html#Window.get_entry_point"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jester.neus.window.Window.get_entry_point" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an entry point from the <span class="math">\(\gamma_{ij}\)</span>.</p>
 <p>This routine selects a <span class="math">\(\gamma_{ij}\)</span> with probability proportional to the value stored in the fluxes array attribute. Once the <span class="math">\(\gamma_{ij}\)</span> is chosen, the entry point is selected from <span class="math">\(\gamma_{ij}\)</span> proportional to the weight of each entry point.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -458,8 +462,8 @@ contained in the partition.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="neus.window.Window.get_flux_lists">
-<code class="descname">get_flux_lists</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/neus/window.html#Window.get_flux_lists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neus.window.Window.get_flux_lists" title="Permalink to this definition">¶</a></dt>
+<dt id="jester.neus.window.Window.get_flux_lists">
+<code class="descname">get_flux_lists</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/jester/neus/window.html#Window.get_flux_lists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jester.neus.window.Window.get_flux_lists" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the dictionary of the flux lists.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -476,8 +480,8 @@ contained in the partition.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="neus.window.Window.get_flux_weights">
-<code class="descname">get_flux_weights</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/neus/window.html#Window.get_flux_weights"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neus.window.Window.get_flux_weights" title="Permalink to this definition">¶</a></dt>
+<dt id="jester.neus.window.Window.get_flux_weights">
+<code class="descname">get_flux_weights</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/jester/neus/window.html#Window.get_flux_weights"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jester.neus.window.Window.get_flux_weights" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the dictionary of the entry_point weights.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -494,8 +498,8 @@ contained in the partition.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="neus.window.Window.get_initial_conditions">
-<code class="descname">get_initial_conditions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/neus/window.html#Window.get_initial_conditions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neus.window.Window.get_initial_conditions" title="Permalink to this definition">¶</a></dt>
+<dt id="jester.neus.window.Window.get_initial_conditions">
+<code class="descname">get_initial_conditions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/jester/neus/window.html#Window.get_initial_conditions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jester.neus.window.Window.get_initial_conditions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the distribution of initial conditions.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -512,8 +516,8 @@ contained in the partition.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="neus.window.Window.reinject">
-<code class="descname">reinject</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/neus/window.html#Window.reinject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neus.window.Window.reinject" title="Permalink to this definition">¶</a></dt>
+<dt id="jester.neus.window.Window.reinject">
+<code class="descname">reinject</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/jester/neus/window.html#Window.reinject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jester.neus.window.Window.reinject" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an entry point drawn proportional to the neighbor fluxes.</p>
 <p>This routine will attempt to return an entry point from the initial distribution attribute with probability equal to value stored in the initial_conditions_probability attribute. With remaining probability, it attempts to draw an entry point from the weighted flux lists.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -531,8 +535,8 @@ contained in the partition.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="neus.window.Window.set_initial_conditions">
-<code class="descname">set_initial_conditions</code><span class="sig-paren">(</span><em>distribution</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/neus/window.html#Window.set_initial_conditions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neus.window.Window.set_initial_conditions" title="Permalink to this definition">¶</a></dt>
+<dt id="jester.neus.window.Window.set_initial_conditions">
+<code class="descname">set_initial_conditions</code><span class="sig-paren">(</span><em>distribution</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jester/neus/window.html#Window.set_initial_conditions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jester.neus.window.Window.set_initial_conditions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the distribution of initial conditions to this window.</p>
 <p>This set corresponds the distribution of the process at J(0). Distribution is expected to be an iterable of entry point objects.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -550,8 +554,8 @@ contained in the partition.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="neus.window.Window.set_initial_conditions_probability">
-<code class="descname">set_initial_conditions_probability</code><span class="sig-paren">(</span><em>p</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/neus/window.html#Window.set_initial_conditions_probability"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neus.window.Window.set_initial_conditions_probability" title="Permalink to this definition">¶</a></dt>
+<dt id="jester.neus.window.Window.set_initial_conditions_probability">
+<code class="descname">set_initial_conditions_probability</code><span class="sig-paren">(</span><em>p</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jester/neus/window.html#Window.set_initial_conditions_probability"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jester.neus.window.Window.set_initial_conditions_probability" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the probability for drawing from the initial conditions.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -568,8 +572,8 @@ contained in the partition.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="neus.window.Window.update_fluxes">
-<code class="descname">update_fluxes</code><span class="sig-paren">(</span><em>fluxes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/neus/window.html#Window.update_fluxes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neus.window.Window.update_fluxes" title="Permalink to this definition">¶</a></dt>
+<dt id="jester.neus.window.Window.update_fluxes">
+<code class="descname">update_fluxes</code><span class="sig-paren">(</span><em>fluxes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jester/neus/window.html#Window.update_fluxes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jester.neus.window.Window.update_fluxes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set neighbor fluxes.</p>
 <p>Sets the array of fluxes observed from the neighboring windows.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -589,16 +593,16 @@ contained in the partition.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-neus.pyramid">
-<span id="pyramid-module-api"></span><h2>Pyramid Module API<a class="headerlink" href="#module-neus.pyramid" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-jester.neus.pyramid">
+<span id="pyramid-module-api"></span><h2>Pyramid Module API<a class="headerlink" href="#module-jester.neus.pyramid" title="Permalink to this headline">¶</a></h2>
 <p>Class definition for Pyramid shaped window. Inherets from Window.</p>
 <dl class="class">
-<dt id="neus.pyramid.Pyramid">
-<em class="property">class </em><code class="descclassname">neus.pyramid.</code><code class="descname">Pyramid</code><span class="sig-paren">(</span><em>center</em>, <em>width</em>, <em>ref_center=None</em>, <em>ref_width=None</em>, <em>time=None</em>, <em>periodic_length=None</em>, <em>max_list_size=100</em>, <em>initial_conditions=[]</em>, <em>initial_conditions_probability=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/neus/pyramid.html#Pyramid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neus.pyramid.Pyramid" title="Permalink to this definition">¶</a></dt>
+<dt id="jester.neus.pyramid.Pyramid">
+<em class="property">class </em><code class="descclassname">jester.neus.pyramid.</code><code class="descname">Pyramid</code><span class="sig-paren">(</span><em>center</em>, <em>width</em>, <em>ref_center=None</em>, <em>ref_width=None</em>, <em>time=None</em>, <em>periodic_length=None</em>, <em>max_list_size=100</em>, <em>initial_conditions=[]</em>, <em>initial_conditions_probability=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jester/neus/pyramid.html#Pyramid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jester.neus.pyramid.Pyramid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class definition of Pyramid which inherits from window. Implements the pyramid shaped basis function.</p>
 <dl class="method">
-<dt id="neus.pyramid.Pyramid.__call__">
-<code class="descname">__call__</code><span class="sig-paren">(</span><em>walker</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/neus/pyramid.html#Pyramid.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neus.pyramid.Pyramid.__call__" title="Permalink to this definition">¶</a></dt>
+<dt id="jester.neus.pyramid.Pyramid.__call__">
+<code class="descname">__call__</code><span class="sig-paren">(</span><em>walker</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jester/neus/pyramid.html#Pyramid.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jester.neus.pyramid.Pyramid.__call__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the value of the support for this Pyramid object.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -621,8 +625,8 @@ contained in the partition.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="neus.pyramid.Pyramid.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>center</em>, <em>width</em>, <em>ref_center=None</em>, <em>ref_width=None</em>, <em>time=None</em>, <em>periodic_length=None</em>, <em>max_list_size=100</em>, <em>initial_conditions=[]</em>, <em>initial_conditions_probability=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/neus/pyramid.html#Pyramid.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neus.pyramid.Pyramid.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="jester.neus.pyramid.Pyramid.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>center</em>, <em>width</em>, <em>ref_center=None</em>, <em>ref_width=None</em>, <em>time=None</em>, <em>periodic_length=None</em>, <em>max_list_size=100</em>, <em>initial_conditions=[]</em>, <em>initial_conditions_probability=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jester/neus/pyramid.html#Pyramid.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jester.neus.pyramid.Pyramid.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create an intsance of the Pyramid object.</p>
 <p>Note that the width parameter refers to the maximum distance in each direction for which this window is defined to have nonzero support.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -672,8 +676,8 @@ contained in the partition.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="neus.pyramid.Pyramid.ref_indicator">
-<code class="descname">ref_indicator</code><span class="sig-paren">(</span><em>coord</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/neus/pyramid.html#Pyramid.ref_indicator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neus.pyramid.Pyramid.ref_indicator" title="Permalink to this definition">¶</a></dt>
+<dt id="jester.neus.pyramid.Pyramid.ref_indicator">
+<code class="descname">ref_indicator</code><span class="sig-paren">(</span><em>coord</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jester/neus/pyramid.html#Pyramid.ref_indicator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jester.neus.pyramid.Pyramid.ref_indicator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the value of the support for the reference phase space point.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -696,8 +700,8 @@ contained in the partition.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="neus.pyramid.Pyramid.time_indicator">
-<code class="descname">time_indicator</code><span class="sig-paren">(</span><em>time</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/neus/pyramid.html#Pyramid.time_indicator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#neus.pyramid.Pyramid.time_indicator" title="Permalink to this definition">¶</a></dt>
+<dt id="jester.neus.pyramid.Pyramid.time_indicator">
+<code class="descname">time_indicator</code><span class="sig-paren">(</span><em>time</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jester/neus/pyramid.html#Pyramid.time_indicator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jester.neus.pyramid.Pyramid.time_indicator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the indicator function on the time interval.</p>
 <p>Takes the value 1.0 if the time provided is in the time interval for which this window has nonzero support.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -723,8 +727,8 @@ contained in the partition.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-neus.entry_points">
-<span id="entry-point-module"></span><h2>Entry Point Module<a class="headerlink" href="#module-neus.entry_points" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-jester.neus.entry_points">
+<span id="entry-point-module"></span><h2>Entry Point Module<a class="headerlink" href="#module-jester.neus.entry_points" title="Permalink to this headline">¶</a></h2>
 <p>This module acts as a template for defining named tuples that store the state of a system at a particular point.</p>
 <p>The named tuple provide the following fields:</p>
 <ul class="simple">
@@ -754,16 +758,19 @@ contained in the partition.</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#partition-module-api">Partition Module API</a></li>
-<li><a class="reference internal" href="#module-neus.window">Window Module API</a></li>
-<li><a class="reference internal" href="#module-neus.pyramid">Pyramid Module API</a></li>
-<li><a class="reference internal" href="#module-neus.entry_points">Entry Point Module</a></li>
+<li><a class="reference internal" href="#module-jester.neus.window">Window Module API</a></li>
+<li><a class="reference internal" href="#module-jester.neus.pyramid">Pyramid Module API</a></li>
+<li><a class="reference internal" href="#module-jester.neus.entry_points">Entry Point Module</a></li>
 </ul>
 </li>
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="installation.html"
-                        title="previous chapter">Installation</a></p>
+  <p class="topless"><a href="walker.html"
+                        title="previous chapter">Walker API</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="testing.html"
+                        title="next chapter">Testing</a></p>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
@@ -788,7 +795,10 @@ contained in the partition.</p>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="installation.html" title="Installation"
+          <a href="testing.html" title="Testing"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="walker.html" title="Walker API"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">Enhanced Sampling Toolkit 0.1a documentation</a> &#187;</li> 
       </ul>

@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-setup(name="jester",
+setup(name="est",
       version="0.1a1",
 
       #package_dir={'applications': 'neus'},

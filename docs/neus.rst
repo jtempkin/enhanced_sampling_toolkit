@@ -3,7 +3,7 @@
 Nonequilibrium Umbrella Sampling (NEUS)
 ==========================================
 
-.. automodule:: neus
+.. automodule:: jester.neus
     :members:
 
 The NEUS toolkit provided in this package contains three modules:
@@ -22,32 +22,32 @@ NEUS Module Basic Usage
 Partition Module API
 -----------------------
 
-.. autoclass:: neus.partition.Partition
+.. autoclass:: jester.neus.partition.Partition
     :members: 
     :special-members:
 
 Window Module API
 --------------------
 
-.. automodule:: neus.window
+.. automodule:: jester.neus.window
     :members: 
 
-.. autoclass:: neus.window.Window
+.. autoclass:: jester.neus.window.Window
     :members:
     :special-members:
 
 
 Pyramid Module API
 --------------------
-.. automodule:: neus.pyramid
+.. automodule:: jester.neus.pyramid
  
-.. autoclass:: neus.pyramid.Pyramid
+.. autoclass:: jester.neus.pyramid.Pyramid
     :members: __init__, __call__, ref_indicator, time_indicator
 
 
 Entry Point Module
 ---------------------
 
-.. automodule:: neus.entry_points
+.. automodule:: jester.neus.entry_points
 
 
