@@ -5,14 +5,12 @@ install:
 	pip install .
 
 uninstall:
-	pip uninstall jester
+	pip uninstall est
 
 reinstall:
-	pip uninstall jester
+	pip uninstall est
 	pip install .
 
 install-dev:
 	pip install -e .
 
-test: 
-	py.test tests

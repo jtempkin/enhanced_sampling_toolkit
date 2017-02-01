@@ -10,3 +10,7 @@
 \.cache/
 
 build/
+
+docs/doctrees/
+
+docs/html/

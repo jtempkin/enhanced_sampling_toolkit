@@ -33,6 +33,6 @@ If this import returns no errors, the LAMMPS Walker module should be able to imp
 LAMMPS Walker API
 --------------------
 
-.. automodule:: jester.walker.lammps_walker
+.. automodule:: est.walker.lammps_walker
     :members:
 
