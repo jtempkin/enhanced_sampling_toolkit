@@ -8,5 +8,6 @@ __author__ = "Jeremy O. B. Tempkin"
 
 __all__ = [ "lammps_walker", 
             "walker_base", 
-            "openmm_walker"
+            "openmm_walker",
+            "dynamics"
             ]
