@@ -1,11 +1,31 @@
 # -*- coding: utf-8 -*-
 """
 Pytest module for unit testing the window module.
+
+Specifically, this module tests the following functionality: 
+ 
+* tests initialization of window objects and yields the correct sequence of parameters 
+ 
+* tests the initilization of the initial conditions buffers and the initial condition probability parameters  
+ 
+* tests the routines implementing the len() function 
+ 
+* tests the representation function 
+ 
+* tests routines that yield the initial conditions buffers 
+ 
+* tests the routines that set and return the flux array  
+ 
+* tests the routines that set and return the flux lists  
+ 
+* tests the correct initialization of the flux list data structure 
+ 
+* tests the routines that return entry point objects from teh flux list data stuctures 
 """
 
 import pytest
 import numpy as np
-import neus
+from est import neus
 
 
 @pytest.fixture
