@@ -11,15 +11,17 @@ This code consists of two components. The first is what we call the Walker API. 
 
 System Prerequisits:
 
-1) Python v2.7.x (v2.7.9 or higher is prefered)
+1) Python v2.7.x (v2.7.9 or higher is required.)
 
-2) LAMMPS distribution built as a shared library. To install LAMMPS see: http://lammps.sandia.gov/doc/Section_python.html
+2) LAMMPS distribution built as a shared library that is importable by the Python interpreter. To install LAMMPS see: http://lammps.sandia.gov/doc/Section_python.html
 
 3) mpi4py distribution for MPI parallelization.
 
+4) h5py, numpy, scipy are required but are easily available in most standard Python distributions. 
+
 Folders:
 
-jester - The main source code for this project. This contains the core API of the toolkit in the walker submodule. It also contains various libraries that provide high-level tools for algorithm development. 
+est - The main source code for this project. This contains the core API of the toolkit in the walker submodule. It also contains various libraries that provide high-level tools for algorithm development. 
 
 docs - documentation for the project. This folder serves to hold the build targets for the Sphinx builds. 
 
