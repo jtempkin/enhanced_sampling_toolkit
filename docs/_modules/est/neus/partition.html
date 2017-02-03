@@ -1,0 +1,225 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>est.neus.partition &#8212; Enhanced Sampling Toolkit 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/pyramid.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Neuton&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nobile:regular,italic,bold,bolditalic&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
+<!--[if lte IE 6]>
+<link rel="stylesheet" href="../../../_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
+<![endif]-->
+
+  </head>
+  <body role="document">
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Enhanced Sampling Toolkit 0.1a documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for est.neus.partition</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">The partition module provides a data structure for containing a set of window instances.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">errors</span>
+
+
+<div class="viewcode-block" id="Partition"><a class="viewcode-back" href="../../../neus.html#est.neus.partition.Partition">[docs]</a><span class="k">class</span> <span class="nc">Partition</span><span class="p">:</span>
+<div class="viewcode-block" id="Partition.__init__"><a class="viewcode-back" href="../../../neus.html#est.neus.partition.Partition.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">umbrellas</span><span class="o">=</span><span class="p">[]):</span>
+        <span class="sd">&quot;&quot;&quot;Construct an instance of the partition.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_umbrellas</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># let&#39;s check to see if every object in the windows is callable.</span>
+        <span class="k">for</span> <span class="n">win</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_umbrellas</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">win</span><span class="p">,</span> <span class="s2">&quot;__call__&quot;</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Items in partition must be callable.&quot;</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_umbrellas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">win</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Partition.__getitem__"><a class="viewcode-back" href="../../../neus.html#est.neus.partition.Partition.__getitem__">[docs]</a>    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return an item in the list.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_umbrellas</span><span class="p">[</span><span class="n">key</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Partition.__setitem__"><a class="viewcode-back" href="../../../neus.html#est.neus.partition.Partition.__setitem__">[docs]</a>    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set item to value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s1">&#39;__call__&#39;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Items in partition must be callable.&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_umbrellas</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Partition.index"><a class="viewcode-back" href="../../../neus.html#est.neus.partition.Partition.index">[docs]</a>    <span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the first index in which item appears in partition.</span>
+
+<span class="sd">        Extended description.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ------------</span>
+<span class="sd">        item : obj</span>
+<span class="sd">            The window object to check for membership.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        ------------</span>
+<span class="sd">        index : int</span>
+<span class="sd">            The index of item in the list. Returns ValueError if item is not</span>
+<span class="sd">            contained in the partition.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_umbrellas</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">item</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Partition.__delitem__"><a class="viewcode-back" href="../../../neus.html#est.neus.partition.Partition.__delitem__">[docs]</a>    <span class="k">def</span> <span class="nf">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Delete window.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_umbrellas</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+        <span class="c1"># note that we really should be careful about how to ensure consistency in the window data structures here. If we delete a window in the middle of a list, we may offset the indicies of the keys for the fluxlists in other remaining windows.</span>
+        <span class="c1"># We may consider that to alter the data structure of the windows at this level will require some checks that the objects in partition can support those operations.</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Partition.__len__"><a class="viewcode-back" href="../../../neus.html#est.neus.partition.Partition.__len__">[docs]</a>    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the number of windows in the partition.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_umbrellas</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Partition.__contains__"><a class="viewcode-back" href="../../../neus.html#est.neus.partition.Partition.__contains__">[docs]</a>    <span class="k">def</span> <span class="nf">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return boolean for if the partition contains the specified item.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_umbrellas</span></div>
+
+<div class="viewcode-block" id="Partition.__iter__"><a class="viewcode-back" href="../../../neus.html#est.neus.partition.Partition.__iter__">[docs]</a>    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return an iterator for the list of basis functions.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_umbrellas</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Partition.__repr__"><a class="viewcode-back" href="../../../neus.html#est.neus.partition.Partition.__repr__">[docs]</a>    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return string representation of the partition.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="s2">&quot;partition(&quot;</span> <span class="o">+</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_umbrellas</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span></div>
+
+<div class="viewcode-block" id="Partition.append"><a class="viewcode-back" href="../../../neus.html#est.neus.partition.Partition.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Append a new value to the partition.</span>
+
+<span class="sd">        Note that this enforces that the input object is callable. Will throw an exception if value is not callable.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ------------</span>
+<span class="sd">        value : obj</span>
+<span class="sd">            A callable Python object.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s1">&#39;__call__&#39;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Items in partition must be callable.&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_umbrellas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Partition.__call__"><a class="viewcode-back" href="../../../neus.html#est.neus.partition.Partition.__call__">[docs]</a>    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a numpy array of the normalized supports of the windows at the given.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># build an array</span>
+        <span class="n">indicators</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="n">win</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span> <span class="k">for</span> <span class="n">win</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">])</span>
+
+        <span class="c1"># raise a support error if the coordinates provided have zero support on the partition.</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">indicators</span><span class="p">)</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">SupportError</span><span class="p">(</span><span class="s2">&quot;The coordinates provided to partition instace had zero support on the partition.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># return the normalized values of the windows as an array.</span>
+        <span class="k">return</span> <span class="n">indicators</span> <span class="o">/</span> <span class="n">indicators</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Enhanced Sampling Toolkit 0.1a documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2015, Jeremy O. B. Tempkin.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>
