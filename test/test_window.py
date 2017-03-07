@@ -20,7 +20,7 @@ Specifically, this module tests the following functionality:
  
 * tests the correct initialization of the flux list data structure 
  
-* tests the routines that return entry point objects from teh flux list data stuctures 
+* tests the routines that return entry point objects from the flux list data structures
 """
 
 import pytest
@@ -32,13 +32,16 @@ from est import neus
 def setup():
     """Sets up some structures and lists useful for the remaining test.
     """
+    
+    # let's create a window instance
+	window = neus.window.Window([1.0, 1.0], [0.1, 0.1])
 
 
 def test_initialization():
     """This routine tests that the initialization routine returns a BF object with the correct parameters.s
     """
 
-    window = neus.window.Window([1.0, 1.0], [0.1, 0.1])
+    #window = neus.window.Window([1.0, 1.0], [0.1, 0.1])
 
     assert isinstance(window, neus.window.Window), "Object returned did not match expected type."
 
@@ -52,3 +55,10 @@ def test_initialization():
 def test_fluxlists():
     """Test the behavior of the routines associated with the flux lists.
     """
+
+
+def test_window_len()
+	"""Test the behavior of the window length function.
+	"""
+
+def test_window_bool()
