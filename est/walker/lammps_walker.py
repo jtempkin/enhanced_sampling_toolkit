@@ -187,7 +187,7 @@ class Lammps(walker):
         cv = self.colvars[-1]
 
         # first set the group for the colvar
-        #self.command("group " + cv.name + " id " + " ".join(map(str,cv.atomIDs)))
+        self.command("group " + cv.name + " id " + " ".join(map(str,cv.atomIDs)))
 
         # now set the appropriate colvar as a compute to LAMMPS
         if cv.type == 'bond':
