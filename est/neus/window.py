@@ -81,7 +81,7 @@ class Window:
             self.wrapping = None
 
         # set initial t=0 distribution and probability with which to draw from this distribution
-        self.initial_conditions = initial_conditions
+        self.initial_conditions = copy.deepcopy(initial_conditions)
         self.initial_conditions_probability = 0.0
 
         # store maximum size of flux list
@@ -269,6 +269,14 @@ class Window:
         assert p >= 0.0, "Probability is not valid."
 
         self.initial_conditions_probability = p
+
+        return None
+
+    def update_initial_conditions(self, items):
+        """Adds elements of items to initial conditions array
+        """
+        for i in items:
+            self.initial_conditions.append(items)
 
         return None
 
