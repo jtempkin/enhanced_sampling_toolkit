@@ -8,45 +8,41 @@ Nonequilibrium Umbrella Sampling (NEUS)
 
 The NEUS toolkit provided in this package contains three modules:
 
-* A module called Window that implements the data structures and routines that represent a single spatiotemporal discretization in the NEUS scheme. An instance of the Window object corresponds to a single value of the :math:`J^{(t)}` process.
-* A module called partition acts as a collection of these windows objects that expresses the full :math:`J^{(t)}` index space.
-* A module called entry points that provides a named tuple for storing phase space points as elements in the :math:`\tilde \gamma_{ij}`
+* A module called Window that implements the data structures and routines that
+  represent a single spatiotemporal discretization in the NEUS scheme. An
+  instance of the Window object corresponds to a single value of the
+  :math:`J^{(t)}` process.
+* A module called partition acts as a collection of these windows objects that
+  expresses the full :math:`J^{(t)}` index space.
+* A module called entry points that provides a named tuple for storing phase
+  space points as elements in the :math:`\tilde \gamma_{ij}`
 
-Below we describe the basic usage of the NEUS toolkit. Please see the Jupyter notebooks provided in the data folder for an interactive version.
+Below we describe the basic usage of the NEUS toolkit. Please see the Jupyter
+notebooks provided in the data folder for an interactive version.
 
-NEUS Module Basic Usage
---------------------------------
+NEUS Module Basic Usage --------------------------------
 
 .. include:: NEUS-basic-usage.rst
 
-Partition Module API
------------------------
+Partition Module API -----------------------
 
-.. autoclass:: est.neus.partition.Partition
-    :members: 
-    :special-members:
+.. autoclass:: est.neus.partition.Partition :members: :special-members:
 
-Window Module API
---------------------
+Window Module API --------------------
 
-.. automodule:: est.neus.window
-    :members: 
+.. automodule:: est.neus.window :members: 
 
-.. autoclass:: est.neus.window.Window
-    :members:
-    :special-members:
+.. autoclass:: est.neus.window.Window :members: :special-members:
 
 
-Pyramid Module API
---------------------
+Pyramid Module API --------------------
 .. automodule:: est.neus.pyramid
  
-.. autoclass:: est.neus.pyramid.Pyramid
-    :members: __init__, __call__, ref_indicator, time_indicator
+.. autoclass:: est.neus.pyramid.Pyramid :members: __init__, __call__,
+ref_indicator, time_indicator
 
 
-Entry Point Module
----------------------
+Entry Point Module ---------------------
 
 .. automodule:: est.neus.entry_points
 
